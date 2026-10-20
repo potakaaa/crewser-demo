@@ -1,6 +1,6 @@
 import { contract, notes, project, today, workdays } from '../mock';
 import type { ApprovalStatus, DayKind, WorkDay } from '../mock';
-import { addDays, fmtDayMonth, fmtDayShort, isoWeek, mondayOf, rangeLabel, toMinutes, weekday } from './dates';
+import { addDays, fmtDayShort, isoWeek, mondayOf, rangeLabel, toMinutes, weekday } from './dates';
 
 /** 10.25 → "10.25", 12.0 → "12", 7.50 → "7.5" */
 export const fmtH = (n: number) => String(Math.round(n * 100) / 100);
@@ -19,8 +19,6 @@ const overlap = (a0: number, a1: number, b0: number, b1: number) => Math.max(0, 
 /** Night work counts from 22:00 to 06:00. */
 const NIGHT_FROM = 22 * 60;
 const NIGHT_TO = 6 * 60;
-/** The break is placed after six hours of work (the latest the law allows). */
-export const BREAK_AFTER_MIN = 6 * 60;
 
 export const hourlyRate = contract.dailyRate / project.dailyTargetHours;
 
@@ -248,32 +246,11 @@ export function computeStats(period: Period, submitted: string[] = []): PeriodSt
 /** Home's week card and the default Statistics view. */
 export const weekStats = computeStats({ kind: 'week', monday: LAST_WEEK });
 
-export interface Deltas {
-  total: number;
-  overtime: number;
-  average: number;
-  night: number;
-}
-
-/** Change against the week before; null when there is nothing to compare with. */
-export function weekDeltas(s: PeriodStats, submitted: string[] = []): Deltas | null {
+/** Hours worked the week before, for the "Last week" line; null when there is no such week. */
+export function previousWeekTotal(s: PeriodStats, submitted: string[] = []): number | null {
   if (s.period.kind !== 'week') return null;
   const prev = computeStats({ kind: 'week', monday: addDays(s.period.monday, -7) }, submitted);
-  if (!prev.hasData || !s.hasData) return null;
-  return { total: s.total - prev.total, overtime: s.overtime - prev.overtime, average: s.average - prev.average, night: s.night - prev.night };
-}
-
-/** "+7.5 h" · "−1.25 h" · "same" */
-export const fmtDelta = (n: number) => (Math.abs(n) < 0.005 ? 'same' : `${n > 0 ? '+' : '−'}${fmtH(Math.abs(n))} h`);
-
-/** One-line readout for the selected bar. */
-export function dayReadout(d: DayStat) {
-  const title = `${fmtDayMonth(d.date)} · ${d.worked ? fmtH(d.hours) + ' h worked' : 'day off'}`;
-  if (!d.worked) return { title, detail: 'Nothing logged for this day.' };
-  const parts = [`${fmtH(d.regular)} h regular`];
-  if (d.overtime) parts.push(`${fmtH(d.overtime)} h overtime`);
-  if (d.night) parts.push(`${fmtH(d.night)} h at night`);
-  return { title, detail: parts.join(', ') + '.' };
+  return prev.hasData ? prev.total : null;
 }
 
 /** "22:00–00:30" for the night part of a shift. */
@@ -301,22 +278,4 @@ export function planSentence(breakMin: number) {
       ? `exactly your ${project.dailyTargetHours} h target`
       : `${fmtH(Math.abs(diff))} h ${diff > 0 ? 'over' : 'under'} your ${project.dailyTargetHours} h target`;
   return `Planned ${p.call}–${p.wrap} is ${fmtH(p.net)} h after the break, ${tail}.`;
-}
-
-export function insightText(s: PeriodStats, breakMin: number) {
-  const head = s.allOverTarget
-    ? `Every worked day went past ${s.dailyTarget} h`
-    : `${s.overtimeDays.length} of ${s.workedDays} worked days went past ${s.dailyTarget} h`;
-  const l = s.longest;
-  let body = `Longest was ${l.short} at ${fmtH(l.hours)} h${l.night ? `, with ${fmtH(l.night)} h at night` : ''}.`;
-  const sr = s.shortRests[0];
-  if (sr) body += ` Rest was short once: ${fmtH(sr.hours)} h between ${sr.from.short} and ${sr.to.short}.`;
-  const p = todayPlan(breakMin);
-  if (p.wrap && (s.period.kind === 'project' || s.period.monday === LAST_WEEK)) {
-    body +=
-      p.overTarget > 0
-        ? ` Today runs ${p.call} to ${p.wrap}, about ${fmtH(p.overTarget)} h more after your break.`
-        : ` Today runs ${p.call} to ${p.wrap}, within your target after your break.`;
-  }
-  return { head, body };
 }

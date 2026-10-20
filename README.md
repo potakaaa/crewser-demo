@@ -70,7 +70,7 @@ Stack: Vite, React 19, TypeScript, Zustand, plain CSS with variables. Icons: Hug
 ## How the data drives the UI
 
 - **Statistics** (`lib/stats.ts`): every logged day in `workdays` has start, end, break and approval status. Hours, overtime (past the 10 h target), night hours (22:00–06:00), rest between shifts (11 h minimum) and the pay estimate (`contract`) are all derived from those times. For CW 42 that gives 67.5 h, +7.5 h overtime, an 11.25 h average, 3.5 h at night, one 10.5 h rest and ~€3,066. The camera-prep days the week before give "vs last week" something to compare against. The project view covers prep plus shoot.
-- **Statistics screen:** Week/Project switch with week paging, a shift timeline for the tapped day, and drill-down sheets for overtime, average, night, rest, approvals and pay. Submitting a day moves it from *Not submitted* to *Waiting*.
+- **Statistics screen:** Week/Project switch with week paging. The hours chart marks overtime in lime and night work with a dot under the day; tapping a bar shows that day's times as plain figures. Below it, each tile shows one number and one sentence (overtime, hours per day, night, rest, approvals, pay); tapping a tile opens the day-by-day breakdown. Submitting a day moves it from *Not submitted* to *Waiting*.
 - **Smart notes** (`lib/notes.ts`):
   - **Next-up card:** the next shoot-day call today.
   - **Top three content cards:** the next timed appointments, flights and hotels ("call times and travel first").
