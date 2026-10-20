@@ -1,0 +1,348 @@
+/* Desktop page: caption + controls beside a centred iPhone 16 (393 × 852 viewport). */
+.page {
+  height: 100%;
+  display: flex;
+  padding: 16px 24px;
+}
+
+.stage {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 56px;
+}
+
+.side-wrap {
+  flex: none;
+  width: 260px;
+  position: relative;
+  z-index: 5;
+}
+
+.device-slot {
+  position: relative;
+  flex: none;
+}
+
+.device {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  border-radius: 58px;
+  padding: 12px;
+  background: #0b0f10;
+  box-shadow:
+    0 0 0 1.5px #3a4446,
+    0 0 0 3px #1a2022,
+    0 40px 80px rgba(17, 26, 27, 0.22),
+    0 12px 28px rgba(17, 26, 27, 0.16);
+}
+
+.device-screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 46px;
+  background: var(--sheet);
+  isolation: isolate;
+}
+
+.hw {
+  position: absolute;
+  width: 4px;
+  background: #2a3234;
+  border-radius: 2px;
+}
+.hw-action {
+  left: -5px;
+  top: 128px;
+  height: 32px;
+}
+.hw-vol-up {
+  left: -5px;
+  top: 186px;
+  height: 58px;
+}
+.hw-vol-down {
+  left: -5px;
+  top: 258px;
+  height: 58px;
+}
+.hw-power {
+  right: -5px;
+  top: 214px;
+  height: 92px;
+}
+.hw-camera {
+  right: -5px;
+  top: 560px;
+  height: 52px;
+  border-radius: 2px;
+}
+
+.island {
+  position: absolute;
+  z-index: 60;
+  top: 11px;
+  left: 50%;
+  width: 124px;
+  height: 36px;
+  margin-left: -62px;
+  border-radius: 18px;
+  background: #000;
+  pointer-events: none;
+}
+
+.statusbar {
+  position: absolute;
+  z-index: 55;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 30px 0 46px;
+  pointer-events: none;
+  transition: color 200ms ease;
+}
+
+.sb-time {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sb-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-indicator {
+  position: absolute;
+  z-index: 60;
+  bottom: 8px;
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  margin-left: -67px;
+  border-radius: 3px;
+  pointer-events: none;
+  transition: background 200ms ease;
+}
+.home-indicator.dark {
+  background: rgba(17, 26, 27, 0.85);
+}
+.home-indicator.light {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Side column */
+.side {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--page-text);
+}
+
+.caption {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.caption-mark {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 5px;
+  background: var(--lime);
+  box-shadow: 0 0 0 3px var(--dark-tile);
+}
+
+.caption-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.caption-sub {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--page-text-2);
+}
+
+.side-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.side-btn {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--r-control);
+  background: var(--page-panel);
+  color: var(--page-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.side-btn[aria-expanded='true'] {
+  border-color: var(--page-text);
+}
+
+.demo-panel {
+  padding: 14px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--r-card);
+  background: var(--page-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.demo-panel[hidden] {
+  display: none;
+}
+
+.dp-h {
+  margin: 4px 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--page-text-2);
+}
+
+.dp-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.dp-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.dp-switch {
+  flex: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  background: rgba(127, 140, 142, 0.45);
+  transition: background 180ms ease;
+}
+
+.dp-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 180ms ease;
+}
+
+.dp-toggle input:checked + .dp-switch {
+  background: var(--teal);
+}
+
+.dp-toggle input:checked + .dp-switch::after {
+  transform: translateX(18px);
+}
+
+.dp-toggle input:focus-visible + .dp-switch {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dp-toggle-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dp-toggle-text small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--page-text-2);
+}
+
+.dp-jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dp-jump {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--page-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Narrow desktop / tablet: controls go above the phone. */
+@media (max-width: 820px) {
+  .page {
+    padding: 12px 16px;
+  }
+  .stage-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .side-wrap {
+    width: min(520px, calc(100vw - 32px));
+  }
+  .side {
+    gap: 10px;
+  }
+  .demo-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    box-shadow: 0 20px 40px rgba(17, 26, 27, 0.2);
+  }
+}
+
+/* Real phones: no frame, the app is the whole screen. */
+.phone-root {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  background: var(--sheet);
+}

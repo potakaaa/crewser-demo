@@ -1,0 +1,65 @@
+/* Crewser crew app v3 design tokens. Radii: 10 px controls, 18 px cards/bars/sheets. Nothing else. */
+:root {
+  --ink: #111a1b;
+  --text-2: #3f5155;
+  --text-3: #54686c;
+  --sheet: #f2f5f4;
+  --card: #ffffff;
+  --hairline: rgba(17, 26, 27, 0.08);
+  --chip: #e6edec;
+  --chip-icon: #2a3b3f;
+  --soft: #edf2f1;
+  --dark-tile: #1e282a;
+  --lime: #dbf227;
+  --on-lime-2: #2b3300;
+
+  --data-regular: #7fa1a8;
+  --data-night-dark: #8a93e8;
+  --teal: #2c6b72;
+  --night: #5a63d6;
+  --night-text: #4a53c0;
+
+  --amber-surface: #fbefd0;
+  --amber-border: #e3c36a;
+  --amber-text: #6b4a00;
+  --amber-dark: #f4c35a;
+
+  --on-dark-2: #c4cfd0;
+  --on-dark-3: #a9b7b9;
+
+  --dashed: 1.5px dashed rgba(17, 26, 27, 0.28);
+  --r-control: 10px;
+  --r-card: 18px;
+
+  --header-gradient: linear-gradient(180deg, #141d1e 0%, #1f3a3d 55%, #2d5559 100%);
+  --header-glow: radial-gradient(circle at 92% 0%, rgba(219, 242, 39, 0.16), rgba(219, 242, 39, 0) 45%);
+
+  --focus: #2c6b72;
+  --font: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bebas Neue', 'Arial Narrow', sans-serif;
+
+  /* Page around the phone (desktop only). */
+  --page-bg: #e7eaea;
+  --page-text: #111a1b;
+  --page-text-2: #3f5155;
+  --page-panel: #ffffff;
+  --page-line: rgba(17, 26, 27, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --page-bg: #161c1d;
+    --page-text: #eaefee;
+    --page-text-2: #a9b7b9;
+    --page-panel: #1e282a;
+    --page-line: rgba(255, 255, 255, 0.14);
+  }
+}
+
+:root[data-theme='dark'] {
+  --page-bg: #161c1d;
+  --page-text: #eaefee;
+  --page-text-2: #a9b7b9;
+  --page-panel: #1e282a;
+  --page-line: rgba(255, 255, 255, 0.14);
+}
