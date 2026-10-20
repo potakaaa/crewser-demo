@@ -1,15 +1,31 @@
-import type { PdfDoc, Person, Project, Today, WorkDay } from './types';
+import type { Contract, PdfDoc, Person, Project, Today, WorkDay } from './types';
 
-/** Last 7 days, Mon 12 – Sun 18 Oct. Every statistic is derived from this array. */
-export const week: WorkDay[] = [
-  { date: '2026-10-12', hours: 10.25, night: 0 },
-  { date: '2026-10-13', hours: 11.5, night: 0 },
-  { date: '2026-10-14', hours: 12.0, night: 0 },
-  { date: '2026-10-15', hours: 10.5, night: 0 },
-  { date: '2026-10-16', hours: 12.5, night: 2.5 },
-  { date: '2026-10-17', hours: 0, night: 0 },
-  { date: '2026-10-18', hours: 10.75, night: 1.0 },
+/**
+ * Every logged day so far: camera prep at the rental house, then shoot days 1–6.
+ * Sat 17 is the day off. Hours per shoot day: Mon 10.25 · Tue 11.5 · Wed 12 ·
+ * Thu 10.5 · Fri 12.5 (2.5 at night) · Sun 10.75 (1 at night).
+ */
+export const workdays: WorkDay[] = [
+  { date: '2026-10-07', kind: 'prep', start: '09:00', end: '18:30', breakMin: 30, status: 'approved' },
+  { date: '2026-10-08', kind: 'prep', start: '09:00', end: '19:00', breakMin: 30, status: 'approved' },
+  { date: '2026-10-09', kind: 'prep', start: '08:30', end: '19:00', breakMin: 30, status: 'approved' },
+  { date: '2026-10-12', kind: 'shoot', start: '07:00', end: '18:00', breakMin: 45, status: 'approved' },
+  { date: '2026-10-13', kind: 'shoot', start: '07:00', end: '19:30', breakMin: 60, status: 'approved' },
+  { date: '2026-10-14', kind: 'shoot', start: '06:00', end: '18:30', breakMin: 30, status: 'approved' },
+  { date: '2026-10-15', kind: 'shoot', start: '08:00', end: '19:00', breakMin: 30, status: 'approved' },
+  { date: '2026-10-16', kind: 'shoot', start: '11:30', end: '00:30', breakMin: 30, status: 'submitted' },
+  { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '23:00', breakMin: 30, status: 'draft' },
 ];
+
+export const contract: Contract = {
+  currency: 'EUR',
+  dailyRate: 420,
+  overtimeRate: 1.5,
+  nightSurcharge: 0.5,
+  perDiem: 26.4,
+  perDiemFrom: '2026-10-21',
+  minRestHours: 11,
+};
 
 export const person: Person = {
   firstName: 'Florentina',

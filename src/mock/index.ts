@@ -1,3 +1,3 @@
 export * from './types';
 export { notes, noteById } from './notes';
-export { week, person, project, today, pdfs } from './data';
+export { workdays, contract, person, project, today, pdfs } from './data';

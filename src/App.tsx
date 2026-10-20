@@ -4,6 +4,7 @@ import { DeviceFrame } from './components/Device';
 import { DemoPanel } from './components/DemoPanel';
 import { TabBar } from './components/TabBar';
 import { LogSheet } from './components/LogSheet';
+import { StatSheets } from './components/StatSheets';
 import { Toast } from './components/Toast';
 import { ScreenStack } from './components/ScreenStack';
 import { Splash } from './components/Brand';
@@ -48,15 +49,17 @@ function AppShell() {
   const route = useRoute();
   const logOpen = useDemo((s) => s.logOpen);
   const splash = useDemo((s) => s.splash);
+  const sheet = useDemo((s) => s.statsSheet);
   const tabs = isTab(route);
   return (
     <div className="app">
-      <div className="app-content" inert={logOpen || splash}>
+      <div className="app-content" inert={logOpen || splash || sheet !== null}>
         <ScreenStack render={(r) => <Screen route={r} />} />
         <TabBar hidden={!tabs} />
       </div>
       <Toast raised={tabs} />
       <LogSheet />
+      <StatSheets />
       {splash && <Splash />}
     </div>
   );

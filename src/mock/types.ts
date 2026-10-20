@@ -59,13 +59,42 @@ export interface Note {
   primaryAction?: PrimaryAction;
 }
 
+export type DayKind = 'prep' | 'shoot';
+
+/** approved by production · submitted and waiting · logged but not sent yet */
+export type ApprovalStatus = 'approved' | 'submitted' | 'draft';
+
+/**
+ * One logged working day. Hours, overtime, night hours and rest are all derived
+ * from start, end and break, so they can never disagree with each other.
+ */
 export interface WorkDay {
   /** ISO date "YYYY-MM-DD" */
   date: string;
-  /** Hours worked after breaks; 0 = day off. */
-  hours: number;
-  /** Part of `hours` that counts as night work. */
-  night: number;
+  kind: DayKind;
+  /** "HH:MM" */
+  start: string;
+  /** "HH:MM"; earlier than start means after midnight. */
+  end: string;
+  breakMin: number;
+  status: ApprovalStatus;
+}
+
+/** Deal-memo numbers used for the pay estimate. */
+export interface Contract {
+  currency: 'EUR';
+  /** Pay for one day at the daily target. */
+  dailyRate: number;
+  /** Multiplier on the hourly rate for hours past the daily target (1.5 = 150 %). */
+  overtimeRate: number;
+  /** Extra on the hourly rate for night hours, 22:00–06:00 (0.5 = +50 %). */
+  nightSurcharge: number;
+  /** Per diem per day away from home. */
+  perDiem: number;
+  /** First day per diem is paid (travel to Madeira). */
+  perDiemFrom: string;
+  /** Minimum rest between two shifts, in hours. */
+  minRestHours: number;
 }
 
 export interface Person {
