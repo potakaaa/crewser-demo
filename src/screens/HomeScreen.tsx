@@ -35,10 +35,13 @@ function NextUpCard({ note }: { note: Note }) {
             <span className="nextup-t2">Call{wrap ? ` · wrap ${wrap}` : ''}</span>
           </span>
         </div>
-        <span className="nextup-pin">
+        <div className="nextup-pin">
           <Icon name="pin" size={16} color="#3F5155" />
-          {place}
-        </span>
+          <span className="nextup-place">{place}</span>
+          <button type="button" className="icon-btn icon-btn-chip copy-btn copy-btn-sm" aria-label={`Copy address: ${place}`} onClick={() => a.copy(place)}>
+            <Icon name="copy" size={17} color="#111A1B" />
+          </button>
+        </div>
         <div className="btn-row">
           <button type="button" className="btn btn-soft" onClick={() => a.openNote(note.id)}>
             Details

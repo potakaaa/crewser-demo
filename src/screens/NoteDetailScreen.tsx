@@ -4,7 +4,9 @@ import { Icon } from '../components/Icon';
 import { Sheet } from '../components/Layout';
 import { TYPE_COLOR } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
-import { timeSub, timeText, TYPE_LABEL, whenLabel } from '../lib/notes';
+import { FactActions } from '../components/NoteCards';
+import { QrPreview } from '../components/QrPreview';
+import { hasScanCode, timeSub, timeText, TYPE_LABEL, whenLabel } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 
 export function NoteDetailScreen({ id }: { id: string }) {
@@ -75,6 +77,7 @@ export function NoteDetailScreen({ id }: { id: string }) {
               </div>
             </div>
           )}
+          {hasScanCode(note) && <QrPreview note={note} />}
           {note.facts.length > 0 && (
             <div className="facts-card">
               {note.facts.map((f) => (
@@ -83,16 +86,7 @@ export function NoteDetailScreen({ id }: { id: string }) {
                     <span className="tile-k">{f.label}</span>
                     <span className={`fact-v${f.unconfirmed ? ' muted' : ''}`}>{f.value}</span>
                   </span>
-                  {f.action && (
-                    <button
-                      type="button"
-                      className="icon-btn icon-btn-chip"
-                      aria-label={f.action === 'map' ? `Open in maps: ${f.value}` : `Copy ${f.label}: ${f.value}`}
-                      onClick={() => (f.action === 'map' ? a.map(f.value) : a.copy(f.value))}
-                    >
-                      <Icon name={f.action === 'map' ? 'nav' : 'copy'} size={18} color="#111A1B" />
-                    </button>
-                  )}
+                  <FactActions fact={f} />
                 </div>
               ))}
             </div>

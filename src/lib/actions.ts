@@ -13,7 +13,7 @@ export function useNoteActions() {
     } catch {
       // Clipboard can be blocked (insecure context, permissions). The demo still confirms.
     }
-    toast('Copied');
+    toast(`Copied “${value}”`);
   };
 
   const openPdf = (file: string) => navigate({ name: 'pdf', file });

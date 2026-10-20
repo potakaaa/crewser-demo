@@ -35,6 +35,9 @@ export function quickAction(n: Note): 'ticket' | 'pdf' | null {
   return n.type === 'flight' ? 'ticket' : 'pdf';
 }
 
+/** Notes whose ticket carries a scannable code (shown as a QR preview). */
+export const hasScanCode = (n: Note) => quickAction(n) === 'ticket';
+
 /** Call times and travel come first. */
 const PRIORITY_TYPES: NoteType[] = ['appointment', 'flight', 'hotel'];
 
@@ -67,7 +70,9 @@ export function smartNotes(list: Note[] = allNotes): SmartNotes {
 
 /** Second line of a content card, e.g. "Appointment · tomorrow" or "Flight · OS487 · Vienna → Funchal". */
 export function cardSubtitle(n: Note) {
-  const detail = n.type === 'flight' ? n.subtitle : n.timeNote ? n.timeNote.toLowerCase() : n.day ? relativeDay(n.day, today.date) : '';
+  // Flights show the full route instead of the type: the coloured chip already says "flight".
+  if (n.type === 'flight') return n.subtitle;
+  const detail = n.timeNote ? n.timeNote.toLowerCase() : n.day ? relativeDay(n.day, today.date) : '';
   return `${TYPE_LABEL[n.type]} · ${detail}`;
 }
 
@@ -87,7 +92,8 @@ export interface CardTile {
  */
 export function cardTiles(n: Note): CardTile[] {
   const actionable = (f: Fact) => !!f.action || !!f.unconfirmed;
-  const att = n.attachments[0];
+  // A ticket with a code gets its own QR preview instead of an attachment tile.
+  const att = hasScanCode(n) ? undefined : n.attachments[0];
   const slots = att ? 2 : 3;
   const chosen = n.facts.filter(actionable).slice(0, slots);
   for (const f of n.facts) {

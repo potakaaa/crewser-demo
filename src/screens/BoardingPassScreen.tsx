@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
 import { noteById, person } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from '../components/Icon';
 import { useNoteActions } from '../lib/actions';
 import { fmtDayMonth } from '../lib/dates';
-import { fakeQr, qrPath, QR_SIZE } from '../lib/qr';
+import { QrCode } from '../components/QrPreview';
 
 const flight = noteById('fl')!;
 const flightNo = flight.facts.find((f) => f.label === 'Flight no.')?.value ?? '';
@@ -19,7 +18,6 @@ export function BoardingPassScreen() {
 function BoardingPass() {
   const back = useDemo((s) => s.back);
   const a = useNoteActions();
-  const path = useMemo(() => qrPath(fakeQr()), []);
   return (
     <div className="screen screen-col screen-white">
       <div className="topbar">
@@ -31,9 +29,14 @@ function BoardingPass() {
       </div>
       <div className="bp-body">
         <div className="bp-flight">
-          <span className="bp-meta">
-            {flightNo} · {fmtDayMonth(flight.day!)}
-          </span>
+          <div className="bp-meta-row">
+            <span className="bp-meta">
+              {flightNo} · {fmtDayMonth(flight.day!)}
+            </span>
+            <button type="button" className="icon-btn icon-btn-chip copy-btn copy-btn-sm" aria-label={`Copy flight number ${flightNo}`} onClick={() => a.copy(flightNo)}>
+              <Icon name="copy" size={17} color="#0E1314" />
+            </button>
+          </div>
           <div className="route">
             <div>
               <span className="route-code route-code-md">{route.from.code}</span>
@@ -53,17 +56,7 @@ function BoardingPass() {
           <strong>{person.displayName}</strong>
         </div>
         <div className="qr-wrap">
-          <svg
-            role="img"
-            aria-label={`Scannable code from ${ticketFile}`}
-            width={QR_SIZE * 9}
-            height={QR_SIZE * 9}
-            viewBox={`0 0 ${QR_SIZE} ${QR_SIZE}`}
-            shapeRendering="crispEdges"
-          >
-            <rect width={QR_SIZE} height={QR_SIZE} fill="#FFFFFF" />
-            <path d={path} fill="#0E1314" />
-          </svg>
+          <QrCode size={232} label={`Scannable code from ${ticketFile}`} />
         </div>
         <span className="bp-source">Code from {ticketFile}</span>
         <div className="bp-chips">
