@@ -36,7 +36,7 @@ export function BottomSheet(props: Props) {
     const t = window.setTimeout(() => {
       setMounted(false);
       setClosing(false);
-      opener.current?.focus?.();
+      opener.current?.focus?.({ preventScroll: true });
     }, CLOSE_MS);
     return () => window.clearTimeout(t);
   }, [props.open, mounted]);
@@ -50,7 +50,7 @@ function SheetBody({ onClose, title, subtitle, children, closing }: Props & { cl
   const titleId = useRef(`sheet-${Math.random().toString(36).slice(2, 8)}`).current;
 
   useEffect(() => {
-    ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus();
+    ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true });
   }, []);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -65,10 +65,10 @@ function SheetBody({ onClose, title, subtitle, children, closing }: Props & { cl
     const last = items[items.length - 1];
     if (e.shiftKey && document.activeElement === first) {
       e.preventDefault();
-      last.focus();
+      last.focus({ preventScroll: true });
     } else if (!e.shiftKey && document.activeElement === last) {
       e.preventDefault();
-      first.focus();
+      first.focus({ preventScroll: true });
     }
   };
 
