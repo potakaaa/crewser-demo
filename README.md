@@ -55,7 +55,7 @@ src/
   store.ts      Zustand store: in-memory state, hash routing with a back-stack
 ```
 
-Stack: Vite, React 19, TypeScript, Zustand, plain CSS with variables. Icons: Hugeicons Stroke Rounded (free set). Fonts: DM Sans and Bebas Neue (stand-in for Tallica), self-hosted via `@fontsource`, so the page makes no third-party requests.
+Stack: Vite, React 19, TypeScript, Zustand, plain CSS with variables. Icons: Hugeicons Stroke Rounded (free set). Font: Inter (400/500/600), self-hosted via `@fontsource`, so the page makes no third-party requests.
 
 ## How the data drives the UI
 

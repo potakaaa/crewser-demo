@@ -35,8 +35,30 @@
   --header-glow: radial-gradient(circle at 92% 0%, rgba(219, 242, 39, 0.16), rgba(219, 242, 39, 0) 45%);
 
   --focus: #2c6b72;
-  --font: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Bebas Neue', 'Arial Narrow', sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-display: var(--font);
+
+  /* Type: small, calm, medium-weight. Big numbers get tight tracking. */
+  --fs-xs: 11px; /* labels, chips, chart ticks */
+  --fs-sm: 12px; /* secondary lines */
+  --fs-md: 13px; /* body, buttons */
+  --fs-base: 14px; /* titles in cards, values */
+  --fs-lg: 16px; /* section titles */
+  --fs-xl: 20px;
+  --fs-2xl: 24px; /* screen titles */
+  --fs-3xl: 28px; /* tile numbers */
+  --fs-4xl: 34px; /* hero numbers */
+  --fs-5xl: 40px;
+  --track-tight: -0.02em;
+
+  /* Spacing steps */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
 
   /* Page around the phone (desktop only). */
   --page-bg: #e7eaea;

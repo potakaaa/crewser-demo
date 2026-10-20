@@ -57,7 +57,7 @@ function WeekSection() {
   const s = weekStats;
   const goStats = () => navigate({ name: 'stats' });
   return (
-    <section className="stack-12" aria-label="Your week">
+    <section className="stack" aria-label="Your week">
       <SectionHead title="Your week" sub={`Last 7 days · ${s.rangeLabel}`} link="All statistics" onLink={goStats} />
       <button type="button" className="week-card" onClick={goStats} aria-label={`${s.summary} ${fmtH(s.total)} h worked, ${fmtH(s.overTarget)} h over target. Open statistics.`}>
         <span className="week-top">
@@ -149,7 +149,7 @@ export function HomeScreen() {
         </button>
 
         {sn.top.length > 0 ? (
-          <section className="stack-12" aria-label="Smart notes">
+          <section className="stack" aria-label="Smart notes">
             <SectionHead title="Smart notes" sub="Call times and travel first, then the rest." link="Calendar" onLink={() => navigate({ name: 'calendar' })} />
             {sn.top.map((n) => (
               <ContentCard key={n.id} note={n} />
@@ -157,7 +157,7 @@ export function HomeScreen() {
             {sn.restCount > 0 && (
               <>
                 <Collapse open={allOpen} id="more-notes">
-                  <div className="stack-12">
+                  <div className="stack">
                     {sn.rest.map((g) => (
                       <div className="day-group" key={g.label}>
                         <span className="day-group-h">
