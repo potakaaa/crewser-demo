@@ -2,6 +2,7 @@ import { noteById } from '../mock';
 import { useDemo, usePrevRoute } from '../store';
 import { Icon } from '../components/Icon';
 import { Sheet } from '../components/Layout';
+import { TYPE_COLOR } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
 import { timeSub, timeText, TYPE_LABEL, whenLabel } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
@@ -21,7 +22,7 @@ export function NoteDetailScreen({ id }: { id: string }) {
     <div className="screen screen-col">
       <div className="screen-scroll" ref={ref}>
         <div className="sat-band" aria-hidden="true" />
-        <header className="gh gh-detail">
+        <header className="gh grain gh-detail">
           <div className="detail-nav">
             <button type="button" className="glass-btn glass-btn-text back-btn" onClick={back}>
               <Icon name="left" size={20} color="#FFFFFF" />
@@ -30,7 +31,7 @@ export function NoteDetailScreen({ id }: { id: string }) {
           </div>
           <div className="detail-type">
             <span className="chip-icon chip-icon-glass">
-              <Icon name={note.type} size={18} color="#FFFFFF" />
+              <Icon name={note.type} size={18} color={TYPE_COLOR[note.type].dot} />
             </span>
             <span className="detail-type-text">
               <strong>{TYPE_LABEL[note.type]}</strong>

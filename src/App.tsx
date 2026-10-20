@@ -5,6 +5,8 @@ import { DemoPanel } from './components/DemoPanel';
 import { TabBar } from './components/TabBar';
 import { LogSheet } from './components/LogSheet';
 import { Toast } from './components/Toast';
+import { ScreenStack } from './components/ScreenStack';
+import { Splash } from './components/Brand';
 import { HomeScreen } from './screens/HomeScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { CalendarScreen } from './screens/CalendarScreen';
@@ -45,15 +47,17 @@ function Screen({ route }: { route: Route }) {
 function AppShell() {
   const route = useRoute();
   const logOpen = useDemo((s) => s.logOpen);
+  const splash = useDemo((s) => s.splash);
   const tabs = isTab(route);
   return (
     <div className="app">
-      <div className="app-content" inert={logOpen}>
-        <Screen key={routeToHash(route)} route={route} />
-        {tabs && <TabBar />}
+      <div className="app-content" inert={logOpen || splash}>
+        <ScreenStack render={(r) => <Screen route={r} />} />
+        <TabBar hidden={!tabs} />
       </div>
       <Toast raised={tabs} />
       <LogSheet />
+      {splash && <Splash />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDemo, type Route } from '../store';
+import { Wordmark } from './Brand';
 
 const JUMPS: { label: string; route?: Route; log?: boolean }[] = [
   { label: 'Home', route: { name: 'home' } },
@@ -38,9 +39,9 @@ export function DemoPanel() {
   return (
     <aside className="side">
       <div className="caption">
-        <span className="caption-mark" aria-hidden="true" />
+        <Wordmark tone="dark" className="caption-wordmark" />
         <div>
-          <p className="caption-title">Crewser crew app · prototype with mock data</p>
+          <p className="caption-title">Crew app · prototype with mock data</p>
           <p className="caption-sub">Crew v3 · Mon 19 Oct 2026, 08:40 · nothing here is live.</p>
         </div>
       </div>

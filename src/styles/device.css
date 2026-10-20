@@ -159,18 +159,15 @@
 
 .caption {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.caption-mark {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  margin-top: 6px;
-  border-radius: 5px;
-  background: var(--lime);
-  box-shadow: 0 0 0 3px var(--dark-tile);
+.caption-wordmark {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: var(--page-text);
 }
 
 .caption-title {
@@ -345,4 +342,8 @@
   inset: 0;
   height: 100dvh;
   background: var(--sheet);
+}
+
+.side .caption-wordmark {
+  color: var(--page-text);
 }

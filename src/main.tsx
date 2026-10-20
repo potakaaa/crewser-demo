@@ -8,6 +8,9 @@ import './styles/base.css';
 import './styles/device.css';
 import './styles/app.css';
 import App from './App';
+import { installGrain } from './lib/grain';
+
+installGrain();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

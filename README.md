@@ -57,6 +57,16 @@ src/
 
 Stack: Vite, React 19, TypeScript, Zustand, plain CSS with variables. Icons: Hugeicons Stroke Rounded (free set). Font: Inter (400/500/600), self-hosted via `@fontsource`, so the page makes no third-party requests.
 
+## Motion and brand
+
+- Screen transitions (`components/ScreenStack.tsx`) keep the outgoing screen mounted while it animates. Pushes slide in from the right, back slides out to the right, and tab switches cross-fade. All moving parts share one easing curve (`--ease-ios`).
+- The tab bar computes tab widths up front, so the white pill, the icons and the active label move together.
+- Note types have their own colours (`lib/noteStyle.ts`). They are used on icon chips, calendar dots and the month-view legend.
+- The Calendar header chip opens a month view; prev/next then pages by month.
+- Film grain (`lib/grain.ts`) is one generated noise tile overlaid on the gradient headers and dark tiles.
+- `prefers-reduced-motion` turns all of this off.
+- **Logo:** `components/Brand.tsx` renders "Crewser" as a text wordmark because the official logo could not be downloaded from crewser.app in the build environment. Swap that one element for the logo SVG and the splash, Home footer and desktop caption all pick it up.
+
 ## How the data drives the UI
 
 - **Week statistics** (`lib/stats.ts`): total 67.5 h, over target +7.5 h, overtime 7.5 h, average 11.25 h over 6 worked days, night 3.5 h and longest day Fri 16 at 12.5 h. All are computed from `week` and `project.dailyTargetHours`. The default selected bar is the longest day.

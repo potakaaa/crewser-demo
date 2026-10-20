@@ -5,7 +5,7 @@ import { fmtDayMonth } from '../lib/dates';
 import { planSentence, todayPlan } from '../lib/stats';
 import { today } from '../mock';
 
-const CLOSE_MS = 220;
+const CLOSE_MS = 300;
 
 /** Bottom sheet over any tab. Mounted while open or animating out. */
 export function LogSheet() {
@@ -120,7 +120,7 @@ function LogSheetBody({ closing }: { closing: boolean }) {
           className="btn btn-lime btn-lg"
           onClick={() => {
             close();
-            toast(`Start time ${plan.call} saved`);
+            toast(`Start time ${plan.call} saved. Have a good shoot!`);
           }}
         >
           Save start time

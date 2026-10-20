@@ -39,7 +39,7 @@ export function StatsScreen() {
       </GradientHeader>
 
       <Sheet className="bento">
-        <section className="tile-dark span-2" aria-label="Hours worked">
+        <section className="tile-dark grain span-2" aria-label="Hours worked">
           <div className="kpi-row">
             <div className="kpi-dark">
               <span className="kpi-k">Hours worked</span>

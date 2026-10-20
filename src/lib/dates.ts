@@ -19,6 +19,29 @@ export const fmtDayShort = (iso: string) => `${weekday(iso)} ${dayOfMonth(iso)}`
 /** "Tue 20 Oct" */
 export const fmtDayMonth = (iso: string) => `${fmtDayShort(iso)} ${monthShort(iso)}`;
 
+/** "2026-10-01" for any day in October 2026. */
+export const firstOfMonth = (iso: string) => iso.slice(0, 8) + '01';
+
+export function addMonths(iso: string, n: number): string {
+  const d = toDate(firstOfMonth(iso));
+  return toIso(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1)));
+}
+
+/** Monday-first grid of whole weeks covering the month of `iso` (5 or 6 rows). */
+export function monthGrid(iso: string): string[] {
+  const first = firstOfMonth(iso);
+  const start = mondayOf(first);
+  const nextMonth = addMonths(first, 1);
+  const days: string[] = [];
+  for (let d = start; d < nextMonth || days.length % 7 !== 0; d = addDays(d, 1)) days.push(d);
+  return days;
+}
+
+export const isSameMonth = (a: string, b: string) => a.slice(0, 7) === b.slice(0, 7);
+
+/** "October 2026" */
+export const fmtMonthYear = (iso: string) => `${MONTH[toDate(iso).getUTCMonth()]} ${toDate(iso).getUTCFullYear()}`;
+
 /** Monday of the week containing `iso`. */
 export const mondayOf = (iso: string) => addDays(iso, -((toDate(iso).getUTCDay() + 6) % 7));
 

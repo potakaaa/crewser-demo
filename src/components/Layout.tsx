@@ -4,7 +4,7 @@ import { today } from '../mock';
 
 /** Dark gradient header with the faint lime glow, used on every main screen. */
 export function GradientHeader({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <header className={`gh ${className}`}>{children}</header>;
+  return <header className={`gh grain ${className}`}>{children}</header>;
 }
 
 /** The light sheet that overlaps the header by 20 px. */

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { noteById, pdfs, today } from './mock';
 import { weekStats } from './lib/stats';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
+import { addDays, addMonths, firstOfMonth } from './lib/dates';
 
 export type TabName = 'home' | 'calendar' | 'stats';
 
@@ -78,9 +79,14 @@ interface DemoState {
   breakMin: number;
   homeAllOpen: boolean;
   expanded: Record<ExpandList, string | null>;
-  calWeekOffset: number;
-  /** 0 = Monday … 6 = Sunday within the shown week */
-  calDayIndex: number;
+  /** Selected day in the calendar (ISO). The week strip shows its week. */
+  calDate: string;
+  /** First day of the month shown when the month view is open (ISO). */
+  calMonth: string;
+  calMonthOpen: boolean;
+  /** How the last navigation moved, for the screen transition. */
+  navDir: NavDir;
+  splash: boolean;
   statsBar: number;
   /** The light sheet has scrolled under the status bar: show dark status bar text. */
   statusDark: boolean;
@@ -96,15 +102,18 @@ interface Actions {
   setBreak: (min: number) => void;
   toggleHomeAll: () => void;
   toggleExpanded: (list: ExpandList, id: string) => void;
-  shiftWeek: (delta: number) => void;
-  setCalDay: (i: number) => void;
+  /** Prev/next: a week in the week strip, a month in the month view. */
+  shiftCal: (delta: number) => void;
+  setCalDate: (iso: string) => void;
+  toggleCalMonth: () => void;
+  hideSplash: () => void;
   setStatsBar: (i: number) => void;
   setStatusDark: (v: boolean) => void;
   showToast: (message: string) => void;
   reset: () => void;
 }
 
-const todayIndex = (new Date(today.date + 'T00:00:00Z').getUTCDay() + 6) % 7;
+export type NavDir = 'push' | 'pop' | 'tab' | 'none';
 
 const initialState = (): DemoState => ({
   stack: initialStack(),
@@ -115,8 +124,11 @@ const initialState = (): DemoState => ({
   breakMin: today.defaultBreakMin,
   homeAllOpen: false,
   expanded: { home: null, calendar: null },
-  calWeekOffset: 0,
-  calDayIndex: todayIndex,
+  calDate: today.date,
+  calMonth: firstOfMonth(today.date),
+  calMonthOpen: false,
+  navDir: 'none',
+  splash: true,
   statsBar: weekStats.longestIndex,
   statusDark: false,
   toast: null,
@@ -131,7 +143,11 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const { stack } = get();
     if (sameRoute(stack[stack.length - 1]?.route, r)) return;
     history.pushState(null, '', routeToHash(r));
-    set({ stack: isTab(r) ? [{ route: r, pushed: true }] : [...stack, { route: r, pushed: true }], logOpen: false });
+    set({
+      stack: isTab(r) ? [{ route: r, pushed: true }] : [...stack, { route: r, pushed: true }],
+      navDir: isTab(r) ? 'tab' : 'push',
+      logOpen: false,
+    });
   },
 
   back: () => {
@@ -139,7 +155,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const top = stack[stack.length - 1];
     if (stack.length < 2) {
       history.replaceState(null, '', routeToHash({ name: 'home' }));
-      set({ stack: [{ route: { name: 'home' }, pushed: false }] });
+      set({ stack: [{ route: { name: 'home' }, pushed: false }], navDir: 'pop' });
       return;
     }
     if (top.pushed) {
@@ -148,7 +164,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     }
     const next = stack.slice(0, -1);
     history.replaceState(null, '', routeToHash(next[next.length - 1].route));
-    set({ stack: next });
+    set({ stack: next, navDir: 'pop' });
   },
 
   syncFromLocation: () => {
@@ -156,11 +172,11 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const { stack } = get();
     if (sameRoute(stack[stack.length - 1]?.route, r)) return;
     if (sameRoute(stack[stack.length - 2]?.route, r)) {
-      set({ stack: stack.slice(0, -1) });
+      set({ stack: stack.slice(0, -1), navDir: 'pop' });
     } else if (isTab(r)) {
-      set({ stack: [{ route: r, pushed: false }] });
+      set({ stack: [{ route: r, pushed: false }], navDir: 'tab' });
     } else {
-      set({ stack: [...stack, { route: r, pushed: false }] });
+      set({ stack: [...stack, { route: r, pushed: false }], navDir: 'push' });
     }
     set({ logOpen: false });
   },
@@ -173,8 +189,15 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   setBreak: (min) => set({ breakMin: Math.max(0, Math.min(120, min)) }),
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
   toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
-  shiftWeek: (delta) => set((s) => ({ calWeekOffset: s.calWeekOffset + delta, expanded: { ...s.expanded, calendar: null } })),
-  setCalDay: (i) => set((s) => ({ calDayIndex: i, expanded: { ...s.expanded, calendar: null } })),
+  shiftCal: (delta) =>
+    set((s) =>
+      s.calMonthOpen
+        ? { calMonth: addMonths(s.calMonth, delta) }
+        : { calDate: addDays(s.calDate, delta * 7), expanded: { ...s.expanded, calendar: null } },
+    ),
+  setCalDate: (iso) => set((s) => ({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false, expanded: { ...s.expanded, calendar: null } })),
+  toggleCalMonth: () => set((s) => ({ calMonthOpen: !s.calMonthOpen, calMonth: firstOfMonth(s.calDate) })),
+  hideSplash: () => set({ splash: false }),
   setStatsBar: (i) => set({ statsBar: i }),
   setStatusDark: (v) => set({ statusDark: v }),
   showToast: (message) => set({ toast: { id: ++toastSeq, message } }),
@@ -182,7 +205,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   reset: () => {
     clearScrollPositions();
     history.replaceState(null, '', routeToHash({ name: 'home' }));
-    set({ ...initialState(), stack: [{ route: { name: 'home' }, pushed: false }] });
+    set({ ...initialState(), stack: [{ route: { name: 'home' }, pushed: false }], navDir: 'tab', splash: false });
   },
 }));
 

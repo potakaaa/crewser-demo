@@ -1,6 +1,7 @@
 import type { Note } from '../mock';
 import { Icon, type IconName } from './Icon';
 import { Collapse } from './Layout';
+import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
 import { cardSubtitle, cardTiles, dayStub, firstSentence, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
 
@@ -45,8 +46,8 @@ export function ContentCard({ note }: { note: Note }) {
           <span className="stub-time">{timeText(note)}</span>
           <span className="stub-sub">{dayStub(note)}</span>
         </span>
-        <span className="chip-icon">
-          <Icon name={note.type} size={18} color="#2A3B3F" />
+        <span className="chip-icon" style={chipStyle(note.type)}>
+          <Icon name={note.type} size={18} />
         </span>
         <span className="row-titles">
           <span className="row-t1 row-t1-lg">{note.title}</span>
@@ -86,8 +87,8 @@ export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; ope
             <span className={`stub-time${note.kind === 'time' ? '' : ' stub-time-sm'}${note.kind === 'undated' ? ' stub-muted' : ''}`}>{timeText(note)}</span>
             <span className="stub-sub">{timeSub(note)}</span>
           </span>
-          <span className="chip-icon">
-            <Icon name={note.type} size={18} color="#2A3B3F" />
+          <span className="chip-icon" style={chipStyle(note.type)}>
+            <Icon name={note.type} size={18} />
           </span>
           <span className="row-titles">
             <span className={`row-t1${note.type === 'flight' ? ' row-t1-route' : ''}`}>{note.title}</span>

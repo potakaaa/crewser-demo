@@ -4,6 +4,7 @@ import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../components/Layout';
 import { ContentCard, NoteRow } from '../components/NoteCards';
 import { MiniWeekChart } from '../components/Charts';
+import { Wordmark } from '../components/Brand';
 import { useNoteActions } from '../lib/actions';
 import { smartNotes, minutesUntil } from '../lib/notes';
 import { fmtCountdown } from '../lib/dates';
@@ -59,7 +60,7 @@ function WeekSection() {
   return (
     <section className="stack" aria-label="Your week">
       <SectionHead title="Your week" sub={`Last 7 days · ${s.rangeLabel}`} link="All statistics" onLink={goStats} />
-      <button type="button" className="week-card" onClick={goStats} aria-label={`${s.summary} ${fmtH(s.total)} h worked, ${fmtH(s.overTarget)} h over target. Open statistics.`}>
+      <button type="button" className="week-card grain" onClick={goStats} aria-label={`${s.summary} ${fmtH(s.total)} h worked, ${fmtH(s.overTarget)} h over target. Open statistics.`}>
         <span className="week-top">
           <span className="kpi-dark">
             <span className="kpi-k">Hours worked</span>
@@ -106,7 +107,7 @@ export function HomeScreen() {
   return (
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
-      <GradientHeader className="gh-home">
+      <GradientHeader className="gh-home grain-strong">
         <div className="home-top">
           <span className="avatar" aria-hidden="true">
             {person.initials}
@@ -188,14 +189,18 @@ export function HomeScreen() {
 
         <WeekSection />
 
-        <div className="footer-links">
-          <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Privacy policy is not part of this demo')}>
-            Privacy
-          </button>
-          <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Imprint is not part of this demo')}>
-            Imprint
-          </button>
-        </div>
+        <footer className="brand-footer">
+          <Wordmark tone="dark" />
+          <span className="brand-footer-line">Time tracking for film crews · Data hosted in Germany</span>
+          <div className="footer-links">
+            <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Privacy policy is not part of this demo')}>
+              Privacy
+            </button>
+            <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Imprint is not part of this demo')}>
+              Imprint
+            </button>
+          </div>
+        </footer>
       </Sheet>
     </div>
   );
