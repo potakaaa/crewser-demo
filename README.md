@@ -32,7 +32,7 @@ The build is static and uses hash routing with a relative base, so `dist/` works
 | `#/ticket` | Boarding pass |
 | `#/pdf/<file>` | PDF viewer (`Ticket_OS487.pdf`, `Reservation_FNC-4471.pdf`) |
 
-Browser back/forward works. In-app back buttons return to where you came from; a cold deep link goes back to a sensible parent.
+Bare-token forms also work (`#stats`, `#note-fl`, `#pdf-Ticket_OS487.pdf`) for hosts that only pass plain anchors. Browser back/forward works. In-app back buttons return to where you came from; a cold deep link goes back to a sensible parent.
 
 ## Demo controls (desktop only)
 

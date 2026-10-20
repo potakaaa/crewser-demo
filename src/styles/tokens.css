@@ -53,6 +53,7 @@
     --page-text-2: #a9b7b9;
     --page-panel: #1e282a;
     --page-line: rgba(255, 255, 255, 0.14);
+    color-scheme: dark;
   }
 }
 
@@ -62,4 +63,5 @@
   --page-text-2: #a9b7b9;
   --page-panel: #1e282a;
   --page-line: rgba(255, 255, 255, 0.14);
+  color-scheme: dark;
 }

@@ -30,9 +30,11 @@ export function routeToHash(r: Route): string {
   }
 }
 
+/** Accepts "#/note/fl" and the bare-token form "#note-fl" (for hosts that only pass plain anchors). */
 export function hashToRoute(hash: string): Route {
-  const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
-  const [head, arg] = parts;
+  const m = hash.replace(/^#\/?/, '').match(/^([a-z]+)(?:[/-](.+))?$/);
+  const head = m?.[1];
+  const arg = m?.[2]?.replace(/\/$/, '');
   if (head === 'calendar' || head === 'stats' || head === 'home') return { name: head };
   if (head === 'note' && arg && noteById(arg)) return { name: 'note', id: arg };
   if (head === 'ticket') return { name: 'ticket' };
