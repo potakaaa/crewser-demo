@@ -3762,7 +3762,8 @@
 }
 
 .ccard-body .crew,
-.nrow-body .crew {
+.nrow-body .crew,
+.nextup-card .crew {
   margin: -4px 0;
   border-top: 1px solid var(--hairline);
   padding-top: 4px;

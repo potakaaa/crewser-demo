@@ -5,6 +5,7 @@ import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../
 import { ContentCard, NoteRow } from '../components/NoteCards';
 import { MiniWeekChart } from '../components/Charts';
 import { Wordmark } from '../components/Brand';
+import { CrewSection } from '../components/CrewStack';
 import { useNoteActions } from '../lib/actions';
 import { smartNotes, minutesUntil } from '../lib/notes';
 import { fmtCountdown } from '../lib/dates';
@@ -42,6 +43,7 @@ function NextUpCard({ note }: { note: Note }) {
             <Icon name="copy" size={17} color="#111A1B" />
           </button>
         </div>
+        <CrewSection note={note} />
         <div className="btn-row">
           <button type="button" className="btn btn-soft" onClick={() => a.openNote(note.id)}>
             Details
