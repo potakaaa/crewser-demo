@@ -268,7 +268,7 @@
   opacity: 0.11;
   mix-blend-mode: overlay;
   pointer-events: none;
-  animation: grain-shift 0.9s steps(1, end) infinite;
+  animation: grain-shift 4.8s steps(1, end) infinite;
 }
 
 .grain-strong::after {
