@@ -6,6 +6,7 @@ import { TYPE_COLOR } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
 import { FactActions } from '../components/NoteCards';
 import { QrPreview } from '../components/QrPreview';
+import { CrewSection } from '../components/CrewStack';
 import { hasScanCode, timeSub, timeText, TYPE_LABEL, whenLabel } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 
@@ -104,11 +105,16 @@ export function NoteDetailScreen({ id }: { id: string }) {
               <span className="att-open">Open</span>
             </button>
           ))}
-          <div className="crew-line">
-            <Icon name="users" size={18} color="#54686C" />
-            <span>{note.crew}</span>
-            {note.source && <span className="source-chip">{note.source}</span>}
+          <div className="crew-card">
+            <span className="crew-card-k">Shared with</span>
+            <CrewSection note={note} />
           </div>
+          {note.source && (
+            <div className="crew-line">
+              <Icon name="calendar" size={16} color="#54686C" />
+              <span>From {note.source}</span>
+            </div>
+          )}
         </Sheet>
       </div>
       <div className="sticky-foot">

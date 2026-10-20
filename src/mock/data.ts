@@ -28,6 +28,7 @@ export const contract: Contract = {
 };
 
 export const person: Person = {
+  id: 'ff',
   firstName: 'Florentina',
   displayName: 'Focus Florentina',
   initials: 'FF',

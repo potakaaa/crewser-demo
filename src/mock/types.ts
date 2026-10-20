@@ -54,7 +54,8 @@ export interface Note {
   facts: Fact[];
   text: string;
   attachments: Attachment[];
-  crew: string;
+  /** Who the note is shared with: the whole crew, or these crew member ids. */
+  crew: 'all' | string[];
   source?: string;
   primaryAction?: PrimaryAction;
 }
@@ -97,7 +98,19 @@ export interface Contract {
   minRestHours: number;
 }
 
+export interface CrewMember {
+  id: string;
+  name: string;
+  initials: string;
+  position: string;
+  department: string;
+  /** Avatar background, a pale tint so the ink initials stay readable. */
+  tint: string;
+}
+
 export interface Person {
+  /** The crew member using the app. */
+  id: string;
   firstName: string;
   /** Name as printed on tickets and the staff list. */
   displayName: string;

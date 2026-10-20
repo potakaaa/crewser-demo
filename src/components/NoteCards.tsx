@@ -2,6 +2,7 @@ import type { Fact, Note } from '../mock';
 import { Icon, type IconName } from './Icon';
 import { Collapse } from './Layout';
 import { QrPreview } from './QrPreview';
+import { CrewSection } from './CrewStack';
 import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
 import { cardSubtitle, cardTiles, dayStub, firstSentence, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
@@ -93,6 +94,7 @@ export function ContentCard({ note }: { note: Note }) {
         </div>
         {hasScanCode(note) && <QrPreview note={note} />}
         {text && <p className="ccard-note">{text}</p>}
+        <CrewSection note={note} />
         {pa && (
           <button type="button" className="btn btn-ink" onClick={() => a.primary(note)}>
             <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
@@ -158,6 +160,7 @@ export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; ope
             </div>
           ))}
           {!note.facts.length && note.text && <p className="nrow-text">{note.text}</p>}
+          <CrewSection note={note} />
           <div className="btn-row">
             <button type="button" className="btn btn-soft" onClick={() => a.openNote(note.id)}>
               {withPrimary ? 'Details' : 'Open details'}

@@ -3638,3 +3638,147 @@
   flex: none;
   margin-top: var(--sp-3);
 }
+
+/* ───────── Crew: avatar stack + list ───────── */
+.crew {
+  display: flex;
+  flex-direction: column;
+}
+.crew-toggle {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink);
+  text-align: left;
+}
+.crew-toggle:focus-visible {
+  outline-offset: 0;
+}
+.avatar-stack {
+  flex: none;
+  display: flex;
+  padding-left: 6px;
+}
+.avatar-chip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.avatar-sm {
+  width: 28px;
+  height: 28px;
+  margin-left: -6px;
+  border: 2px solid var(--avatar-ring, #ffffff);
+  font-size: 10px;
+}
+.avatar-md {
+  width: 34px;
+  height: 34px;
+  font-size: 11.5px;
+}
+.avatar-more {
+  background: #ededeb;
+  color: var(--text-2);
+}
+.crew-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-md);
+  font-weight: 500;
+}
+.crew-action {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--teal);
+}
+
+.crew-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 2px var(--sp-1);
+}
+.crew-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crew-dept {
+  display: block;
+  padding-bottom: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.crew-person {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  border-top: 1px solid var(--hairline);
+}
+.crew-group li:first-child {
+  border-top: 0;
+}
+.crew-person-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.crew-person-text strong {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+.crew-person-text span {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+.you-chip {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: var(--r-control);
+  background: var(--chip);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.ccard-body .crew,
+.nrow-body .crew {
+  margin: -4px 0;
+  border-top: 1px solid var(--hairline);
+  padding-top: 4px;
+}
+
+.crew-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px 8px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.crew-card-k {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}

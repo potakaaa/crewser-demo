@@ -1,4 +1,5 @@
 import type { Note } from './types';
+import { madeiraTeam } from './crew';
 
 const directionsToSet = { kind: 'directions', label: 'Directions to set', short: 'Directions' } as const;
 
@@ -19,7 +20,7 @@ export const notes: Note[] = [
     ],
     text: 'Night scene 34 from 19:30 at the canal. Bring warm jackets.',
     attachments: [],
-    crew: 'Whole crew (20)',
+    crew: 'all',
     source: 'Production calendar',
     primaryAction: directionsToSet,
   },
@@ -33,7 +34,7 @@ export const notes: Note[] = [
     facts: [],
     text: '24 people, 2 of them vegan.\nDelivery 12:00 to set.',
     attachments: [],
-    crew: 'Whole crew (20)',
+    crew: 'all',
   },
   {
     id: 'd8',
@@ -50,7 +51,7 @@ export const notes: Note[] = [
     ],
     text: 'Pack the camera gear for Madeira after wrap.',
     attachments: [],
-    crew: 'Whole crew (20)',
+    crew: 'all',
     source: 'Production calendar',
     primaryAction: directionsToSet,
   },
@@ -69,7 +70,7 @@ export const notes: Note[] = [
     ],
     text: 'Plan 30 min extra for check-in. Camera gear is registered as bulky luggage.',
     attachments: [{ file: 'Ticket_OS487.pdf', kind: 'PDF · ticket' }],
-    crew: 'You + 8 others',
+    crew: madeiraTeam,
     primaryAction: { kind: 'boardingPass', label: 'Show boarding pass', short: 'Boarding pass' },
   },
   {
@@ -90,7 +91,7 @@ export const notes: Note[] = [
     ],
     text: '',
     attachments: [],
-    crew: 'You + 8 others',
+    crew: madeiraTeam,
     primaryAction: { kind: 'directions', label: 'Directions to hotel', short: 'Directions' },
   },
   {
@@ -111,7 +112,7 @@ export const notes: Note[] = [
     ],
     text: 'Refuel as needed, return with a full tank.',
     attachments: [{ file: 'Reservation_FNC-4471.pdf', kind: 'PDF · reservation' }],
-    crew: 'You + 8 others',
+    crew: madeiraTeam,
     primaryAction: { kind: 'directions', label: 'Directions to desk', short: 'Directions' },
   },
   {
@@ -128,7 +129,7 @@ export const notes: Note[] = [
     ],
     text: '',
     attachments: [],
-    crew: 'You + 8 others',
+    crew: madeiraTeam,
     source: 'Production calendar',
     primaryAction: directionsToSet,
   },
@@ -141,7 +142,7 @@ export const notes: Note[] = [
     facts: [],
     text: 'Phone numbers and opening hours of the production office.',
     attachments: [],
-    crew: 'Whole crew (20)',
+    crew: 'all',
   },
 ];
 

@@ -47,7 +47,7 @@ The panel also has shortcuts to jump to each screen.
 
 ```
 src/
-  mock/         typed mock data: notes, workdays, contract, person, project, today, pdfs (+ shared types)
+  mock/         typed mock data: notes, crew, workdays, contract, person, project, today, pdfs (+ shared types)
   lib/          derivations: stats from `week`, smart-note ordering, dates, fake QR, scroll memory, click actions
   components/   device frame + status bar, tab bar, log sheet, toast, note cards/rows, charts, layout pieces
   screens/      Home, Calendar, Stats, NoteDetail, BoardingPass, PdfViewer
@@ -75,5 +75,6 @@ Stack: Vite, React 19, TypeScript, Zustand, plain CSS with variables. Icons: Hug
   - **Next-up card:** the next shoot-day call today.
   - **Top three content cards:** the next timed appointments, flights and hotels ("call times and travel first").
   - **The rest:** grouped by day under "Show N more notes".
+- **Who's on a note:** each note is shared with the whole crew (20) or a list of crew ids, e.g. the 9 going to Madeira. Cards, expanded rows and the detail show an avatar stack (3 + "+N") and the label, e.g. "You + 8 others". Tapping it opens the list grouped by department. The first five crew and their avatar tints come from the Inspector board.
 - **Fact tiles on a card:** facts you act on come first (copy, map, unconfirmed), filled up in data order. Map facts and attachments span both columns.
 - **Log today:** the "Planned 11:00–22:00 is X h after the break…" line and the stats insight both recalculate from the break stepper.
