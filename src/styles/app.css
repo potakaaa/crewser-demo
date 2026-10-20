@@ -1278,25 +1278,25 @@
   font-weight: 500;
   color: var(--teal);
 }
-.qr-missing {
-  border-color: var(--amber-border);
-  background: var(--amber-surface);
-}
-.qr-missing strong {
-  color: var(--amber-text);
-}
-.qr-missing .qr-copy > span {
-  color: #3f3a2a;
-}
-.qr-missing-icon {
-  flex: none;
-  width: 44px;
-  height: 44px;
+.qr-thumb-empty {
+  width: 90px;
+  height: 90px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-control);
-  background: rgba(255, 255, 255, 0.6);
+  gap: 6px;
+  border: var(--dashed);
+  background: transparent;
+  line-height: 1;
+}
+.qr-thumb-empty span {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-3);
+}
+.qr-copy > .qr-cta {
+  overflow-wrap: anywhere;
 }
 
 .nrow-text {

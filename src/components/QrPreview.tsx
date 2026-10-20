@@ -26,16 +26,21 @@ export function QrPreview({ note }: { note: Note }) {
   const file = note.attachments[0]?.file ?? '';
 
   if (!codeFound) {
+    // Same tile as a found code, with an empty dashed slot where the code would be.
     return (
-      <button type="button" className="qr-preview qr-missing" onClick={() => a.openPdf(file)}>
-        <span className="qr-missing-icon">
-          <Icon name="file" size={20} color="#6B4A00" />
+      <button type="button" className="qr-preview" onClick={() => a.openPdf(file)} aria-label={`No scannable code in ${file}. Open the PDF`}>
+        <span className="qr-thumb qr-thumb-empty" aria-hidden="true">
+          <Icon name="ticket" size={24} color="#54686C" />
+          <span>No code</span>
         </span>
         <span className="qr-copy">
-          <strong>No scannable code in this PDF</strong>
-          <span>Open the original ticket at check-in</span>
+          <strong>Boarding pass</strong>
+          <span>Show the PDF at check-in and the gate</span>
+          <span className="qr-cta">
+            Open {file}
+            <Icon name="arrowUpRight" size={14} strokeWidth={1.8} />
+          </span>
         </span>
-        <Icon name="right" size={18} color="#6B4A00" />
       </button>
     );
   }
