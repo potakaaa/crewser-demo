@@ -347,3 +347,34 @@
 .side .caption-wordmark {
   color: var(--page-text);
 }
+
+/* Smart note accent picker */
+.dp-accents {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dp-accent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--page-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+.dp-accent small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--page-text-2);
+}
+.dp-accent[aria-checked='true'] {
+  border-color: var(--page-text);
+  box-shadow: inset 0 0 0 1px var(--page-text);
+}

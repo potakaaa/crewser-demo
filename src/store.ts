@@ -65,6 +65,9 @@ function initialStack(): Entry[] {
 
 export type ExpandList = 'home' | 'calendar';
 
+/** Brand accent on smart notes, switchable from the demo panel while we try them out. */
+export type NoteAccent = 'stub' | 'corner' | 'band' | 'edge' | 'none';
+
 interface Toast {
   id: number;
   message: string;
@@ -98,6 +101,7 @@ interface DemoState {
   /** The light sheet has scrolled under the status bar: show dark status bar text. */
   statusDark: boolean;
   toast: Toast | null;
+  noteAccent: NoteAccent;
 }
 
 interface Actions {
@@ -121,6 +125,7 @@ interface Actions {
   submitDay: (iso: string) => void;
   setStatusDark: (v: boolean) => void;
   showToast: (message: string) => void;
+  setNoteAccent: (a: NoteAccent) => void;
   reset: () => void;
 }
 
@@ -153,6 +158,7 @@ const initialState = (): DemoState => ({
   submitted: [],
   statusDark: false,
   toast: null,
+  noteAccent: 'stub',
 });
 
 let toastSeq = 0;
@@ -236,11 +242,12 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   submitDay: (iso) => set((s) => ({ submitted: s.submitted.includes(iso) ? s.submitted : [...s.submitted, iso] })),
   setStatusDark: (v) => set({ statusDark: v }),
   showToast: (message) => set({ toast: { id: ++toastSeq, message } }),
+  setNoteAccent: (a) => set({ noteAccent: a }),
 
   reset: () => {
     clearScrollPositions();
     history.replaceState(null, '', routeToHash({ name: 'home' }));
-    set({ ...initialState(), stack: [{ route: { name: 'home' }, pushed: false }], navDir: 'tab', splash: false });
+    set({ ...initialState(), stack: [{ route: { name: 'home' }, pushed: false }], navDir: 'tab', splash: false, noteAccent: get().noteAccent });
   },
 }));
 

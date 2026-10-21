@@ -16,7 +16,10 @@ export function Toast({ raised }: { raised: boolean }) {
     <div className={`toast-region${raised ? ' raised' : ''}`} aria-live="polite" aria-atomic="true">
       {toast && (
         <div key={toast.id} className={`toast${visible ? ' show' : ''}`}>
-          {toast.message}
+          <svg className="toast-burst" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.5v6M12 15.5v6M2.5 12h6M15.5 12h6M5.3 5.3l4.2 4.2M14.5 14.5l4.2 4.2M18.7 5.3l-4.2 4.2M9.5 14.5l-4.2 4.2" />
+          </svg>
+          <span>{toast.message}</span>
         </div>
       )}
     </div>

@@ -3,6 +3,12 @@
   /* Safe areas: in the desktop frame the fake status bar is 54 px; on real phones use env(). */
   --sat: 54px;
   --sab: 0px;
+  --brand-surface:
+    radial-gradient(circle at 100% 0%, rgba(219, 242, 39, 0.2), rgba(219, 242, 39, 0) 50%),
+    linear-gradient(135deg, #172123 0%, #1f3a3d 60%, #2a5155 100%);
+  --brand-surface-hover:
+    radial-gradient(circle at 100% 0%, rgba(219, 242, 39, 0.28), rgba(219, 242, 39, 0) 55%),
+    linear-gradient(135deg, #1b2729 0%, #244448 60%, #305b60 100%);
   --shadow-card: 0 1px 2px rgba(17, 26, 27, 0.04), 0 6px 18px rgba(17, 26, 27, 0.04);
   /* Motion: one iOS-like curve for anything that moves, a softer one for fades. */
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
@@ -390,12 +396,13 @@
 }
 
 .btn-ink {
-  background: var(--dark-tile);
+  background: var(--brand-surface);
   color: #ffffff;
   font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .btn-ink:hover {
-  background: #293639;
+  background: var(--brand-surface-hover);
 }
 
 .btn-lime {
@@ -2705,10 +2712,16 @@
   bottom: max(100px, calc(var(--sab) + 84px));
 }
 .toast {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
   max-width: 100%;
-  padding: 10px var(--sp-4);
+  padding: 10px var(--sp-4) 10px 12px;
   border-radius: var(--r-control);
-  background: var(--dark-tile);
+  background: var(--brand-surface);
   color: #ffffff;
   font-size: var(--fs-md);
   font-weight: 500;
@@ -2723,6 +2736,179 @@
 .toast.show {
   opacity: 1;
   transform: none;
+}
+.toast::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--grain, none);
+  background-size: 160px 160px;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
+}
+.toast-burst {
+  flex: none;
+  fill: none;
+  stroke: var(--lime);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.toast.show .toast-burst {
+  animation: burst-spin 900ms var(--ease-out) both;
+}
+@keyframes burst-spin {
+  from {
+    transform: rotate(-60deg) scale(0.4);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* ───────── Smart note accents (switch in the demo panel) ─────────
+   Every variant borrows the header's material: teal gradient, lime glow, film grain. */
+.ccard,
+.nrow {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Ticket stub: the time column becomes a torn-off stub on the brand gradient. */
+[data-accent='stub'] .ccard-head,
+[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --stub-w: 76px;
+}
+[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
+  --stub-w: 84px;
+}
+[data-accent='stub'] .ccard-head::before,
+[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--stub-w);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(219, 242, 39, 0.3), rgba(219, 242, 39, 0) 60%),
+    var(--header-gradient);
+  /* Punched edge, like a ticket perforation */
+  -webkit-mask: radial-gradient(circle at 100% 50%, transparent 5px, #000 5.5px);
+  mask: radial-gradient(circle at 100% 50%, transparent 5px, #000 5.5px);
+}
+[data-accent='stub'] .ccard-head::after,
+[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--stub-w);
+  background-image: var(--grain, none);
+  background-size: 160px 160px;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+}
+[data-accent='stub'] .ccard-head .stub-time,
+[data-accent='stub'] .nrow:not(.nrow-dashed) .stub-time {
+  color: #ffffff;
+}
+[data-accent='stub'] .ccard-head .stub-sub,
+[data-accent='stub'] .nrow:not(.nrow-dashed) .stub-sub {
+  color: var(--on-dark-2);
+}
+[data-accent='stub'] .ccard-head .chip-icon,
+[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle .chip-icon {
+  margin-left: 4px;
+}
+
+/* Corner glow: a lime light leak with grain in the top-right corner. */
+[data-accent='corner'] .ccard::before,
+[data-accent='corner'] .nrow::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -40px;
+  right: -40px;
+  width: 190px;
+  height: 150px;
+  background: radial-gradient(closest-side, rgba(219, 242, 39, 0.3), rgba(111, 208, 200, 0.1) 60%, rgba(111, 208, 200, 0));
+  pointer-events: none;
+}
+[data-accent='corner'] .ccard::after,
+[data-accent='corner'] .nrow::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 110px;
+  background-image: var(--grain, none);
+  background-size: 160px 160px;
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+  -webkit-mask: radial-gradient(circle at 100% 0%, #000, transparent 60%);
+  mask: radial-gradient(circle at 100% 0%, #000, transparent 60%);
+  pointer-events: none;
+}
+
+/* Header band: the whole title row sits on the brand gradient. */
+[data-accent='band'] .ccard-head,
+[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 96% 0%, rgba(219, 242, 39, 0.22), rgba(219, 242, 39, 0) 45%),
+    linear-gradient(120deg, #141d1e 0%, #1f3a3d 60%, #2d5559 100%);
+  color: #ffffff;
+}
+[data-accent='band'] .ccard-head::after,
+[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-top::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--grain, none);
+  background-size: 160px 160px;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+}
+[data-accent='band'] .ccard-head + .ccard-body {
+  padding-top: var(--sp-4);
+}
+[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-toggle,
+[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-quick {
+  color: #ffffff;
+}
+[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-quick {
+  border-left-color: rgba(255, 255, 255, 0.14);
+}
+[data-accent='band'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-top) :is(.row-t2, .stub-sub) {
+  color: var(--on-dark-2);
+}
+[data-accent='band'] :is(.ccard-head > svg, .nrow:not(.nrow-dashed) .chev svg, .nrow:not(.nrow-dashed) .nrow-quick svg) path {
+  stroke: #ffffff;
+}
+
+/* Bottom edge: a thin teal-to-lime line, like the light at the bottom of the header. */
+[data-accent='edge'] .ccard::after,
+[data-accent='edge'] .nrow:not(.nrow-dashed)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1f3a3d 0%, #2c6b72 45%, #6fd0c8 75%, var(--lime) 100%);
+  pointer-events: none;
 }
 
 /* ───────── Brand ───────── */

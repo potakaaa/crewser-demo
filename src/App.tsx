@@ -50,9 +50,10 @@ function AppShell() {
   const logOpen = useDemo((s) => s.logOpen);
   const splash = useDemo((s) => s.splash);
   const sheet = useDemo((s) => s.statsSheet);
+  const accent = useDemo((s) => s.noteAccent);
   const tabs = isTab(route);
   return (
-    <div className="app">
+    <div className="app" data-accent={accent}>
       <div className="app-content" inert={logOpen || splash || sheet !== null}>
         <ScreenStack render={(r) => <Screen route={r} />} />
         <TabBar hidden={!tabs} />
