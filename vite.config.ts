@@ -5,4 +5,6 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: './',
   plugins: [react()],
+  // The logo PNGs are ~4 kB; inline them so the single-file artifact build carries them too.
+  build: { assetsInlineLimit: 8192 },
 });

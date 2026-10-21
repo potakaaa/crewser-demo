@@ -159,9 +159,12 @@ export function StatsScreen() {
                       )}
                     </div>
                     {restBefore?.short && (
-                      <span className="day-warn">
-                        Only {fmtH(restBefore.hours)} h rest before this day (minimum {contract.minRestHours} h)
-                      </span>
+                      <div className="warn-line warn-dark">
+                        <Icon name="alert" size={16} color="#F4C35A" strokeWidth={1.8} />
+                        <span className="warn-text">
+                          <strong>{fmtH(restBefore.hours)} h rest</strong> before this day · min {contract.minRestHours} h
+                        </span>
+                      </div>
                     )}
                   </>
                 ) : (
@@ -218,19 +221,21 @@ export function StatsScreen() {
               </div>
               {openParts.length > 0 && <span className="stat-note">{openParts.join(' · ')}</span>}
               {draft && (
-                <div className="appr-todo">
-                  <span>
-                    <strong>{draft.short}</strong> isn't submitted yet
+                <div className="warn-line">
+                  <Icon name="alert" size={16} color="#B5621E" strokeWidth={1.8} />
+                  <span className="warn-text">
+                    <strong>{draft.short}</strong> not submitted
                   </span>
                   <button
                     type="button"
-                    className="btn btn-ink appr-submit"
+                    className="warn-action"
                     onClick={() => {
                       submitDay(draft.date);
                       toast(`${draft.short} sent to production for approval`);
                     }}
                   >
                     Submit
+                    <Icon name="right" size={14} strokeWidth={2} />
                   </button>
                 </div>
               )}

@@ -2,6 +2,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import type { IconSvgElement } from '@hugeicons/react';
 import {
   Airplane01Icon,
+  Alert02Icon,
   Analytics01Icon,
   Appointment01Icon,
   ArrowDown01Icon,
@@ -64,6 +65,7 @@ export const icons = {
   right: ArrowRight01Icon,
   left: ArrowLeft01Icon,
   arrowRight: ArrowRight02Icon,
+  alert: Alert02Icon,
   minus: MinusSignIcon,
   plus: PlusSignIcon,
 } satisfies Record<string, IconSvgElement>;

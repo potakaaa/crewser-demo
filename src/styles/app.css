@@ -3321,24 +3321,57 @@
 .seg-draft {
   border: 1.5px dashed rgba(17, 26, 27, 0.35);
 }
-.appr-todo {
+/* Compact warning: icon, one short line, optional text action. No box, so it
+   reads as a note inside the tile rather than a second card. */
+.warn-line {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  margin-top: var(--sp-1);
-  padding: 10px 10px 10px 14px;
-  border-radius: var(--r-control);
-  background: var(--amber-surface);
+  gap: var(--sp-2);
+  min-height: 36px;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
   font-size: var(--fs-sm);
-  color: #3f3a2a;
+  line-height: 1.35;
+  color: var(--text-2);
   animation: list-in var(--t-med) var(--ease-ios) both;
 }
-.appr-todo > span {
-  flex: 1;
-}
-.appr-submit {
+.warn-line > svg {
   flex: none;
-  min-height: 40px;
+}
+.warn-text {
+  flex: 1;
+  min-width: 0;
+}
+.warn-text strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.warn-action {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  margin: -10px -8px -10px 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--teal);
+}
+.warn-action:hover {
+  background: var(--soft);
+}
+.warn-dark {
+  margin-top: 0;
+  border-top-color: rgba(255, 255, 255, 0.1);
+  color: var(--on-dark-2);
+}
+.warn-dark .warn-text strong {
+  color: #f4c35a;
 }
 
 /* Days on project (wide) */
@@ -3618,11 +3651,6 @@
 }
 .day-pills .pill-night b {
   color: #b3b9f2;
-}
-.day-warn {
-  font-size: var(--fs-sm);
-  line-height: 1.45;
-  color: #f2a476;
 }
 
 /* Small tiles */
