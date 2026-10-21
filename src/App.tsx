@@ -58,7 +58,7 @@ function AppShell() {
         <ScreenStack render={(r) => <Screen route={r} />} />
         <TabBar hidden={!tabs} />
       </div>
-      <Toast raised={tabs} />
+      <Toast raised={tabs} top={logOpen || sheet !== null} />
       <LogSheet />
       <StatSheets />
       {splash && <Splash />}

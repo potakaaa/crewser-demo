@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { noteById, pdfs, today } from './mock';
-import { computeStats, CURRENT_WEEK, FIRST_WEEK, LAST_WEEK, weekStats, type Period } from './lib/stats';
+import { computeStats, CURRENT_WEEK, FIRST_WEEK, LAST_WEEK, todayPlan, weekStats, type Period } from './lib/stats';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { addDays, addMonths, firstOfMonth } from './lib/dates';
 
@@ -80,6 +80,9 @@ interface DemoState {
   codeFound: boolean;
   logOpen: boolean;
   breakMin: number;
+  /** Times entered in the Log sheet, "HH:MM". End stays empty until wrap. */
+  logStart: string;
+  logEnd: string | null;
   homeAllOpen: boolean;
   expanded: Record<ExpandList, string | null>;
   /** Selected day in the calendar (ISO). The week strip shows its week. */
@@ -111,6 +114,7 @@ interface Actions {
   setFlag: (k: 'offline' | 'empty' | 'codeFound', v: boolean) => void;
   setLogOpen: (v: boolean) => void;
   setBreak: (min: number) => void;
+  setLogTime: (k: 'logStart' | 'logEnd', v: string | null) => void;
   toggleHomeAll: () => void;
   toggleExpanded: (list: ExpandList, id: string) => void;
   /** Prev/next: a week in the week strip, a month in the month view. */
@@ -144,6 +148,8 @@ const initialState = (): DemoState => ({
   codeFound: true,
   logOpen: false,
   breakMin: today.defaultBreakMin,
+  logStart: todayPlan(today.defaultBreakMin).call,
+  logEnd: null,
   homeAllOpen: false,
   expanded: { home: null, calendar: null },
   calDate: today.date,
@@ -215,6 +221,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   },
   setLogOpen: (v) => set({ logOpen: v }),
   setBreak: (min) => set({ breakMin: Math.max(0, Math.min(120, min)) }),
+  setLogTime: (k, v) => set({ [k]: v } as Pick<DemoState, typeof k>),
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
   toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
   shiftCal: (delta) =>
