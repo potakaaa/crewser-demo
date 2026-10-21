@@ -4,10 +4,10 @@
   --sat: 54px;
   --sab: 0px;
   --brand-surface:
-    radial-gradient(circle at 100% 0%, rgba(219, 242, 39, 0.2), rgba(219, 242, 39, 0) 50%),
+    radial-gradient(160px 70px at 100% 0%, rgba(219, 242, 39, 0.22), rgba(219, 242, 39, 0)),
     linear-gradient(135deg, #172123 0%, #1f3a3d 60%, #2a5155 100%);
   --brand-surface-hover:
-    radial-gradient(circle at 100% 0%, rgba(219, 242, 39, 0.28), rgba(219, 242, 39, 0) 55%),
+    radial-gradient(180px 80px at 100% 0%, rgba(219, 242, 39, 0.3), rgba(219, 242, 39, 0)),
     linear-gradient(135deg, #1b2729 0%, #244448 60%, #305b60 100%);
   --shadow-card: 0 1px 2px rgba(17, 26, 27, 0.04), 0 6px 18px rgba(17, 26, 27, 0.04);
   /* Motion: one iOS-like curve for anything that moves, a softer one for fades. */
@@ -403,6 +403,21 @@
 }
 .btn-ink:hover {
   background: var(--brand-surface-hover);
+}
+.btn-ink {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.btn-ink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--grain, none) 0 0 / 160px 160px;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
 .btn-lime {
@@ -1114,6 +1129,42 @@
   font-weight: 600;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+/* Home smart cards: tighter than the detail screen, so more of the day fits. */
+.ccard-head {
+  min-height: 64px;
+  grid-template-columns: 52px 36px minmax(0, 1fr) 18px;
+  padding: 12px 14px 10px;
+}
+.ccard-head .chip-icon {
+  width: 36px;
+  height: 36px;
+}
+.ccard-body {
+  gap: 8px;
+  padding: 2px 14px 14px;
+}
+.ccard .tiles {
+  gap: 8px;
+}
+.ccard .tile {
+  min-height: 48px;
+}
+.ccard .tile-main {
+  padding: 7px 12px;
+}
+.ccard .tile-text {
+  gap: 1px;
+}
+.ccard .tile-extra {
+  width: 44px;
+}
+.ccard-note {
+  padding: 0 2px;
+}
+.ccard-body .crew-toggle {
+  min-height: 40px;
 }
 
 /* ───────── Note rows ───────── */
@@ -2774,58 +2825,61 @@
   isolation: isolate;
 }
 
-/* Ticket stub: the time column becomes a torn-off stub on the brand gradient. */
-[data-accent='stub'] .ccard-head,
-[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
+/* Ticket stub: the time column sits on the brand gradient, and its edge breaks
+   up into film grain (with a few lime specks) instead of ending in a hard line. */
+[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle) {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  --stub-w: 76px;
+  --stub-solid: 68px;
+  --stub-edge: 28px;
 }
 [data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
-  --stub-w: 84px;
+  --stub-solid: 82px;
 }
-[data-accent='stub'] .ccard-head::before,
-[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle::before {
+[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle)::before {
   content: '';
   position: absolute;
   z-index: -1;
   top: 0;
   bottom: 0;
   left: 0;
-  width: var(--stub-w);
+  width: calc(var(--stub-solid) + var(--stub-edge));
   background:
-    radial-gradient(circle at 0% 0%, rgba(219, 242, 39, 0.3), rgba(219, 242, 39, 0) 60%),
+    var(--grain-soft, none) 0 0 / 160px 160px,
+    radial-gradient(120px 90px at 0% 0%, rgba(219, 242, 39, 0.26), rgba(219, 242, 39, 0)),
     var(--header-gradient);
-  /* Punched edge, like a ticket perforation */
-  -webkit-mask: radial-gradient(circle at 100% 50%, transparent 5px, #000 5.5px);
-  mask: radial-gradient(circle at 100% 50%, transparent 5px, #000 5.5px);
+  background-blend-mode: overlay, normal, normal;
+  -webkit-mask:
+    linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
+    var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
+  mask:
+    linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
+    var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
 }
-[data-accent='stub'] .ccard-head::after,
-[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle::after {
+[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle)::after {
   content: '';
   position: absolute;
   z-index: -1;
   top: 0;
   bottom: 0;
-  left: 0;
-  width: var(--stub-w);
-  background-image: var(--grain, none);
-  background-size: 160px 160px;
-  opacity: 0.16;
-  mix-blend-mode: overlay;
+  left: calc(var(--stub-solid) - 12px);
+  width: 44px;
+  opacity: 0.9;
+  background: var(--sparks, none) 0 0 / 44px 256px repeat-y;
 }
-[data-accent='stub'] .ccard-head .stub-time,
-[data-accent='stub'] .nrow:not(.nrow-dashed) .stub-time {
+[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-time {
   color: #ffffff;
 }
-[data-accent='stub'] .ccard-head .stub-sub,
-[data-accent='stub'] .nrow:not(.nrow-dashed) .stub-sub {
+[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-sub {
   color: var(--on-dark-2);
 }
-[data-accent='stub'] .ccard-head .chip-icon,
-[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle .chip-icon {
-  margin-left: 4px;
+/* Room for the grain edge between the time and the type chip */
+[data-accent='stub'] .ccard-head {
+  grid-template-columns: 74px 36px minmax(0, 1fr) 18px;
+}
+[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
+  grid-template-columns: 86px 40px minmax(0, 1fr) 18px;
 }
 
 /* Corner glow: a lime light leak with grain in the top-right corner. */
