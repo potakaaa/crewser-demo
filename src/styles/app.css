@@ -2727,9 +2727,21 @@
 
 /* ───────── Brand ───────── */
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1;
+}
+/* The mark scales with the wordmark's font size. */
+.wordmark-mark {
+  width: auto;
+  height: 1.15em;
+}
+.logo-mark {
+  display: block;
+  flex: none;
 }
 .wordmark-light {
   color: #ffffff;
@@ -2776,8 +2788,15 @@
   gap: 10px;
   animation: splash-in 700ms var(--ease-ios) both;
 }
+.splash-logo {
+  margin-bottom: 14px;
+}
 .splash-wordmark {
-  font-size: 44px;
+  font-size: 40px;
+}
+/* The big mark already sits above, so the name stands alone here. */
+.splash-wordmark .wordmark-mark {
+  display: none;
 }
 .splash-sub {
   font-size: var(--fs-xs);
