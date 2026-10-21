@@ -1,13 +1,14 @@
-import { noteById, person } from '../mock';
-import { useDemo } from '../store';
-import { Icon } from '../components/Icon';
-import { useNoteActions } from '../lib/actions';
-import { fmtDayMonth } from '../lib/dates';
-import { QrCode } from '../components/QrPreview';
+import { noteById, person } from "../mock";
+import { useDemo } from "../store";
+import { Icon } from "../components/Icon";
+import { useNoteActions } from "../lib/actions";
+import { fmtDayMonth } from "../lib/dates";
+import { QrCode } from "../components/QrPreview";
 
-const flight = noteById('fl')!;
-const flightNo = flight.facts.find((f) => f.label === 'Flight no.')?.value ?? '';
-const ticketFile = flight.attachments[0]?.file ?? '';
+const flight = noteById("fl")!;
+const flightNo =
+  flight.facts.find((f) => f.label === "Flight no.")?.value ?? "";
+const ticketFile = flight.attachments[0]?.file ?? "";
 const route = flight.route!;
 
 export function BoardingPassScreen() {
@@ -21,44 +22,71 @@ function BoardingPass() {
   return (
     <div className="screen screen-col screen-white">
       <div className="topbar">
-        <button type="button" className="icon-btn icon-btn-soft" aria-label="Close boarding pass" onClick={back}>
+        <button
+          type="button"
+          className="icon-btn icon-btn-soft"
+          aria-label="Close boarding pass"
+          onClick={back}
+        >
           <Icon name="close" size={20} color="#0E1314" strokeWidth={1.8} />
         </button>
         <h1 className="topbar-title">Boarding pass</h1>
         <span />
       </div>
       <div className="bp-body">
-        <div className="bp-flight">
-          <div className="bp-meta-row">
-            <span className="bp-meta">
-              {flightNo} · {fmtDayMonth(flight.day!)}
-            </span>
-            <button type="button" className="icon-btn icon-btn-chip copy-btn copy-btn-sm" aria-label={`Copy flight number ${flightNo}`} onClick={() => a.copy(flightNo)}>
-              <Icon name="copy" size={17} color="#0E1314" />
-            </button>
-          </div>
-          <div className="route">
-            <div>
-              <span className="route-code route-code-md">{route.from.code}</span>
-              <span className="route-city">
-                {route.from.city} · {flight.time}
-              </span>
+        <div className="bp-ticket">
+          <div className="bp-ticket-top">
+            <div className="bp-flight">
+              <div className="bp-meta-row">
+                <span className="bp-meta">
+                  {flightNo} · {fmtDayMonth(flight.day!)}
+                </span>
+                <button
+                  type="button"
+                  className="icon-btn glass-btn copy-btn copy-btn-sm"
+                  aria-label={`Copy flight number ${flightNo}`}
+                  onClick={() => a.copy(flightNo)}
+                >
+                  <Icon name="copy" size={17} color="#FFFFFF" />
+                </button>
+              </div>
+              <div className="route route-dark">
+                <div>
+                  <span className="route-code route-code-md">
+                    {route.from.code}
+                  </span>
+                  <span className="route-city">
+                    {route.from.city} · {flight.time}
+                  </span>
+                </div>
+                <Icon
+                  name="arrowRight"
+                  size={24}
+                  color="#DBF227"
+                  strokeWidth={1.8}
+                  className="route-arrow"
+                />
+                <div className="route-end">
+                  <span className="route-code route-code-md">
+                    {route.to.code}
+                  </span>
+                  <span className="route-city">{route.to.city}</span>
+                </div>
+              </div>
             </div>
-            <Icon name="arrowRight" size={24} color="#61787D" strokeWidth={1.8} className="route-arrow" />
-            <div className="route-end">
-              <span className="route-code route-code-md">{route.to.code}</span>
-              <span className="route-city">{route.to.city}</span>
+            <div className="bp-passenger">
+              <span>Passenger</span>
+              <strong>{person.displayName}</strong>
             </div>
           </div>
+          <div className="bp-perf" aria-hidden="true" />
+          <div className="bp-ticket-bottom">
+            <div className="qr-wrap">
+              <QrCode size={232} label={`Scannable code from ${ticketFile}`} />
+            </div>
+            <span className="bp-source">Code from {ticketFile}</span>
+          </div>
         </div>
-        <div className="bp-passenger">
-          <span>Passenger</span>
-          <strong>{person.displayName}</strong>
-        </div>
-        <div className="qr-wrap">
-          <QrCode size={232} label={`Scannable code from ${ticketFile}`} />
-        </div>
-        <span className="bp-source">Code from {ticketFile}</span>
         <div className="bp-chips">
           <span className="bp-chip">
             <Icon name="sun" size={15} color="#0E1314" />
@@ -68,7 +96,11 @@ function BoardingPass() {
         </div>
       </div>
       <div className="foot-pad">
-        <button type="button" className="btn btn-outline-ink btn-lg" onClick={() => a.openPdf(ticketFile)}>
+        <button
+          type="button"
+          className="btn btn-outline-ink btn-lg"
+          onClick={() => a.openPdf(ticketFile)}
+        >
           Original PDF
         </button>
         <button type="button" className="btn btn-ink btn-lg" onClick={back}>
@@ -85,7 +117,12 @@ function BoardingPassFallback() {
   return (
     <div className="screen screen-col">
       <div className="topbar">
-        <button type="button" className="icon-btn" aria-label="Back" onClick={back}>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Back"
+          onClick={back}
+        >
           <Icon name="left" size={22} color="#111A1B" />
         </button>
         <h1 className="topbar-title">Boarding pass</h1>
@@ -94,9 +131,16 @@ function BoardingPassFallback() {
       <div className="screen-scroll fallback-body">
         <div className="notice-amber" role="status">
           <strong>No scannable code in this PDF</strong>
-          <span>We couldn't read a QR, Aztec or PDF417 code in {ticketFile}. Show the original PDF at check-in and the gate.</span>
+          <span>
+            We couldn't read a QR, Aztec or PDF417 code in {ticketFile}. Show
+            the original PDF at check-in and the gate.
+          </span>
         </div>
-        <button type="button" className="btn btn-ink btn-xl" onClick={() => a.openPdf(ticketFile)}>
+        <button
+          type="button"
+          className="btn btn-ink btn-xl"
+          onClick={() => a.openPdf(ticketFile)}
+        >
           <Icon name="file" size={20} color="#FFFFFF" strokeWidth={1.8} />
           Open original PDF
         </button>
@@ -106,10 +150,17 @@ function BoardingPassFallback() {
           </span>
           <div className="route">
             <div>
-              <span className="route-code route-code-sm">{route.from.code}</span>
+              <span className="route-code route-code-sm">
+                {route.from.code}
+              </span>
               <span className="route-city">{flight.time}</span>
             </div>
-            <Icon name="arrowRight" size={22} color="#54686C" className="route-arrow" />
+            <Icon
+              name="arrowRight"
+              size={22}
+              color="#54686C"
+              className="route-arrow"
+            />
             <div className="route-end">
               <span className="route-code route-code-sm">{route.to.code}</span>
               <span className="route-city">{route.to.city}</span>
@@ -117,7 +168,11 @@ function BoardingPassFallback() {
           </div>
           <span className="fallback-text">{flight.text}</span>
         </div>
-        <button type="button" className="btn btn-soft btn-lg" onClick={() => a.copy(flightNo)}>
+        <button
+          type="button"
+          className="btn btn-soft btn-lg"
+          onClick={() => a.copy(flightNo)}
+        >
           <Icon name="copy" size={18} color="#111A1B" />
           Copy flight number
         </button>

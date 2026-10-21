@@ -2215,7 +2215,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-5);
-  padding: var(--sp-2) var(--sp-6) var(--sp-4);
+  padding: var(--sp-2) var(--sp-5) var(--sp-4);
 }
 .bp-flight {
   display: flex;
@@ -2266,6 +2266,86 @@
   text-align: center;
   font-size: var(--fs-sm);
   color: #394c50;
+}
+/* The pass as a real ticket: flight details on the brand gradient with grain,
+   a perforated tear line, and the code on plain white so scanners read it. */
+.bp-ticket {
+  flex: none;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(17, 26, 27, 0.1);
+}
+.bp-ticket-top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: 18px 18px 20px;
+  background:
+    radial-gradient(220px 140px at 100% 0%, rgba(219, 242, 39, 0.22), rgba(219, 242, 39, 0)),
+    radial-gradient(180px 120px at 0% 100%, rgba(111, 208, 200, 0.14), rgba(111, 208, 200, 0)),
+    var(--header-gradient);
+  color: #ffffff;
+}
+.bp-ticket-top::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--grain, none) 0 0 / 160px 160px;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  animation: grain-shift 4.8s steps(1, end) infinite;
+  pointer-events: none;
+}
+.bp-ticket-top .bp-meta,
+.bp-ticket-top .bp-passenger span {
+  color: var(--on-dark-2);
+}
+.bp-ticket-top .copy-btn {
+  margin-right: -6px;
+}
+/* Tear line with a punched notch on each side */
+.bp-perf {
+  position: relative;
+  height: 0;
+  margin: 0 18px;
+  border-top: 2px dashed rgba(17, 26, 27, 0.16);
+}
+.bp-perf::before,
+.bp-perf::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: #ffffff;
+}
+.bp-perf::before {
+  left: -30px;
+}
+.bp-perf::after {
+  right: -30px;
+}
+.bp-ticket-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 14px 18px 16px;
+}
+.bp-ticket .qr-wrap {
+  padding: 4px;
+  border: 0;
+}
+.bp-ticket .bp-source {
+  margin-top: 0;
 }
 .bp-chips {
   display: flex;
