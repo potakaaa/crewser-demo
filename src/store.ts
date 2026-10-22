@@ -177,8 +177,8 @@ interface Actions {
   setLogOpen: (v: boolean) => void;
   openSheet: (kind: SheetKind, id?: string) => void;
   closeSheet: () => void;
-  /** Switch to another crew link; expired links are refused with a toast. */
-  setActiveLink: (id: string) => void;
+  /** Switch to another crew link. Returns false when refused (unknown, expired or revoked link, with a toast for the last two); true when the link is now active. */
+  setActiveLink: (id: string) => boolean;
   completeMasterData: () => void;
   setFontTheme: (t: FontTheme) => void;
   setBreak: (min: number) => void;
@@ -340,16 +340,16 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   },
   setActiveLink: (id) => {
     const link = linkById(id);
-    if (!link) return;
+    if (!link) return false;
     if (link.status === 'revoked') {
       get().showToast(`Production removed this access to ${link.projectName}. Ask them for a new link.`);
-      return;
+      return false;
     }
     if (link.status === 'expired') {
       get().showToast(`The link for ${link.projectName} has expired. Ask production for a new one.`);
-      return;
+      return false;
     }
-    if (id === get().activeLinkId) return;
+    if (id === get().activeLinkId) return true;
     // Close what is open and swap the Log form: park this link's, bring back the other's (or defaults).
     dropSheet(get().sheetPushed);
     set((s) => {
@@ -357,6 +357,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       const { [id]: next = logDefaults(), ...rest } = parked;
       return { activeLinkId: id, sheet: null, sheetPushed: false, logOpen: false, logs: rest, ...next };
     });
+    return true;
   },
   completeMasterData: () => set({ masterDataDone: true }),
   setFontTheme: (t) => {
