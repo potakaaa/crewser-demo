@@ -3,6 +3,7 @@ import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { addDays, fmtCountdown } from '../lib/dates';
+import { useSubmitted } from '../lib/useSubmitted';
 import { minutesUntil } from '../lib/notes';
 
 const callSheetFor = (day: string) => docs.find((d) => d.kind === 'callsheet' && d.day === day);
@@ -17,7 +18,7 @@ const shortTitle = (title: string) => title.replace(/^Call sheet · /, '');
 export function TodayCard({ note }: { note: Note | undefined }) {
   const a = useNoteActions();
   const setLogOpen = useDemo((s) => s.setLogOpen);
-  const submitted = useDemo((s) => s.submitted.includes(today.date));
+  const submitted = useSubmitted().includes(today.date);
   const sheet = callSheetFor(today.date);
   const tomorrow = callSheetFor(addDays(today.date, 1));
   const wrap = note?.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;

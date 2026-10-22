@@ -2,12 +2,13 @@ import { useMemo } from 'react';
 import { project, today } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
+import { useSubmitted } from '../lib/useSubmitted';
 import { fmtBig, hoursOverview, type HoursOverview } from '../lib/stats';
 
 export type HoursMetric = 'week' | 'overtime' | 'days';
 
 export const useHoursOverview = () => {
-  const submitted = useDemo((s) => s.submitted);
+  const submitted = useSubmitted();
   return useMemo(() => hoursOverview(submitted), [submitted]);
 };
 
