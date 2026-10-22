@@ -183,7 +183,7 @@ export function LogSheet() {
         </button>
       </div>
 
-      <p className="log-plan" aria-live="polite">
+      <p className="log-plan" aria-live={badSpan ? 'off' : 'polite'}>
         {summary(start, end, breakMin)}
       </p>
 
@@ -198,7 +198,7 @@ export function LogSheet() {
           You are sending hours for {link.personName}, not for yourself.
         </p>
       )}
-      <button type="button" className="btn btn-lime btn-lg" disabled={badSpan} aria-describedby={badSpan ? 'log-bad-span' : undefined} onClick={save}>
+      <button type="button" className="btn btn-lime btn-lg" aria-disabled={badSpan} aria-describedby={badSpan ? 'log-bad-span' : undefined} onClick={save}>
         {!end ? 'Save start time' : confirming ? `Submit for ${link.personName}` : 'Submit hours'}
       </button>
       <button type="button" className="text-btn" onClick={() => toast('The full workday view is not part of this demo')}>

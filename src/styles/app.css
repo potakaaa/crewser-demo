@@ -2358,7 +2358,7 @@
   font-size: var(--fs-sm);
   line-height: 1.4;
 }
-.btn-lime:disabled {
+.btn-lime[aria-disabled='true'] {
   opacity: 0.45;
   cursor: not-allowed;
 }
