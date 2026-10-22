@@ -18,7 +18,10 @@ const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
 /** The call sheet for each shoot day; a day with one is a shoot day. */
 const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
 
-/** Shoot days up to today whose hours have not gone to production: logged as a draft, or not logged yet. */
+/**
+ * Shoot days up to today whose hours have not gone to production: logged as a draft, or not logged yet.
+ * The draft part must agree with hoursOverview's `unsent` (lib/stats.ts); days nobody logged are extra, which `unsent` cannot know about.
+ */
 function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): boolean {
   if (iso > today.date || !callSheetByDay.has(iso)) return false;
   const logged = workdays.find((w) => w.date === iso);

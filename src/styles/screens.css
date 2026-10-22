@@ -853,11 +853,6 @@
   align-self: flex-start;
   max-width: 100%;
 }
-.actingas-light {
-  border-color: var(--hairline);
-  background: var(--card);
-  color: var(--ink);
-}
 .actingas-av {
   flex: none;
   width: 32px;

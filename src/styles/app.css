@@ -578,15 +578,6 @@
   font-weight: 500;
   color: var(--amber-text);
 }
-.empty-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--r-control);
-  background: rgba(255, 255, 255, 0.12);
-}
 .empty-light {
   display: flex;
   flex-direction: column;
@@ -775,12 +766,6 @@
   gap: var(--sp-3);
   padding: var(--sp-1) var(--sp-4) var(--sp-4);
 }
-.ccard-note {
-  padding: 2px 2px 0;
-  font-size: var(--fs-sm);
-  line-height: 1.5;
-  color: var(--text-2);
-}
 .stub {
   display: flex;
   flex-direction: column;
@@ -940,9 +925,6 @@
 }
 .ccard .tile-extra {
   width: 44px;
-}
-.ccard-note {
-  padding: 0 2px;
 }
 .ccard-body .crew-toggle {
   min-height: 40px;

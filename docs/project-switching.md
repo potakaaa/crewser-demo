@@ -1,6 +1,6 @@
 # Switching between projects in the Crewser crew app
 
-Status: proposal for the production app. The prototype shows the behaviour with mock data only.
+Status: proposal for the production app. The clickable prototype (mock data, no backend) shows only: the project switcher, drafts and logged hours kept per link, the expired and revoked states, the "Acting as" banner and the confirm step before sending hours for a colleague. Everything else here (the wallet, adding and validating links, status checks, "Request a new link", "Remove from this phone", delegation grants and the security measures) is proposed and not built.
 
 ## Summary
 
@@ -25,8 +25,8 @@ Crew members often work on two productions at the same time, and a department me
 
 - A project switcher at the top of the app lists every link on the phone: project, production, whose hours the link is for, and when it ends.
 - Links that end soon show a warning ("ends in 3 days"). Expired links are greyed out. A link that production revoked is shown differently from one that simply ran out, so the user knows whether to wait or to ask.
-- Choosing a link switches the whole app (dashboard, calendar, documents, contacts) to that project and person. Anything half-typed for the previous person stays saved as a draft with that person (see "Drafts").
-- Links that belong to a colleague carry the colleague's name everywhere hours are shown, so it is always clear whose hours are being entered.
+- Choosing a link switches the app to that project and person. In the production app that means dashboard, calendar, documents and contacts. In the prototype only the project name, the logged hours and the Log sheet draft change; documents and contacts are shared mock data. Anything half-typed for the previous person stays saved as a draft with that person (see "Drafts").
+- Links that belong to a colleague carry the colleague's name wherever hours are shown, so it is always clear whose hours are being entered. The prototype does this with the "Acting as" banner and the "Hours for …" title of the Log sheet.
 
 ## The local wallet
 
@@ -55,7 +55,7 @@ Display data (project name, person name, department) is cached next to it so the
 - When the app starts and when it returns to the foreground, it checks each link in the background with one cheap call, for example `GET /crew/me`, sent with that link's token.
   - `200`: the link is valid. Refresh the cached display data and the expiry date.
   - `410`, or an explicit "revoked" response: **final**. The link is dead. Mark it revoked (or expired when the server says it ran out) and do not retry.
-  - `401`: not final at first. It can mean a mistyped or rotated token or a temporary state. Re-check once on the next start. After a second `401` the link is shown as "needs a new link" and offers "Request a new link".
+  - `401`: not final at first. It can mean a mistyped or rotated token or a temporary state. Re-check once on the next start. After a second `401` the link is shown as "needs a new link" and (proposed) offers "Request a new link". The prototype has no such action; a blocked link only says "Ask production for a new link".
   - Network error or `5xx`: keep the previous status. Being offline never counts as expired.
 - "Request a new link" is open to anyone who can type a phone number, so it should be built to resist abuse. The proposal: requests are rate-limited per phone number and per device, the one-time code is short-lived and single-use, and the reply is the same whether or not the number belongs to a crew member. These are design requirements for the backend, not existing behaviour. They keep the endpoint from being used to guess crew phone numbers or to send unwanted SMS.
 - The device clock only drives the warning text ("ends in 3 days"). The server decides whether a link works.
@@ -90,7 +90,7 @@ The delegate then holds a token of their own with that restricted scope, and the
 ### Rules the app follows in both phases
 
 - Hours are only ever sent with the token of the person they are for. Every screen that edits hours works on one selected entry.
-- When the person is not the user, the app confirms before sending: "Submitting hours for Slate Bianca".
+- When the person is not the user, the app confirms before sending. In the prototype the first tap on Submit shows "You are sending hours for Slate Bianca, not for yourself." and changes the button to "Submit for Slate Bianca"; the second tap sends.
 - The app never mixes tokens in one request and never sends a token to any origin other than the allowlisted Crewser one.
 
 ## Drafts and sending
@@ -99,12 +99,12 @@ The delegate then holds a token of their own with that restricted scope, and the
 - A queued send looks up its token from its own wallet entry at the moment it is sent. It never uses whichever link happens to be active.
 - Switching link cancels only reads that belong to the previous link. Writes already on their way are allowed to finish, or are retried later with the same key, so a switch can never lose an hours entry.
 - Each submission carries an idempotency key made from the entry, the date and the draft revision (or a hash of the content). A retry of the same send after a bad connection cannot create a second submission. A resubmit on the same day with changed content has a new key and counts as an update. If the API does not already treat a repeat submission for the same day as an update, accepting this key is a small backend addition.
-- An expired link that still has unsent drafts stays in the list and offers "Request a new link". The drafts are not lost.
+- An expired link that still has unsent drafts stays in the list and (proposed) offers "Request a new link". The drafts are not lost.
 - Removing a link asks whether to keep or discard its unsent drafts. Drafts that are kept are parked: stored encrypted, kept for a limited time (for example 30 days), and they cannot be sent until the link has been added again.
 
 ## Removing a link
 
-"Remove from this phone" deletes the wallet entry and every cached item for it: names, phone numbers, call sheets, notes. It does not revoke the link on the server, so the user can add it again from the SMS. Production can revoke a link at any time (for example when someone leaves the crew); the next check then returns `410` and the app marks it revoked.
+(Proposed; the prototype has no remove action.) "Remove from this phone" deletes the wallet entry and every cached item for it: names, phone numbers, call sheets, notes. It does not revoke the link on the server, so the user can add it again from the SMS. Production can revoke a link at any time (for example when someone leaves the crew); the next check then returns `410` and the app marks it revoked.
 
 ## Security notes
 

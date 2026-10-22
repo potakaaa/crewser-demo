@@ -5,14 +5,14 @@ import { Icon } from './Icon';
  * Shown while you enter hours for a colleague, so you never forget whose app this is.
  * Renders nothing on your own link. Tap to switch back in the project sheet.
  */
-export function ActingAs({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
+export function ActingAs() {
   const link = useActiveLink();
   const openSheet = useDemo((s) => s.openSheet);
   if (link.isMe) return null;
   return (
     <button
       type="button"
-      className={`actingas actingas-${tone}`}
+      className="actingas"
       aria-haspopup="dialog"
       aria-label={`Acting as ${link.personName}, ${link.position}. Open projects to switch.`}
       onClick={() => openSheet('project')}

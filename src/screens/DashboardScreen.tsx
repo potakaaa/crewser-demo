@@ -61,7 +61,7 @@ export function DashboardScreen() {
             <Icon name="search" size={20} color="#FFFFFF" />
           </button>
         </div>
-        <ActingAs tone="dark" />
+        <ActingAs />
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
         <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />
