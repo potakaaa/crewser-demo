@@ -155,3 +155,41 @@ export function previewLine(s: Scrub, p: Preview): string {
   }
   return p.quiet ? `Nothing else until ${stop.when}` : `Preview · ${stop.rel} · ${stop.when}`;
 }
+
+/** Notes closer together than this (px) on the ruler overlap as dots (10 px wide), so they get one count badge. */
+export const CLUSTER_PX = 12;
+
+/** A cluster of tied notes, recorded on its leading stop. */
+export interface Cluster {
+  /** Notes in the cluster. */
+  n: number;
+  /** px from the lead's marker to the last one's. */
+  span: number;
+}
+
+/**
+ * Per stop: the cluster it leads if two or more notes follow one another within CLUSTER_PX, else null.
+ * The badge goes on the leading stop only; the others are drawn stacked behind it.
+ */
+export function clusters(stops: ScrubStop[]): (Cluster | null)[] {
+  const out: (Cluster | null)[] = stops.map(() => null);
+  let lead = -1;
+  stops.forEach((s, i) => {
+    if (lead >= 0 && s.x - stops[i - 1].x < CLUSTER_PX) {
+      const c = out[lead] ?? { n: 1, span: 0 };
+      out[lead] = { n: c.n + 1, span: s.x - stops[lead].x };
+    } else lead = i;
+  });
+  return out;
+}
+
+/**
+ * Where the ruler should settle once it stops moving: the note at or after the playhead, so that
+ * note's marker sits exactly under it, or Now when the playhead is back in the rest zone.
+ * Null when nothing is left ahead (the playhead is past the last note): stay where it is.
+ */
+export function snapTarget(s: Scrub, x: number): number | null {
+  const p = previewAt(s, x);
+  if (!p) return 0;
+  return s.stops[p.index]?.x ?? null;
+}
