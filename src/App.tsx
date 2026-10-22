@@ -79,11 +79,13 @@ export default function App() {
 
   useEffect(() => {
     if (!location.hash) history.replaceState(null, '', routeToHash({ name: 'dashboard' }));
-    window.addEventListener('popstate', sync);
-    window.addEventListener('hashchange', sync);
+    const onPop = () => sync('popstate');
+    const onHash = () => sync('hashchange');
+    window.addEventListener('popstate', onPop);
+    window.addEventListener('hashchange', onHash);
     return () => {
-      window.removeEventListener('popstate', sync);
-      window.removeEventListener('hashchange', sync);
+      window.removeEventListener('popstate', onPop);
+      window.removeEventListener('hashchange', onHash);
     };
   }, [sync]);
 

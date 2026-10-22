@@ -17,7 +17,7 @@ export function DashboardScreen() {
   const empty = useDemo((s) => s.empty);
   const allOpen = useDemo((s) => s.homeAllOpen);
   const toggleAll = useDemo((s) => s.toggleHomeAll);
-  const expanded = useDemo((s) => s.expanded.home);
+  const expanded = useDemo((s) => s.expanded.dashboard);
   const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const masterDataDone = useDemo((s) => s.masterDataDone);
   const openSheet = useDemo((s) => s.openSheet);
@@ -87,7 +87,7 @@ export function DashboardScreen() {
                           <strong>{g.label}</strong> · {g.sub}
                         </span>
                         {g.notes.map((n) => (
-                          <NoteRow key={n.id} note={n} open={expanded === n.id} onToggle={() => toggleExpanded('home', n.id)} />
+                          <NoteRow key={n.id} note={n} open={expanded === n.id} onToggle={() => toggleExpanded('dashboard', n.id)} />
                         ))}
                       </div>
                     ))}

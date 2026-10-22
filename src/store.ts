@@ -21,6 +21,8 @@ interface Entry {
   pushed: boolean;
   /** Sheet that was open when this screen was pushed from it; Back brings it back. */
   reopen?: SheetState;
+  /** Whether that sheet had its own browser-history entry. */
+  reopenPushed?: boolean;
 }
 
 const TABS: readonly string[] = ['dashboard', 'calendar', 'documents', 'contacts', 'settings'];
@@ -35,6 +37,15 @@ export function routeToHash(r: Route): string {
   }
 }
 
+/** decodeURIComponent throws on a stray "%"; a bad link should land on the dashboard, not crash. */
+function safeDecode(v: string): string | null {
+  try {
+    return decodeURIComponent(v);
+  } catch {
+    return null;
+  }
+}
+
 const parseHash = (hash: string) => {
   const m = hash.replace(/^#\/?/, '').match(/^([a-z]+)(?:[/-](.+))?$/);
   return { head: m?.[1], arg: m?.[2]?.replace(/\/$/, '') };
@@ -46,8 +57,8 @@ export function hashToRoute(hash: string): Route {
   if (head === 'calendar' || head === 'documents' || head === 'contacts' || head === 'settings') return { name: head };
   if (head === 'ticket') return { name: 'ticket' };
   if (head === 'pdf' && arg) {
-    const file = decodeURIComponent(arg);
-    if (pdfs[file]) return { name: 'pdf', file };
+    const file = safeDecode(arg);
+    if (file !== null && Object.hasOwn(pdfs, file)) return { name: 'pdf', file };
   }
   return { name: 'dashboard' };
 }
@@ -99,7 +110,7 @@ function loadFontTheme(): FontTheme {
   return 'inter';
 }
 
-export type ExpandList = 'home' | 'calendar';
+export type ExpandList = 'dashboard' | 'calendar';
 
 /** Brand accent on smart notes, switchable from the demo panel while we try them out. */
 export type NoteAccent = 'stub' | 'corner' | 'band' | 'edge' | 'none';
@@ -137,8 +148,10 @@ interface DemoState {
   /** How the last navigation moved, for the screen transition. */
   navDir: NavDir;
   splash: boolean;
-  /** Days submitted from this prototype (draft → submitted). */
-  submitted: string[];
+  /** Days submitted from this prototype (draft → submitted), per crew link. Read it with useSubmitted(). */
+  submitted: Record<string, string[]>;
+  /** The open sheet has its own browser-history entry, so Back closes it. */
+  sheetPushed: boolean;
   /** The light sheet has scrolled under the status bar: show dark status bar text. */
   statusDark: boolean;
   toast: Toast | null;
@@ -148,7 +161,8 @@ interface DemoState {
 interface Actions {
   navigate: (r: Route) => void;
   back: () => void;
-  syncFromLocation: () => void;
+  /** `src` matters for a sheet's own history entry: only popstate closes it, so a hashchange fired by the same step cannot undo a reopen. */
+  syncFromLocation: (src?: 'popstate' | 'hashchange') => void;
   setFlag: (k: 'offline' | 'empty' | 'codeFound', v: boolean) => void;
   setLogOpen: (v: boolean) => void;
   openSheet: (kind: SheetKind, id?: string) => void;
@@ -175,6 +189,13 @@ interface Actions {
 
 export type NavDir = 'push' | 'pop' | 'tab' | 'none';
 
+/** Log sheet defaults for a crew link: today's call time, the usual break, wrap still open. */
+const logDefaults = () => ({
+  breakMin: today.defaultBreakMin,
+  logStart: todayPlan(today.defaultBreakMin).call,
+  logEnd: null as string | null,
+});
+
 const initialState = (): DemoState => ({
   stack: initialStack(),
   offline: false,
@@ -186,17 +207,16 @@ const initialState = (): DemoState => ({
   activeLinkId: links.find((l) => l.isMe && l.status === 'active')!.id,
   masterDataDone: false,
   fontTheme: loadFontTheme(),
-  breakMin: today.defaultBreakMin,
-  logStart: todayPlan(today.defaultBreakMin).call,
-  logEnd: null,
+  ...logDefaults(),
   homeAllOpen: false,
-  expanded: { home: null, calendar: null },
+  expanded: { dashboard: null, calendar: null },
   calDate: today.date,
   calMonth: firstOfMonth(today.date),
   calMonthOpen: false,
   navDir: 'none',
   splash: true,
-  submitted: [],
+  submitted: {},
+  sheetPushed: false,
   statusDark: false,
   toast: null,
   noteAccent: 'stub',
@@ -204,18 +224,29 @@ const initialState = (): DemoState => ({
 
 let toastSeq = 0;
 
+/**
+ * Close the open sheet without going through Back. If it owns a history entry, step back over it
+ * so Back does not later land on a sheet that is gone.
+ */
+function dropSheet(pushed: boolean) {
+  if (pushed) history.back();
+}
+
 export const useDemo = create<DemoState & Actions>()((set, get) => ({
   ...initialState(),
 
   navigate: (r) => {
-    const { stack, sheet } = get();
+    const { stack, sheet, sheetPushed } = get();
     if (sameRoute(stack[stack.length - 1]?.route, r)) return;
     history.pushState(null, '', routeToHash(r));
     set({
-      stack: isTab(r) ? [{ route: r, pushed: true }] : [...stack, { route: r, pushed: true, reopen: sheet ?? undefined }],
+      stack: isTab(r)
+        ? [{ route: r, pushed: true }]
+        : [...stack, { route: r, pushed: true, reopen: sheet ?? undefined, reopenPushed: sheet ? sheetPushed : undefined }],
       navDir: isTab(r) ? 'tab' : 'push',
       logOpen: false,
       sheet: null,
+      sheetPushed: false,
     });
   },
 
@@ -233,13 +264,18 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     }
     const next = stack.slice(0, -1);
     history.replaceState(null, '', routeToHash(next[next.length - 1].route));
-    set({ stack: next, navDir: 'pop', sheet: top.reopen ?? null });
+    set({ stack: next, navDir: 'pop', sheet: top.reopen ?? null, sheetPushed: top.reopenPushed ?? false });
   },
 
-  syncFromLocation: () => {
+  syncFromLocation: (src) => {
     const r = hashToRoute(location.hash);
     const deepSheet = hashToSheet(location.hash);
-    const { stack } = get();
+    const { stack, sheet, sheetPushed } = get();
+    // Back with a sheet open that owns a history entry: close the sheet, stay on the page.
+    if (sheet && sheetPushed && src !== 'hashchange') {
+      set({ sheet: null, sheetPushed: false });
+      return;
+    }
     const top = stack[stack.length - 1];
     if (deepSheet) {
       set({ stack: isTab(top.route) ? stack : [{ route: r, pushed: false }], navDir: 'none', sheet: deepSheet, logOpen: false });
@@ -247,11 +283,11 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     }
     if (sameRoute(top?.route, r)) return;
     if (sameRoute(stack[stack.length - 2]?.route, r)) {
-      set({ stack: stack.slice(0, -1), navDir: 'pop', sheet: top.reopen ?? null, logOpen: false });
+      set({ stack: stack.slice(0, -1), navDir: 'pop', sheet: top.reopen ?? null, sheetPushed: top.reopenPushed ?? false, logOpen: false });
     } else if (isTab(r)) {
-      set({ stack: [{ route: r, pushed: false }], navDir: 'tab', sheet: null, logOpen: false });
+      set({ stack: [{ route: r, pushed: false }], navDir: 'tab', sheet: null, sheetPushed: false, logOpen: false });
     } else {
-      set({ stack: [...stack, { route: r, pushed: false }], navDir: 'push', sheet: null, logOpen: false });
+      set({ stack: [...stack, { route: r, pushed: false }], navDir: 'push', sheet: null, sheetPushed: false, logOpen: false });
     }
   },
 
@@ -259,9 +295,24 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     set({ [k]: v } as Pick<DemoState, typeof k>);
     scrollAllToTop(); // so the state you just switched on is in view
   },
-  setLogOpen: (v) => set(v ? { logOpen: true, sheet: null } : { logOpen: false }),
-  openSheet: (kind, id) => set({ sheet: { kind, id }, logOpen: false }),
+  setLogOpen: (v) => {
+    if (!v) return set({ logOpen: false });
+    dropSheet(get().sheetPushed);
+    set({ logOpen: true, sheet: null, sheetPushed: false });
+  },
+  openSheet: (kind, id) => {
+    const { sheet, sheetPushed } = get();
+    // A sheet gets one history entry; switching to another sheet reuses it.
+    if (!sheet && !sheetPushed) history.pushState(null, '', location.hash || routeToHash(get().stack[get().stack.length - 1].route));
+    set({ sheet: { kind, id }, sheetPushed: sheet ? sheetPushed : true, logOpen: false });
+  },
   closeSheet: () => {
+    const { sheet, sheetPushed } = get();
+    if (!sheet) return;
+    if (sheetPushed) {
+      history.back(); // popstate → syncFromLocation closes the sheet
+      return;
+    }
     // A deep link (#/note/fl) leaves its hash behind; drop it so reload doesn't reopen the sheet.
     if (hashToSheet(location.hash)) history.replaceState(null, '', routeToHash(get().stack[get().stack.length - 1].route));
     set({ sheet: null });
@@ -273,7 +324,10 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       get().showToast(`The link for ${link.projectName} has expired. Ask production for a new one.`);
       return;
     }
-    set({ activeLinkId: id });
+    if (id === get().activeLinkId) return;
+    // Another person's day starts clean: no open sheet or log form, default times.
+    dropSheet(get().sheetPushed);
+    set({ activeLinkId: id, sheet: null, sheetPushed: false, logOpen: false, ...logDefaults() });
   },
   completeMasterData: () => set({ masterDataDone: true }),
   setFontTheme: (t) => {
@@ -297,7 +351,11 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   setCalDate: (iso) => set((s) => ({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false, expanded: { ...s.expanded, calendar: null } })),
   toggleCalMonth: () => set((s) => ({ calMonthOpen: !s.calMonthOpen, calMonth: firstOfMonth(s.calDate) })),
   hideSplash: () => set({ splash: false }),
-  submitDay: (iso) => set((s) => ({ submitted: s.submitted.includes(iso) ? s.submitted : [...s.submitted, iso] })),
+  submitDay: (iso) =>
+    set((s) => {
+      const days = s.submitted[s.activeLinkId] ?? [];
+      return days.includes(iso) ? {} : { submitted: { ...s.submitted, [s.activeLinkId]: [...days, iso] } };
+    }),
   setStatusDark: (v) => set({ statusDark: v }),
   showToast: (message) => set({ toast: { id: ++toastSeq, message } }),
   setNoteAccent: (a) => set({ noteAccent: a }),
@@ -311,7 +369,6 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
 }));
 
 export const useRoute = () => useDemo((s) => s.stack[s.stack.length - 1].route);
-export const usePrevRoute = () => useDemo((s) => s.stack[s.stack.length - 2]?.route);
 
 /** The crew link the app is showing right now. */
 export const useActiveLink = () => useDemo((s) => s.links.find((l) => l.id === s.activeLinkId)!);
