@@ -45,7 +45,7 @@ function SwitchRow({ icon, title, hint, on, onToggle }: { icon: IconName; title:
 function Group({ title, sub, children }: { title: string; sub?: string; children: ReactNode }) {
   return (
     <section className="stack" aria-label={title}>
-      <SectionHead title={title} sub={sub ?? ''} />
+      <SectionHead title={title} sub={sub} />
       {children}
     </section>
   );
@@ -73,7 +73,7 @@ export function SettingsScreen() {
         <ScreenTitle eyebrow={link.projectName} title="Settings" />
       </GradientHeader>
 
-      <Sheet>
+      <Sheet className="sheet-compact">
         {!link.isMe && (
           <section className="setbanner" aria-label="Acting for a colleague">
             <span className="setbanner-text">
@@ -96,7 +96,7 @@ export function SettingsScreen() {
         )}
         <section className="setprofile" aria-label="Your profile">
           <div className="setprofile-who">
-            <Avatar initials={own.initials} tint="#C0D6DB" size={56} />
+            <Avatar initials={own.initials} tint="#C0D6DB" size={44} />
             <span className="crow-text">
               <span className="setprofile-name">{own.personName}</span>
               <span className="setprofile-sub">
@@ -126,20 +126,20 @@ export function SettingsScreen() {
               </span>
               <span className="todo-titles">
                 <span className="todo-t1">Complete master data</span>
-                <span className="todo-t2">Payroll needs it before your first payout</span>
+                <span className="todo-t2">Needed before your first payout</span>
               </span>
               <Icon name="right" size={18} color="#54686C" />
             </button>
           )}
         </section>
 
-        <Group title="Projects" sub="Switch between productions and people you enter hours for.">
+        <Group title="Projects">
           <div className="dlist">
             <NavRow icon="users" title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
           </div>
         </Group>
 
-        <Group title="Font" sub="Headlines and numbers. Body text stays Inter.">
+        <Group title="Font" sub="Headlines and numbers">
           <div className="fontlist" role="group" aria-label="Font">
             {FONT_THEMES.map((f) => {
               const on = f.value === fontTheme;
@@ -165,8 +165,8 @@ export function SettingsScreen() {
 
         <Group title="Notifications">
           <div className="dlist">
-            <SwitchRow icon="bell" title="Call sheet is out" hint="A ping when production publishes tomorrow's call sheet." on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
-            <SwitchRow icon="logTime" title="Reminder to submit hours" hint="A nudge at the end of the week if days are still open." on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
+            <SwitchRow icon="bell" title="Call sheet is out" hint="When tomorrow's call sheet is out" on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
+            <SwitchRow icon="logTime" title="Reminder to submit hours" hint="When days are still open at week's end" on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
           </div>
         </Group>
 

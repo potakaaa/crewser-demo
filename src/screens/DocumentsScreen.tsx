@@ -79,7 +79,7 @@ function CallSheetSection({ filtered }: { filtered: CallSheet[] }) {
   const rest = filtered.slice(RECENT);
   return (
     <section className="stack" aria-label={KIND_TITLE.callsheet}>
-      <SectionHead title={KIND_TITLE.callsheet} sub="By day, newest first" />
+      <SectionHead title={KIND_TITLE.callsheet} />
       <div className="dlist">
         {recent.map((d) => (
           <DocRow key={d.id} doc={d} />
@@ -115,11 +115,7 @@ export function DocumentsScreen() {
   const rest = callSheets.slice(1);
   const show = (k: DocKind) => filter === 'all' || filter === k;
   const kindDocs = (k: DocKind) => docs.filter((d) => d.kind === k);
-  const sections: { group: Exclude<DocKind, 'callsheet'>; sub: string }[] = [
-    { group: 'schedule', sub: 'Shoot plan and script overview' },
-    { group: 'safety', sub: 'Know where you are and what to watch' },
-    { group: 'other', sub: 'Everything else production shared' },
-  ];
+  const sections: Exclude<DocKind, 'callsheet'>[] = ['schedule', 'safety', 'other'];
 
   return (
     <div className="screen" ref={ref}>
@@ -136,16 +132,16 @@ export function DocumentsScreen() {
         </div>
       </GradientHeader>
 
-      <Sheet>
+      <Sheet className="sheet-compact">
         {latest && show('callsheet') && <PinnedCallSheet doc={latest} />}
         {show('callsheet') && rest.length > 0 && <CallSheetSection filtered={rest} />}
         {sections
-          .filter((s) => show(s.group) && kindDocs(s.group).length > 0)
-          .map((s) => (
-            <section className="stack" key={s.group} aria-label={KIND_TITLE[s.group]}>
-              <SectionHead title={KIND_TITLE[s.group]} sub={s.sub} />
+          .filter((k) => show(k) && kindDocs(k).length > 0)
+          .map((k) => (
+            <section className="stack" key={k} aria-label={KIND_TITLE[k]}>
+              <SectionHead title={KIND_TITLE[k]} />
               <div className="dlist">
-                {kindDocs(s.group).map((d) => (
+                {kindDocs(k).map((d) => (
                   <DocRow key={d.id} doc={d} />
                 ))}
               </div>

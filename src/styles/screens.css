@@ -68,8 +68,8 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--sp-2);
-  padding: var(--sp-5);
+  gap: 4px;
+  padding: var(--sp-4);
   border-radius: var(--r-card);
   background: var(--brand-surface);
   color: #ffffff;
@@ -95,9 +95,9 @@
   color: var(--on-dark-2);
 }
 .dpin-title {
-  margin-top: var(--sp-2);
+  margin-top: 2px;
   font-family: var(--font-display);
-  font-size: var(--fs-xl);
+  font-size: var(--fs-lg);
   font-weight: 600;
   letter-spacing: var(--track-tight);
   line-height: 1.2;
@@ -107,8 +107,8 @@
   color: var(--on-dark-3);
 }
 .dpin-cta {
-  margin-top: var(--sp-4);
-  min-height: 48px;
+  margin-top: var(--sp-2);
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,11 +122,11 @@
 
 .drow {
   width: 100%;
-  min-height: 68px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
   background: none;
   text-align: left;
   color: var(--ink);
@@ -140,7 +140,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
 }
 .drow-title {
   display: flex;
@@ -152,6 +152,9 @@
 .drow-meta {
   font-size: var(--fs-sm);
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .drow-today {
   padding: 2px 7px;
@@ -171,7 +174,7 @@
 }
 .dmore {
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,8 +242,8 @@
   --focus: #dbf227;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-  padding: var(--sp-4);
+  gap: var(--sp-3);
+  padding: var(--sp-3);
   border-radius: var(--r-card);
   background: var(--brand-surface);
   color: #ffffff;
@@ -273,7 +276,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding-top: var(--sp-3);
+  padding-top: var(--sp-2);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 .coffice-row .crow-main {
@@ -291,7 +294,7 @@
 .cdept {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: 4px;
 }
 .cdept-h {
   position: sticky;
@@ -315,9 +318,6 @@
   font-weight: 500;
   color: var(--text-3);
 }
-.csheet-list {
-  gap: var(--sp-6);
-}
 
 .crow {
   display: flex;
@@ -328,11 +328,11 @@
 .crow-main {
   flex: 1;
   min-width: 0;
-  min-height: 64px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) 0 var(--sp-2) var(--sp-3);
+  padding: 6px 0 6px var(--sp-3);
   background: none;
   text-align: left;
   color: var(--ink);
@@ -357,6 +357,9 @@
 .crow-pos {
   font-size: var(--fs-sm);
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .crow-you {
   flex: none;
@@ -373,8 +376,8 @@
   gap: var(--sp-1);
 }
 .cquick {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -425,7 +428,7 @@
   gap: var(--sp-2);
 }
 .cact {
-  min-height: 72px;
+  min-height: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -457,7 +460,7 @@
   grid-template-columns: 60px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--sp-3);
-  min-height: 56px;
+  min-height: 48px;
   padding: 0 var(--sp-2) 0 var(--sp-4);
 }
 .cdetail + .cdetail {
@@ -474,8 +477,8 @@
   overflow-wrap: anywhere;
 }
 .cdetail-copy {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -493,8 +496,8 @@
 .setprofile {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-  padding: var(--sp-4);
+  gap: var(--sp-3);
+  padding: var(--sp-3);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
   background: var(--card);
@@ -519,24 +522,26 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  min-height: 44px;
+  min-height: 40px;
   padding: 0 var(--sp-3);
   border-radius: var(--r-control);
   background: var(--soft);
   font-size: var(--fs-md);
   font-weight: 500;
 }
-.setstatus-todo {
+.setprofile .setstatus-todo {
+  min-height: 56px;
+  padding: var(--sp-2) var(--sp-3);
   box-shadow: none;
 }
 
 .setrow {
   width: 100%;
-  min-height: 64px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-3);
+  padding: 6px var(--sp-3);
   background: none;
   text-align: left;
   color: var(--ink);
@@ -550,7 +555,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   font-size: var(--fs-base);
   font-weight: 600;
 }
@@ -558,6 +563,9 @@
   font-size: var(--fs-sm);
   font-weight: 400;
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .setrow-value {
   font-size: var(--fs-md);
@@ -593,14 +601,14 @@
 .fontlist {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: 6px;
 }
 .fontopt {
-  min-height: 72px;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-3) var(--sp-4);
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
   border: 1.5px solid var(--hairline);
   border-radius: var(--r-card);
   background: var(--card);
@@ -618,8 +626,8 @@
 }
 .fontopt-sample {
   flex: none;
-  width: 84px;
-  font-size: 28px;
+  width: 72px;
+  font-size: 24px;
   line-height: 1;
   letter-spacing: -0.01em;
 }
@@ -637,6 +645,9 @@
 .fontopt-hint {
   font-size: var(--fs-sm);
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .fontopt-check {
   flex: none;
@@ -691,7 +702,7 @@
 .switcher {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
 }
 .lintro {
   font-size: var(--fs-sm);
@@ -720,11 +731,11 @@
 }
 .lrow {
   width: 100%;
-  min-height: 72px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
   background: none;
   text-align: left;
   color: var(--ink);
@@ -738,12 +749,12 @@
 }
 .lrow-av {
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 22px;
+  border-radius: 19px;
   background: var(--chip);
   font-size: var(--fs-md);
   font-weight: 600;
@@ -769,6 +780,9 @@
 .lrow-sub {
   font-size: var(--fs-sm);
   color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .lrow-ask {
   font-size: var(--fs-sm);
@@ -890,4 +904,13 @@
 .setbanner-btn {
   flex: none;
   min-height: 44px;
+}
+
+/* Compact rhythm: sections sit closer than on the dashboard. */
+.sheet.sheet-compact {
+  gap: var(--sp-5);
+}
+
+.btn-sm {
+  min-height: 40px;
 }

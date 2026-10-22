@@ -14,7 +14,7 @@ export function ContactSheet({ id }: { id?: string }) {
   return (
     <div className="csheet">
       <div className="csheet-who">
-        <Avatar initials={c.initials} tint={c.tint} size={56} />
+        <Avatar initials={c.initials} tint={c.tint} size={44} />
         <span className="crow-text">
           <span className="csheet-dept">
             {c.department}

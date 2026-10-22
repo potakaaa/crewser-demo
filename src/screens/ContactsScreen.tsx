@@ -51,7 +51,7 @@ function Office({ office, others }: { office: Contact; others: Contact[] }) {
   return (
     <section className="coffice" aria-label="Production office">
       <button type="button" className="coffice-head" onClick={() => openSheet('contact', office.id)}>
-        <Avatar initials={office.initials} tint={office.tint} size={48} />
+        <Avatar initials={office.initials} tint={office.tint} size={40} />
         <span className="crow-text">
           <span className="coffice-kicker">Pinned</span>
           <span className="coffice-name">{office.name}</span>
@@ -59,11 +59,11 @@ function Office({ office, others }: { office: Contact; others: Contact[] }) {
         </span>
       </button>
       <div className="btn-row">
-        <button type="button" className="btn btn-lime btn-md" onClick={() => act.call(office)}>
+        <button type="button" className="btn btn-lime btn-sm" onClick={() => act.call(office)}>
           <Icon name="call" size={18} color="#111A1B" />
           Call
         </button>
-        <button type="button" className="btn btn-glass btn-md" onClick={() => act.mail(office)}>
+        <button type="button" className="btn btn-glass btn-sm" onClick={() => act.mail(office)}>
           <Icon name="mail" size={18} color="#FFFFFF" />
           Email
         </button>
@@ -71,7 +71,7 @@ function Office({ office, others }: { office: Contact; others: Contact[] }) {
       {others.map((c) => (
         <div className="coffice-row" key={c.id}>
           <button type="button" className="crow-main" onClick={() => openSheet('contact', c.id)}>
-            <Avatar initials={c.initials} tint={c.tint} size={40} />
+            <Avatar initials={c.initials} tint={c.tint} size={36} />
             <span className="crow-text">
               <span className="crow-name">{c.name}</span>
               <span className="coffice-sub">{c.position}</span>
@@ -122,7 +122,7 @@ export function ContactsScreen() {
         </div>
       </GradientHeader>
 
-      <Sheet className="csheet-list">
+      <Sheet className="sheet-compact">
         {!q && office && <Office office={office} others={pinned.filter((c) => c.id !== office.id)} />}
         {groups.map((g) => (
           <section className="cdept" key={g.department} aria-label={g.department}>
