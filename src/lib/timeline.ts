@@ -13,6 +13,12 @@ export const MARK_GAP = 84;
 const TAIL = 12 * HOUR;
 /** Closer to Now than this (px) counts as "back at Now". */
 export const REST_PX = 4;
+/** Notes keep at least this much room (px) on the ruler, so each one has a spot the playhead can stop on. */
+export const STOP_GAP = 3;
+/** How close (px) the playhead must be to a note to count as on it: scrollLeft sits on the screen's pixel grid. */
+const PICK_EPS = 1;
+/** Arrow keys step to the next note further than this (px) from the playhead. Smaller than STOP_GAP, so ties never trap them. */
+export const NAV_EPS = STOP_GAP / 2;
 /** A note further than this past the playhead is "nothing else until …". */
 const QUIET = 3 * HOUR;
 
@@ -95,27 +101,31 @@ export function buildScrub(list: Note[] = allNotes): Scrub {
     return last.min + ((x - last.x) / MARK_GAP) * DAY;
   };
 
+  // Notes at the same time, or just after Now, would share a spot or sit under the "back at Now" zone
+  // and never be reachable: each is nudged right of the one before it.
+  let prevX = REST_PX - STOP_GAP + 1;
   const stops = upcoming.map<ScrubStop>((n) => {
     const min = Math.max(at(n) - nowMin, 0);
     const day = weekday(n.day!);
+    const x = Math.max(xAt(min), prevX + STOP_GAP);
+    prevX = x;
     return {
       note: n,
       min,
-      x: xAt(min),
+      x,
       when: n.kind === 'time' ? `${day} ${n.time}` : `${day}, all day`,
       rel: shortRel(min),
     };
   });
 
   const end = Math.max(last.min, (stops[stops.length - 1]?.min ?? 0) + TAIL);
-  return { marks, stops, length: Math.ceil(xAt(end)), minAt };
+  return { marks, stops, length: Math.ceil(Math.max(xAt(end), prevX + STOP_GAP * 4)), minAt };
 }
 
 /** The note at or after the playhead, or null while it rests on Now. */
 export function previewAt(s: Scrub, x: number): Preview | null {
   if (x < REST_PX) return null;
-  // One px of slack: scrollLeft is rounded to the screen's pixel grid.
-  const index = s.stops.findIndex((st) => st.x >= x - 1);
+  const index = s.stops.findIndex((st) => st.x >= x - PICK_EPS);
   const i = index < 0 ? s.stops.length : index;
   return { index: i, quiet: i < s.stops.length && s.stops[i].min - s.minAt(x) > QUIET };
 }

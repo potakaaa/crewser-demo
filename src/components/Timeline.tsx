@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useImperativeHandle, useRef, useState, type KeyboardEvent, type Ref } from 'react';
+import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type KeyboardEvent, type Ref } from 'react';
 import { TYPE_COLOR } from '../lib/noteStyle';
-import { previewAt, previewLine, samePreview, type Preview, type Scrub } from '../lib/timeline';
+import { NAV_EPS, previewAt, previewLine, samePreview, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
 /** Fastest fling that still counts, px per ms. */
@@ -98,16 +98,21 @@ function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
     const onUp = (e: PointerEvent) => {
       if (e.pointerId === pointer) endDrag(e);
     };
-    const onLost = (e: PointerEvent) => {
+    // Cancelled, or capture taken away: stop where we are, no fling.
+    const onCancel = (e: PointerEvent) => {
       if (e.pointerId === pointer) endDrag();
     };
 
-    // A mouse wheel only scrolls up and down; here it scrubs. Trackpads send small fractional
-    // steps, so they keep scrolling the page and use two-finger sideways swipes for the ruler.
+    // A mouse wheel only scrolls up and down; here it scrubs. Only real wheel notches count: line steps,
+    // or whole multiples of 100 px. Trackpad swipes and their momentum send other values, so the page
+    // keeps scrolling. And once the ruler is at its end in that direction the wheel goes back to the page.
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.deltaX !== 0) return;
-      const notched = e.deltaMode !== 0 || (Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 50);
+      if (e.ctrlKey || e.deltaX !== 0 || e.deltaY === 0) return;
+      const notched = e.deltaMode === 1 || (e.deltaMode === 0 && e.deltaY % 100 === 0);
       if (!notched) return;
+      const atStart = el.scrollLeft <= 0 && e.deltaY < 0;
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1 && e.deltaY > 0;
+      if (atStart || atEnd) return;
       e.preventDefault();
       el.scrollBy({ left: e.deltaY * (e.deltaMode === 1 ? 16 : 1) * 0.6, behavior: 'auto' });
     };
@@ -123,8 +128,8 @@ function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
     el.addEventListener('pointerdown', onDown);
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerup', onUp);
-    el.addEventListener('pointercancel', onUp);
-    el.addEventListener('lostpointercapture', onLost);
+    el.addEventListener('pointercancel', onCancel);
+    el.addEventListener('lostpointercapture', onCancel);
     el.addEventListener('wheel', onWheel, { passive: false });
     el.addEventListener('click', onClickCapture, true);
     return () => {
@@ -133,8 +138,8 @@ function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
       el.removeEventListener('pointerdown', onDown);
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerup', onUp);
-      el.removeEventListener('pointercancel', onUp);
-      el.removeEventListener('lostpointercapture', onLost);
+      el.removeEventListener('pointercancel', onCancel);
+      el.removeEventListener('lostpointercapture', onCancel);
       el.removeEventListener('wheel', onWheel);
       el.removeEventListener('click', onClickCapture, true);
     };
@@ -161,6 +166,7 @@ export function Timeline({
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   const shown = useRef<Preview | null>(null);
   const tickRef = useRef<HTMLSpanElement>(null);
+  const hintId = useId();
 
   const onScrub = useCallback(
     (x: number) => {
@@ -178,7 +184,8 @@ export function Timeline({
         tick.classList.add('tl-tick-on');
       }
       try {
-        navigator.vibrate?.(6);
+        // Browsers only allow a buzz right after the user touched something.
+        if (navigator.userActivation?.isActive) navigator.vibrate?.(6);
       } catch {
         /* vibration is optional */
       }
@@ -193,7 +200,19 @@ export function Timeline({
   }, [preview]);
 
   const backToNow = useCallback(() => {
-    el?.scrollTo({ left: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+    if (!el) return;
+    // The "Back to now" button disappears as the preview ends and takes focus with it:
+    // once the ruler has settled, focus goes to the ruler instead of the page.
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      if (!document.activeElement || document.activeElement === document.body) el.focus({ preventScroll: true });
+    };
+    if (el.scrollLeft < 1) return settle();
+    el.addEventListener('scrollend', settle, { once: true });
+    window.setTimeout(settle, reducedMotion() ? 50 : 600);
+    el.scrollTo({ left: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
   }, [el]);
   useImperativeHandle(handle, () => ({ backToNow }), [backToNow]);
 
@@ -201,8 +220,8 @@ export function Timeline({
     if (!el) return;
     const x = el.scrollLeft;
     let to: number | null = null;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = scrub.stops.find((s) => s.x > x + 1.5)?.x ?? x;
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = [...scrub.stops].reverse().find((s) => s.x < x - 1.5)?.x ?? 0;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = scrub.stops.find((s) => s.x > x + NAV_EPS)?.x ?? x;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = [...scrub.stops].reverse().find((s) => s.x < x - NAV_EPS)?.x ?? 0;
     else if (e.key === 'Home') to = 0;
     else if (e.key === 'End') to = scrub.stops[scrub.stops.length - 1]?.x ?? 0;
     if (to === null) return;
@@ -220,12 +239,12 @@ export function Timeline({
         ref={setEl}
         tabIndex={0}
         role="slider"
-        aria-label="Preview upcoming notes. Left and right arrows move between notes."
+        aria-label="Preview upcoming notes"
+        aria-describedby={hintId}
         aria-orientation="horizontal"
         aria-valuemin={0}
         aria-valuemax={scrub.stops.length}
         aria-valuenow={preview ? Math.min(preview.index + 1, scrub.stops.length) : 0}
-        aria-valuetext={preview ? line : 'Now'}
         onKeyDown={onKeyDown}
       >
         <div className="tl-track">
@@ -250,7 +269,10 @@ export function Timeline({
       <span className="tl-head" aria-hidden="true">
         <span className="tl-tick" ref={tickRef} />
       </span>
-      <p className="sr-only" aria-live="polite" role="status">
+      <p className="sr-only" id={hintId}>
+        Left and right arrow keys move between notes. Home goes back to now.
+      </p>
+      <p className="sr-only" role="status">
         {preview ? `${line}${current ? `: ${current.note.title}` : ''}` : ''}
       </p>
     </section>
