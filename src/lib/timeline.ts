@@ -43,8 +43,16 @@ export interface ScrubStop {
   rel: string;
 }
 
+/** A note from earlier today, drawn dimmed before Now. Decoration only: the ruler cannot scroll there. */
+export interface PastDot {
+  note: Note;
+  /** Negative: px before Now. */
+  x: number;
+}
+
 export interface Scrub {
   marks: RulerMark[];
+  past: PastDot[];
   stops: ScrubStop[];
   /** Ruler length in px, Now to the end. */
   length: number;
@@ -118,8 +126,14 @@ export function buildScrub(list: Note[] = allNotes): Scrub {
     };
   });
 
+  // Earlier today, at the scale of the first stretch (2 h per gap), left of Now.
+  const pxPerMin = MARK_GAP / (marks[1]?.min ?? 2 * HOUR);
+  const past = sortNotes(list)
+    .filter((n) => n.day === today.date && n.kind === 'time' && at(n) < nowMin)
+    .map<PastDot>((n) => ({ note: n, x: -(nowMin - at(n)) * pxPerMin }));
+
   const end = Math.max(last.min, (stops[stops.length - 1]?.min ?? 0) + TAIL);
-  return { marks, stops, length: Math.ceil(Math.max(xAt(end), prevX + STOP_GAP * 4)), minAt };
+  return { marks, past, stops, length: Math.ceil(Math.max(xAt(end), prevX + STOP_GAP * 4)), minAt };
 }
 
 /** The note at or after the playhead, or null while it rests on Now. */

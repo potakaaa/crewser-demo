@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type KeyboardEvent, type Ref } from 'react';
 import { TYPE_COLOR } from '../lib/noteStyle';
-import { NAV_EPS, previewAt, previewLine, samePreview, type Preview, type Scrub } from '../lib/timeline';
+import { MARK_GAP, NAV_EPS, previewAt, previewLine, samePreview, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
 /** Fastest fling that still counts, px per ms. */
@@ -111,7 +111,7 @@ function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
     let lastOther = -Infinity;
     const onWheel = (e: WheelEvent) => {
       const legacy = (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY ?? 0;
-      const notched = e.deltaX === 0 && !e.ctrlKey && (e.deltaMode === 1 || (e.deltaMode === 0 && Math.abs(legacy) === 120 && legacy !== -3 * e.deltaY));
+      const notched = e.deltaX === 0 && e.deltaY !== 0 && !e.ctrlKey && (e.deltaMode === 1 || (e.deltaMode === 0 && Math.abs(legacy) === 120 && legacy !== -3 * e.deltaY));
       if (!notched) {
         lastOther = e.timeStamp;
         return;
@@ -256,6 +256,15 @@ export function Timeline({
       >
         <div className="tl-track">
           <div className="tl-ruler" style={{ width: scrub.length }}>
+            {/* Earlier today: a dimmed backdrop in the room left of Now. It scrolls away; the ruler never starts before Now. */}
+            <span className="tl-past" aria-hidden="true">
+              <span className="tl-past-label" style={{ left: `calc(100% - ${MARK_GAP}px)` }}>
+                Earlier
+              </span>
+              {scrub.past.map((d) => (
+                <span className="tl-dot" key={d.note.id} style={{ left: `calc(100% + ${d.x}px)`, background: TYPE_COLOR[d.note.type].dot }} />
+              ))}
+            </span>
             {scrub.marks.map((m) => (
               <span className="tl-mark" key={m.key} data-now={m.x === 0} style={{ left: m.x }}>
                 <span className="tl-label">{m.label}</span>
