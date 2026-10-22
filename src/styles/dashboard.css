@@ -619,7 +619,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 6px 0 14px;
   border-top: 1px solid var(--hairline);
 }
