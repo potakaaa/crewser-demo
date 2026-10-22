@@ -4,22 +4,16 @@ import { Icon } from './Icon';
 import { BottomSheet } from './BottomSheet';
 import { Collapse } from './Layout';
 import { TimeWheel } from './TimeWheel';
-import { fmtDayMonth, toMinutes } from '../lib/dates';
-import { fmtH, todayPlan } from '../lib/stats';
+import { fmtDayMonth } from '../lib/dates';
+import { fmtH, netMinutes, todayPlan } from '../lib/stats';
 import { project, today } from '../mock';
 
 type Field = 'start' | 'end';
 
-/**
- * Worked hours for start–end minus the break; an end before the start runs past midnight.
- * An end equal to the start is an empty shift, not 24 h, and hours are never negative.
- */
+/** Worked hours for start–end minus the break (see `netMinutes`); `valid` is false when nothing is left to send. */
 function worked(start: string, end: string, breakMin: number) {
-  let mins = toMinutes(end) - toMinutes(start);
-  const overnight = mins < 0;
-  if (overnight) mins += 24 * 60;
-  const net = mins - breakMin;
-  return { hours: Math.max(net, 0) / 60, overnight, valid: net > 0 };
+  const { minutes, overnight } = netMinutes(start, end, breakMin);
+  return { hours: minutes / 60, overnight, valid: minutes > 0 };
 }
 
 const BAD_SPAN = 'End must be after the start plus the break.';
