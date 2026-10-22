@@ -566,9 +566,8 @@
   font-size: var(--fs-sm);
   font-weight: 400;
   color: var(--text-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 .setrow-value {
   font-size: var(--fs-md);
@@ -784,9 +783,8 @@
 .lrow-sub {
   font-size: var(--fs-sm);
   color: var(--text-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 .lrow-ask {
   font-size: var(--fs-sm);
