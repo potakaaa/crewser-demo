@@ -38,6 +38,12 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   --font-display: var(--font);
   --font-numeral: var(--font);
+  /* Each theme's own stack, for previews (the font picker) without switching the app. */
+  --ff-inter: var(--font);
+  --ff-screenplay: 'Courier Prime', 'Courier New', monospace;
+  --ff-poster: 'Bebas Neue', Impact, sans-serif;
+  --ff-editorial: 'Fraunces', Georgia, serif;
+  --ff-credits: 'Syne', sans-serif;
   /* Per-font tuning, switched by .app[data-font]: weight, tracking and size scale for headlines and big numbers. */
   --display-weight: 600;
   --display-track: -0.02em;

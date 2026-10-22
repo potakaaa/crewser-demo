@@ -4,14 +4,14 @@ Status: proposal for the production app. The prototype shows the behaviour with 
 
 ## The idea in one paragraph
 
-Crew members on film sets often work on more than one production at the same time, and a gaffer may enter hours for colleagues. Crewser already gives every person on every project their own personal access link by SMS. We keep it that way: **each crew link stays a separate credential**. The app simply remembers several links on the phone and lets the user choose which one is active. No shared account, no login, and no change to the backend is needed to ship this.
+Crew members on film sets often work on more than one production at the same time, and a department member may enter hours for colleagues (a 1st AC for the camera team, a gaffer for lighting, a key grip for grip). Crewser already gives every person on every project their own personal access link by SMS. We keep it that way: **each crew link stays a separate credential**. The app simply remembers several links on the phone and lets the user choose which one is active. No shared account, no login, and no change to the backend is needed to ship this.
 
 ## What the user sees
 
 - A project switcher at the top of the app lists all links on the phone: project name, production, whose hours the link is for, and when it expires.
 - Links that expire soon show a warning (for example "expires in 3 days"). Expired links are greyed out and cannot be selected; the user is told to ask production for a new link.
 - Selecting a link switches the whole app (dashboard, calendar, documents, contacts) to that project and person.
-- A gaffer who holds links for colleagues sees them in the same list, marked with the person's name, so it is always clear whose hours are being entered.
+- A 1st AC who holds links for camera colleagues sees them in the same list, marked with the person's name, so it is always clear whose hours are being entered. The same pattern applies to lighting and grip, where one person logs hours for the whole department.
 
 ## The local wallet
 
@@ -47,9 +47,9 @@ A link is added to the wallet when the user opens an SMS link. If the link is al
 This is the key safety rule: **an hours entry is only ever submitted with the token of the crew member it is for.**
 
 - Every screen that edits hours works on one selected link. Switching link clears any open draft form.
-- A gaffer entering hours for a colleague uses the colleague's link. The server therefore sees exactly the same request as if the colleague had entered them, with the same validation, rest-time checks and approval flow.
+- A 1st AC (or gaffer, or key grip) entering hours for a colleague uses the colleague's link. The server therefore sees exactly the same request as if the colleague had entered them, with the same validation, rest-time checks and approval flow.
 - The app never mixes tokens in one request and never sends a token to a project it does not belong to. The API base URL comes from the link, not from a global setting.
-- The gaffer's own link has no extra power over colleagues' hours. If production revokes the colleague's link, the gaffer can no longer enter for that person, which is what production wants.
+- The department head's own link has no extra power over colleagues' hours. If production revokes the colleague's link, the department head can no longer enter for that person, which is what production wants.
 
 ## What the backend needs today
 

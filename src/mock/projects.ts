@@ -2,7 +2,7 @@ import type { CrewLink } from './types';
 
 /**
  * Crew links the phone holds. Each link is its own credential for one person on one
- * project: the app user's own links, plus colleagues whose hours the gaffer enters.
+ * project: the app user's own links, plus camera-team colleagues whose hours the 1st AC enters.
  * The demo is frozen to Mon 19 Oct 2026.
  */
 export const links: CrewLink[] = [
@@ -53,10 +53,10 @@ export const links: CrewLink[] = [
     projectId: 'p-ferry',
     projectName: 'The Last Ferry',
     production: 'Nordlicht Film',
-    personName: 'Backlight Bianca',
-    initials: 'BB',
-    department: 'Lighting',
-    position: 'Electrician',
+    personName: 'Slate Bianca',
+    initials: 'SB',
+    department: 'Camera',
+    position: '2nd AC',
     isMe: false,
     token: 'cw_Bc3Yd8hNs1Fj6Wu0',
     expiresAt: '2026-11-30T23:59:00',
@@ -67,10 +67,10 @@ export const links: CrewLink[] = [
     projectId: 'p-ferry',
     projectName: 'The Last Ferry',
     production: 'Nordlicht Film',
-    personName: 'Spark Samir',
-    initials: 'SS',
-    department: 'Lighting',
-    position: 'Electrician',
+    personName: 'Mag Samir',
+    initials: 'MS',
+    department: 'Camera',
+    position: 'Camera Loader',
     isMe: false,
     token: 'cw_Sm9Kp4zLe2Qt7Xb5',
     expiresAt: '2026-11-30T23:59:00',
