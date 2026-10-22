@@ -1,16 +1,14 @@
 import { notes, project, today, workdays } from '../mock';
 import type { ApprovalStatus, DayKind, WorkDay } from '../mock';
-import { addDays, fmtDayShort, isoWeek, mondayOf, rangeLabel, toMinutes, weekday } from './dates';
+import { addDays, fmtDayShort, rangeLabel, toMinutes, weekday } from './dates';
 
 /** 10.25 → "10.25", 12.0 → "12", 7.50 → "7.5" */
 export const fmtH = (n: number) => String(Math.round(n * 100) / 100);
 
-const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
-const overlap = (a0: number, a1: number, b0: number, b1: number) => Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
+/** 57.25 → "57.3", 7 → "7": one decimal is plenty for a big number. */
+export const fmtBig = (n: number) => String(Math.round(n * 10) / 10);
 
-/** Night work counts from 22:00 to 06:00. */
-const NIGHT_FROM = 22 * 60;
-const NIGHT_TO = 6 * 60;
+const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
 export interface DayStat {
   date: string;
@@ -23,80 +21,18 @@ export interface DayStat {
   start?: string;
   end?: string;
   breakMin: number;
-  /** Minutes from that day's 00:00; end can pass 1440 (after midnight). */
-  startMin: number;
-  endMin: number;
   hours: number;
-  regular: number;
   overtime: number;
-  night: number;
 }
 
-export interface Rest {
-  from: DayStat;
-  to: DayStat;
-  hours: number;
-  short: boolean;
-}
-
-export type Period = { kind: 'week'; monday: string } | { kind: 'project' };
-
-export interface PeriodStats {
-  period: Period;
-  label: string;
-  /** "CW 42 · 12–18 Oct" or "Prep + shoot · 7–18 Oct" */
-  eyebrow: string;
-  /** "12–18 Oct" */
-  rangeLabel: string;
-  days: DayStat[];
-  worked: DayStat[];
-  hasData: boolean;
-  dailyTarget: number;
-  total: number;
-  target: number;
-  workedDays: number;
-  overTarget: number;
-  overtime: number;
-  overtimeDays: DayStat[];
-  average: number;
-  night: number;
-  nightDays: DayStat[];
-  longest: DayStat;
-  allOverTarget: boolean;
-  rests: Rest[];
-  shortest: Rest | undefined;
-  shortRests: Rest[];
-  approvals: Record<ApprovalStatus, DayStat[]>;
-  prepDays: number;
-  shootDays: number;
-  summary: string;
-}
-
-/** Turn a logged shift into hours, overtime and night hours. */
+/** Turn a logged shift into hours and overtime. */
 export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalStatus): DayStat {
-  const short = fmtDayShort(date);
-  const empty: DayStat = {
-    date,
-    weekday: weekday(date),
-    short,
-    worked: false,
-    breakMin: 0,
-    startMin: 0,
-    endMin: 0,
-    hours: 0,
-    regular: 0,
-    overtime: 0,
-    night: 0,
-  };
+  const empty: DayStat = { date, weekday: weekday(date), short: fmtDayShort(date), worked: false, breakMin: 0, hours: 0, overtime: 0 };
   if (!wd) return empty;
   const startMin = toMinutes(wd.start);
   let endMin = toMinutes(wd.end);
   if (endMin <= startMin) endMin += 24 * 60;
   const hours = (endMin - startMin - wd.breakMin) / 60;
-  const target = project.dailyTargetHours;
-  const regular = Math.min(hours, target);
-  const overtime = Math.max(hours - target, 0);
-  const night = (overlap(startMin, endMin, NIGHT_FROM, 24 * 60 + NIGHT_TO) + overlap(startMin, endMin, 0, NIGHT_TO)) / 60;
   return {
     ...empty,
     worked: true,
@@ -105,119 +41,46 @@ export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalSta
     start: wd.start,
     end: wd.end,
     breakMin: wd.breakMin,
-    startMin,
-    endMin,
     hours,
-    regular,
-    overtime,
-    night,
+    overtime: Math.max(hours - project.dailyTargetHours, 0),
   };
 }
 
-const firstLogged = workdays[0].date;
-const lastLogged = workdays[workdays.length - 1].date;
-/** Mondays the week view can page between: first logged week up to this week. */
-export const FIRST_WEEK = mondayOf(firstLogged);
-export const CURRENT_WEEK = mondayOf(today.date);
-/** "Last 7 days" on Home: the week before today's. */
-export const LAST_WEEK = addDays(CURRENT_WEEK, -7);
+/** Days the crew member sent from this prototype move from draft to submitted. */
+const statusFor = (w: WorkDay, submitted: string[]): ApprovalStatus => (w.status === 'draft' && submitted.includes(w.date) ? 'submitted' : w.status);
 
-function daysOf(period: Period): string[] {
-  if (period.kind === 'week') return Array.from({ length: 7 }, (_, i) => addDays(period.monday, i));
-  const out: string[] = [];
-  for (let d = firstLogged; d <= lastLogged; d = addDays(d, 1)) out.push(d);
-  return out;
+export interface HoursOverview {
+  /** "13–19 Oct" */
+  rangeLabel: string;
+  /** Logged days in the last 7 days, today included, oldest first. */
+  weekDays: DayStat[];
+  weekTotal: number;
+  overtime: number;
+  /** Days of the last 7 that ran past the daily target. */
+  overtimeDays: DayStat[];
+  /** Shoot days logged so far, oldest first (prep days do not count). */
+  shootDone: DayStat[];
+  shootLeft: number;
+  /** Logged days not sent to production yet. */
+  unsent: DayStat[];
 }
 
-/** All rest periods between consecutive logged shifts, wherever they fall. */
-function allRests(submitted: string[]): Rest[] {
-  const shifts = workdays.map((w) => dayStat(w.date, w, statusFor(w, submitted)));
-  return shifts.slice(1).map((to, i) => {
-    const from = shifts[i];
-    const gapMin = (toEpochMin(to.date) + to.startMin) - (toEpochMin(from.date) + from.endMin);
-    const hours = gapMin / 60;
-    return { from, to, hours, short: hours < project.minRestHours };
-  });
-}
-
-const toEpochMin = (iso: string) => Date.parse(iso + 'T00:00:00Z') / 60000;
-
-const statusFor = (w: WorkDay, submitted: string[]): ApprovalStatus =>
-  w.status === 'draft' && submitted.includes(w.date) ? 'submitted' : w.status;
-
-/**
- * Every number on the Statistics screen for one period. `submitted` holds days the
- * crew member sent from this prototype, so their status moves from draft to submitted.
- */
-export function computeStats(period: Period, submitted: string[] = []): PeriodStats {
-  const byDate = new Map(workdays.map((w) => [w.date, w]));
-  const days = daysOf(period).map((date) => {
-    const w = byDate.get(date);
-    return dayStat(date, w, w ? statusFor(w, submitted) : undefined);
-  });
-  const worked = days.filter((d) => d.worked);
-  const dailyTarget = project.dailyTargetHours;
-  const total = sum(worked.map((d) => d.hours));
-  const target = worked.length * dailyTarget;
-  const longest = days.reduce((best, d) => (d.hours > best.hours ? d : best), days[0]);
-  const range = rangeLabel(days[0].date, days[days.length - 1].date);
-  const inRange = new Set(days.map((d) => d.date));
-  const rests = allRests(submitted).filter((r) => inRange.has(r.to.date));
-  const shortest = rests.reduce<Rest | undefined>((best, r) => (!best || r.hours < best.hours ? r : best), undefined);
-  const approvals: Record<ApprovalStatus, DayStat[]> = {
-    approved: worked.filter((d) => d.status === 'approved'),
-    submitted: worked.filter((d) => d.status === 'submitted'),
-    draft: worked.filter((d) => d.status === 'draft'),
-  };
-  const label = period.kind === 'week' ? `CW ${isoWeek(period.monday)}` : 'Whole project';
+/** The three big numbers on the dashboard and everything the hours sheet lists under them. */
+export function hoursOverview(submitted: string[] = []): HoursOverview {
+  const from = addDays(today.date, -6);
+  const all = workdays.map((w) => dayStat(w.date, w, statusFor(w, submitted)));
+  const weekDays = all.filter((d) => d.date >= from && d.date <= today.date);
+  const shootDone = all.filter((d) => d.kind === 'shoot');
   return {
-    period,
-    label,
-    eyebrow: period.kind === 'week' ? `CW ${isoWeek(period.monday)} · ${range}` : `Prep + shoot · ${range}`,
-    rangeLabel: range,
-    days,
-    worked,
-    hasData: worked.length > 0,
-    dailyTarget,
-    total,
-    target,
-    workedDays: worked.length,
-    overTarget: total - target,
-    overtime: sum(days.map((d) => d.overtime)),
-    overtimeDays: days.filter((d) => d.overtime > 0),
-    average: worked.length ? total / worked.length : 0,
-    night: sum(days.map((d) => d.night)),
-    nightDays: days.filter((d) => d.night > 0),
-    longest,
-    allOverTarget: worked.length > 0 && worked.every((d) => d.overtime > 0),
-    rests,
-    shortest,
-    shortRests: rests.filter((r) => r.short),
-    approvals,
-    prepDays: worked.filter((d) => d.kind === 'prep').length,
-    shootDays: worked.filter((d) => d.kind === 'shoot').length,
-    summary:
-      `Hours per day, ${range}: ` +
-      days.map((d) => `${d.short} ${d.worked ? fmtH(d.hours) + ' h' : 'off'}`).join(', ') +
-      `. Target ${dailyTarget} h per day.`,
+    rangeLabel: rangeLabel(from, today.date),
+    weekDays,
+    weekTotal: sum(weekDays.map((d) => d.hours)),
+    overtime: sum(weekDays.map((d) => d.overtime)),
+    overtimeDays: weekDays.filter((d) => d.overtime > 0),
+    shootDone,
+    shootLeft: Math.max(project.totalShootDays - today.shootDay, 0),
+    unsent: all.filter((d) => d.status === 'draft'),
   };
-}
-
-/** Home's week card and the default Statistics view. */
-export const weekStats = computeStats({ kind: 'week', monday: LAST_WEEK });
-
-/** Hours worked the week before, for the "Last week" line; null when there is no such week. */
-export function previousWeekTotal(s: PeriodStats, submitted: string[] = []): number | null {
-  if (s.period.kind !== 'week') return null;
-  const prev = computeStats({ kind: 'week', monday: addDays(s.period.monday, -7) }, submitted);
-  return prev.hasData ? prev.total : null;
-}
-
-/** "22:00–00:30" for the night part of a shift. */
-export function nightRange(d: DayStat) {
-  const from = Math.max(d.startMin, NIGHT_FROM);
-  const clock = (m: number) => `${String(Math.floor((m % 1440) / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-  return `${clock(from)}–${clock(d.endMin)}`;
 }
 
 /** Today's planned shift, taken from the shoot-day note's call and wrap facts. */
@@ -227,15 +90,4 @@ export function todayPlan(breakMin: number) {
   const wrap = shoot?.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
   const net = wrap ? (toMinutes(wrap) - toMinutes(call) - breakMin) / 60 : 0;
   return { call, wrap, net, overTarget: net - project.dailyTargetHours };
-}
-
-export function planSentence(breakMin: number) {
-  const p = todayPlan(breakMin);
-  if (!p.wrap) return `Starts at ${p.call}. Wrap is not confirmed yet.`;
-  const diff = p.overTarget;
-  const tail =
-    Math.abs(diff) < 0.001
-      ? `exactly your ${project.dailyTargetHours} h target`
-      : `${fmtH(Math.abs(diff))} h ${diff > 0 ? 'over' : 'under'} your ${project.dailyTargetHours} h target`;
-  return `Planned ${p.call}–${p.wrap} is ${fmtH(p.net)} h after the break, ${tail}.`;
 }

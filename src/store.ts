@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { linkById, links, noteById, pdfs, today, type CrewLink } from './mock';
-import { computeStats, CURRENT_WEEK, FIRST_WEEK, LAST_WEEK, todayPlan, weekStats, type Period } from './lib/stats';
+import { todayPlan } from './lib/stats';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { addDays, addMonths, firstOfMonth } from './lib/dates';
 
@@ -137,13 +137,6 @@ interface DemoState {
   /** How the last navigation moved, for the screen transition. */
   navDir: NavDir;
   splash: boolean;
-  statsPeriod: 'week' | 'project';
-  /** Monday of the week shown in the week view (ISO). */
-  statsWeek: string;
-  /** Selected bar / day (ISO). */
-  statsDay: string;
-  /** Legacy, goes away with StatsScreen. */
-  statsSheet: StatSheetKind | null;
   /** Days submitted from this prototype (draft → submitted). */
   submitted: string[];
   /** The light sheet has scrolled under the status bar: show dark status bar text. */
@@ -173,10 +166,6 @@ interface Actions {
   setCalDate: (iso: string) => void;
   toggleCalMonth: () => void;
   hideSplash: () => void;
-  setStatsPeriod: (p: 'week' | 'project') => void;
-  shiftStatsWeek: (delta: number) => void;
-  setStatsDay: (iso: string) => void;
-  openStatsSheet: (k: StatSheetKind | null) => void;
   submitDay: (iso: string) => void;
   setStatusDark: (v: boolean) => void;
   showToast: (message: string) => void;
@@ -185,13 +174,6 @@ interface Actions {
 }
 
 export type NavDir = 'push' | 'pop' | 'tab' | 'none';
-/** Legacy, goes away with StatsScreen. */
-export type StatSheetKind = 'overtime' | 'average' | 'night' | 'rest' | 'approvals';
-
-const longestIn = (period: Period, submitted: string[]) => {
-  const s = computeStats(period, submitted);
-  return (s.hasData ? s.longest : s.days[0]).date;
-};
 
 const initialState = (): DemoState => ({
   stack: initialStack(),
@@ -214,10 +196,6 @@ const initialState = (): DemoState => ({
   calMonthOpen: false,
   navDir: 'none',
   splash: true,
-  statsPeriod: 'week',
-  statsWeek: LAST_WEEK,
-  statsDay: weekStats.longest.date,
-  statsSheet: null,
   submitted: [],
   statusDark: false,
   toast: null,
@@ -238,7 +216,6 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       navDir: isTab(r) ? 'tab' : 'push',
       logOpen: false,
       sheet: null,
-      statsSheet: null,
     });
   },
 
@@ -320,19 +297,6 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   setCalDate: (iso) => set((s) => ({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false, expanded: { ...s.expanded, calendar: null } })),
   toggleCalMonth: () => set((s) => ({ calMonthOpen: !s.calMonthOpen, calMonth: firstOfMonth(s.calDate) })),
   hideSplash: () => set({ splash: false }),
-  setStatsPeriod: (p) =>
-    set((s) => ({
-      statsPeriod: p,
-      statsDay: longestIn(p === 'week' ? { kind: 'week', monday: s.statsWeek } : { kind: 'project' }, s.submitted),
-    })),
-  shiftStatsWeek: (delta) =>
-    set((s) => {
-      const next = addDays(s.statsWeek, delta * 7);
-      if (next < FIRST_WEEK || next > CURRENT_WEEK) return {};
-      return { statsWeek: next, statsDay: longestIn({ kind: 'week', monday: next }, s.submitted) };
-    }),
-  setStatsDay: (iso) => set({ statsDay: iso }),
-  openStatsSheet: (k) => set({ statsSheet: k }),
   submitDay: (iso) => set((s) => ({ submitted: s.submitted.includes(iso) ? s.submitted : [...s.submitted, iso] })),
   setStatusDark: (v) => set({ statusDark: v }),
   showToast: (message) => set({ toast: { id: ++toastSeq, message } }),

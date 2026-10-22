@@ -40,6 +40,7 @@ export function LogSheet() {
   const end = useDemo((s) => s.logEnd);
   const setTime = useDemo((s) => s.setLogTime);
   const toast = useDemo((s) => s.showToast);
+  const submitDay = useDemo((s) => s.submitDay);
   const [editing, setEditing] = useState<Field | null>(null);
   const plan = todayPlan(breakMin);
   const close = () => setOpen(false);
@@ -69,6 +70,8 @@ export function LogSheet() {
 
   const save = () => {
     close();
+    // An end time means the day is over: it goes to production and the dashboard shows it as done.
+    if (end) submitDay(today.date);
     if (end && endInfo) toast(`Workday saved: ${start}–${end}, ${fmtH(endInfo.hours)} h`);
     else toast(`Start time ${start} saved. Have a good shoot!`);
   };

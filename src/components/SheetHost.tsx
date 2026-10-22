@@ -3,8 +3,8 @@ import { useDemo, type SheetKind, type SheetState } from '../store';
 import { contacts, links } from '../mock';
 import { BottomSheet } from './BottomSheet';
 import { NoteSheet, noteSheetMeta } from './sheets/NoteSheet';
-import { HoursSheet } from './sheets/HoursSheet';
-import { InfoSheet } from './sheets/InfoSheet';
+import { HoursSheet, hoursSheetMeta } from './sheets/HoursSheet';
+import { InfoSheet, infoSheetMeta } from './sheets/InfoSheet';
 import { ContactSheet } from './sheets/ContactSheet';
 import { ProjectSwitcher } from './ProjectSwitcher';
 
@@ -18,8 +18,8 @@ interface Meta {
 /** Header of each sheet kind. Edit your kind's entry when its sheet needs a better title. */
 const META: Record<SheetKind, (id?: string) => Meta> = {
   note: (id) => ({ ...noteSheetMeta(id), tone: 'soft' }),
-  hours: () => ({ title: 'Hours' }),
-  info: () => ({ title: 'Info' }),
+  hours: (id) => ({ ...hoursSheetMeta(id), tone: 'soft' }),
+  info: (id) => ({ ...infoSheetMeta(id), tone: 'soft' }),
   project: () => ({ title: 'Your projects', subtitle: `${links.length} crew links on this phone`, tone: 'soft' }),
   contact: (id) => {
     const c = contacts.find((x) => x.id === id);

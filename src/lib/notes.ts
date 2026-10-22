@@ -42,30 +42,33 @@ export const hasScanCode = (n: Note) => quickAction(n) === 'ticket';
 const PRIORITY_TYPES: NoteType[] = ['appointment', 'flight', 'hotel'];
 
 export interface SmartNotes {
+  /** Today's call: the note the top card is about. */
   hero: Note | undefined;
   top: Note[];
   rest: { label: string; sub: string; notes: Note[] }[];
   restCount: number;
+  /** Notes without a date: they live in the info pocket, not in the list. */
+  undated: Note[];
 }
 
 export function smartNotes(list: Note[] = allNotes): SmartNotes {
   const sorted = sortNotes(list);
-  const hero = sorted.find((n) => n.type === 'appointment' && n.day === today.date && minutesUntil(n) > 0);
-  const upcoming = sorted.filter((n) => n !== hero && (!n.day || diffDays(n.day, today.date) >= 0));
+  const hero = sorted.find((n) => n.type === 'appointment' && n.kind === 'time' && n.day === today.date);
+  const undated = sorted.filter((n) => !n.day);
+  const upcoming = sorted.filter((n) => n !== hero && n.day && diffDays(n.day, today.date) >= 0);
   const top = upcoming.filter((n) => n.kind === 'time' && PRIORITY_TYPES.includes(n.type)).slice(0, 3);
   const restNotes = upcoming.filter((n) => !top.includes(n));
   const groups = new Map<string, Note[]>();
   restNotes.forEach((n) => {
-    const k = n.day ?? 'undated';
+    const k = n.day!;
     groups.set(k, [...(groups.get(k) ?? []), n]);
   });
   const rest = [...groups.entries()].map(([day, ns]) => {
-    if (day === 'undated') return { label: 'No date', sub: 'always valid', notes: ns };
     const rel = relativeDay(day, today.date);
     if (rel === 'tomorrow') return { label: 'Tomorrow', sub: fmtDayMonth(day), notes: ns };
     return { label: fmtDayMonth(day), sub: project.dayLabels[day] ?? rel, notes: ns };
   });
-  return { hero, top, rest, restCount: restNotes.length };
+  return { hero, top, rest, restCount: restNotes.length, undated };
 }
 
 /** Second line of a content card, e.g. "Appointment · tomorrow" or "Flight · OS487 · Vienna → Funchal". */
