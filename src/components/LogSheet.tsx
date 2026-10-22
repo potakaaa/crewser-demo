@@ -10,20 +10,27 @@ import { project, today } from '../mock';
 
 type Field = 'start' | 'end';
 
-/** Worked hours for start–end minus the break; an end before the start runs past midnight. */
+/**
+ * Worked hours for start–end minus the break; an end before the start runs past midnight.
+ * An end equal to the start is an empty shift, not 24 h, and hours are never negative.
+ */
 function worked(start: string, end: string, breakMin: number) {
   let mins = toMinutes(end) - toMinutes(start);
-  const overnight = mins <= 0;
+  const overnight = mins < 0;
   if (overnight) mins += 24 * 60;
-  return { hours: (mins - breakMin) / 60, overnight };
+  const net = mins - breakMin;
+  return { hours: Math.max(net, 0) / 60, overnight, valid: net > 0 };
 }
+
+const BAD_SPAN = 'End must be after the start plus the break.';
 
 function summary(start: string, end: string | null, breakMin: number) {
   const target = project.dailyTargetHours;
   const plan = todayPlan(breakMin);
   const to = end ?? plan.wrap;
   if (!to) return `Starts at ${start}. Wrap is not confirmed yet.`;
-  const { hours, overnight } = worked(start, to, breakMin);
+  const { hours, overnight, valid } = worked(start, to, breakMin);
+  if (!valid) return `${end ? '' : 'Planned '}${start}–${to} leaves no hours after the break.`;
   const diff = hours - target;
   const tail = Math.abs(diff) < 0.001 ? `exactly your ${target} h target` : `${fmtH(Math.abs(diff))} h ${diff > 0 ? 'over' : 'under'} your ${target} h target`;
   const span = `${start}–${to}${overnight ? ' (next day)' : ''}`;
@@ -80,7 +87,10 @@ export function LogSheet() {
   const sendLine =
     end && endInfo ? `${fmtDayMonth(today.date)} · ${start}–${end}${endInfo.overnight ? ' (next day)' : ''} · ${fmtH(endInfo.hours)} h` : null;
 
+  const badSpan = !!endInfo && !endInfo.valid;
+
   const save = () => {
+    if (badSpan) return;
     if (!end) {
       close();
       toast(link.isMe ? `Start time ${start} saved. Have a good shoot!` : `Start time${forName} saved`);
@@ -177,13 +187,18 @@ export function LogSheet() {
         {summary(start, end, breakMin)}
       </p>
 
-      {sendLine && <p className="log-send">{sendLine}</p>}
+      {sendLine && !badSpan && <p className="log-send">{sendLine}</p>}
+      {badSpan && (
+        <p className="log-confirm" id="log-bad-span" role="alert">
+          {BAD_SPAN}
+        </p>
+      )}
       {confirming && (
         <p className="log-confirm" role="status">
           You are sending hours for {link.personName}, not for yourself.
         </p>
       )}
-      <button type="button" className="btn btn-lime btn-lg" onClick={save}>
+      <button type="button" className="btn btn-lime btn-lg" disabled={badSpan} aria-describedby={badSpan ? 'log-bad-span' : undefined} onClick={save}>
         {!end ? 'Save start time' : confirming ? `Submit for ${link.personName}` : 'Submit hours'}
       </button>
       <button type="button" className="text-btn" onClick={() => toast('The full workday view is not part of this demo')}>
