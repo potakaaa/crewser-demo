@@ -2362,6 +2362,12 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+/* Fully inert: no hover colour, no pressed shrink. */
+.btn-lime[aria-disabled='true']:hover,
+.btn-lime[aria-disabled='true']:active {
+  background: var(--lime);
+  transform: none;
+}
 .log-dialog .btn-lime {
   flex: none;
   min-height: 52px;
