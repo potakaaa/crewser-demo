@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { linkById, links, noteById, pdfs, today, type CrewLink } from './mock';
 import { todayPlan } from './lib/stats';
+import { resetPrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { addDays, addMonths, firstOfMonth } from './lib/dates';
 
@@ -50,6 +51,13 @@ const parseHash = (hash: string) => {
   const m = hash.replace(/^#\/?/, '').match(/^([a-z]+)(?:[/-](.+))?$/);
   return { head: m?.[1], arg: m?.[2]?.replace(/\/$/, '') };
 };
+
+/** Rewrite an old or loose hash (#home, #stats, #ticket...) to its canonical form, so the address bar matches the screen. */
+export function normalizeLocation() {
+  if (typeof location === 'undefined' || hashToSheet(location.hash)) return;
+  const canon = routeToHash(hashToRoute(location.hash));
+  if (location.hash !== canon) history.replaceState(history.state, '', canon);
+}
 
 /** Accepts "#/pdf/x.pdf" and the bare-token form "#ticket" (for hosts that only pass plain anchors). Old #home and #stats land on the dashboard. */
 export function hashToRoute(hash: string): Route {
@@ -277,6 +285,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       return;
     }
     const top = stack[stack.length - 1];
+    if (!deepSheet) normalizeLocation();
     if (deepSheet) {
       set({ stack: isTab(top.route) ? stack : [{ route: r, pushed: false }], navDir: 'none', sheet: deepSheet, logOpen: false });
       return;
@@ -363,6 +372,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   reset: () => {
     clearScrollPositions();
     history.replaceState(null, '', routeToHash({ name: 'dashboard' }));
+    resetPrefs();
     const { noteAccent, fontTheme } = get();
     set({ ...initialState(), stack: [{ route: { name: 'dashboard' }, pushed: false }], sheet: null, navDir: 'tab', splash: false, noteAccent, fontTheme });
   },

@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Icon } from './Icon';
 
 const CLOSE_MS = 300;
@@ -66,6 +66,8 @@ export function BottomSheet(props: Props) {
 function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, children, closing }: Props & { closing: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
+  const scrimRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ y0: number; t0: number; dy: number; h: number } | null>(null);
 
   // On open and whenever the content changes: back to the top, focus on the close button.
   useEffect(() => {
@@ -75,6 +77,52 @@ function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, child
     if (scroll) scroll.scrollTop = 0;
     root.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true });
   }, [contentKey]);
+
+  // Drag down on the grabber or the header: the sheet follows the finger, then closes or snaps back.
+  const onDragStart = (e: PointerEvent<HTMLElement>) => {
+    const dialog = ref.current;
+    if (!dialog || closing || (e.pointerType === 'mouse' && e.button !== 0) || (e.target as HTMLElement).closest('button')) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Capture can fail for a pointer that just ended; the drag still works while it stays over the handle.
+    }
+    dialog.style.transition = 'none';
+    drag.current = { y0: e.clientY, t0: e.timeStamp, dy: 0, h: dialog.offsetHeight };
+  };
+  const onDragMove = (e: PointerEvent<HTMLElement>) => {
+    const s = drag.current;
+    if (!s || !ref.current) return;
+    s.dy = Math.max(0, e.clientY - s.y0);
+    // `translate` stacks with the open/close animation instead of fighting its transform.
+    ref.current.style.translate = `0 ${s.dy}px`;
+    if (scrimRef.current) scrimRef.current.style.background = `rgba(17, 26, 27, ${0.5 * (1 - Math.min(1, s.dy / s.h))})`;
+  };
+  const onDragEnd = (e: PointerEvent<HTMLElement>) => {
+    const s = drag.current;
+    const dialog = ref.current;
+    drag.current = null;
+    if (!s || !dialog) return;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    const speed = s.dy / Math.max(1, e.timeStamp - s.t0); // px per ms
+    if (e.type === 'pointerup' && (s.dy > s.h * 0.25 || (speed > 0.5 && s.dy > 24))) {
+      onClose(); // the closing animation carries on from where the finger let go
+      return;
+    }
+    dialog.style.transition = 'translate 240ms var(--ease-ios)';
+    dialog.style.translate = '0 0';
+    if (scrimRef.current) scrimRef.current.style.background = '';
+    window.setTimeout(() => {
+      dialog.style.transition = '';
+      dialog.style.translate = '';
+    }, 260);
+  };
+  const dragProps = {
+    onPointerDown: onDragStart,
+    onPointerMove: onDragMove,
+    onPointerUp: onDragEnd,
+    onPointerCancel: onDragEnd,
+  };
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Escape') {
@@ -104,11 +152,11 @@ function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, child
   };
 
   return (
-    <div className={`scrim${closing ? ' closing' : ''}`} inert={closing}>
+    <div ref={scrimRef} className={`scrim${closing ? ' closing' : ''}`} inert={closing}>
       <button type="button" className="scrim-hit" tabIndex={-1} aria-hidden="true" onClick={onClose} />
-      <div ref={ref} className={`log-dialog${tone === 'soft' ? ' log-dialog-soft' : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} onKeyDown={onKeyDown}>
-        <span className="grabber" aria-hidden="true" />
-        <div className="log-head">
+      <div ref={ref} className={`log-dialog${tone === 'soft' ? ' log-dialog-soft' : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1} onKeyDown={onKeyDown}>
+        <span className="grabber sheet-drag" aria-hidden="true" {...dragProps} />
+        <div className="log-head sheet-drag" {...dragProps}>
           <div className="log-titles">
             <h2 id={titleId}>{title}</h2>
             {subtitle && <span>{subtitle}</span>}

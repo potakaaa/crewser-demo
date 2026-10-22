@@ -1,5 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { isTab, routeToHash, useDemo, useRoute, type Route } from './store';
+import { isTab, normalizeLocation, useDemo, useRoute, type Route } from './store';
 import { DeviceFrame } from './components/Device';
 import { DemoPanel } from './components/DemoPanel';
 import { TabBar } from './components/TabBar';
@@ -78,7 +78,7 @@ export default function App() {
   const logOpen = useDemo((s) => s.logOpen);
 
   useEffect(() => {
-    if (!location.hash) history.replaceState(null, '', routeToHash({ name: 'dashboard' }));
+    normalizeLocation();
     const onPop = () => sync('popstate');
     const onHash = () => sync('hashchange');
     window.addEventListener('popstate', onPop);

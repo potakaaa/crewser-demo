@@ -2070,13 +2070,29 @@
     opacity: 0;
   }
 }
+.log-dialog:focus {
+  outline: none;
+}
+/* Grabber and header drag the sheet down to close it. */
+.sheet-drag {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
 .grabber {
+  position: relative;
   align-self: center;
   width: 36px;
   height: 5px;
   margin-bottom: calc(-1 * var(--sp-1));
   border-radius: 3px;
   background: rgba(17, 26, 27, 0.16);
+}
+/* A taller target than the 5 px bar. */
+.grabber::before {
+  content: '';
+  position: absolute;
+  inset: -14px -64px -10px;
 }
 .log-head {
   display: flex;
