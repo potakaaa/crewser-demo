@@ -6,15 +6,18 @@ Status: proposal for the production app. The prototype shows the behaviour with 
 
 Crew members often work on two productions at the same time, and a department member (a 1st AC for the camera team, a gaffer for lighting, a key grip for grip) is often the one who enters hours for colleagues. Today every person on every project gets their own personal access link by SMS. The proposal is to keep that model and let the phone hold several links at once, with a switcher to choose which one is active.
 
-- **Own projects:** this is safe and needs no backend change. Each link stays a separate credential and the app only decides which one to send.
+- **Wallet and switcher:** the wallet and the switcher need no backend change. Each link stays a separate credential and the app only decides which one to send. A few supporting items do need small backend or message changes; they are listed in the table below.
 - **Entering hours for a colleague:** this works today with no backend change if the colleague forwards their link, but it is a weak form of delegation (see "Entering hours for a colleague"). We recommend shipping it as phase 1 only with the colleague's agreement, and building a proper delegation grant as phase 2, which does need a backend change.
 - **Security:** the main risks are tokens leaking through the browser, link previews or backups. The measures are listed in "Security notes". Nothing in this document makes a stored link more secure than the SMS it came from, so it is a convenience feature with sensible hygiene, not extra protection.
 
-| Part | Backend change needed? |
+| Part | Backend or message change needed? |
 |---|---|
 | Wallet and project switcher (own links) | No |
 | Validating a link before adding it, status checks | No, if `GET /crew/me` already exists and returns 401/410 as described below |
-| Hours for a colleague by forwarded link (phase 1) | No |
+| Hours for a colleague by forwarded link (phase 1) | No (but needs a legal and data-protection review, see below) |
+| SMS template and web app: link with the token in the URL fragment | Yes, small: the SMS text and the web app's link handling change |
+| Telling "revoked" from "expired" | Yes, small: the API must answer differently (for example `410` with a reason) |
+| Self-service "Request a new link" | Yes: proposal is phone number plus one-time code, so a crew member can get a fresh link without calling production |
 | Delegation grant with audit trail (phase 2) | Yes |
 | Idempotent hour submissions | Only if repeat submissions for the same day are not already treated as an update |
 
@@ -45,14 +48,14 @@ Display data (project name, person name, department) is cached next to it so the
 1. The user opens an SMS link, or pastes one.
 2. The app reads the token and **validates it with the server** before storing anything. The API address is not taken from the link. The app only talks to an allowlisted Crewser origin, so a crafted link cannot point the app at another server.
 3. The server answers with the person and project. The app asks the user to confirm: "Add Slate Bianca on The Last Ferry?" Nothing is saved until the user says yes.
-4. The entry is stored. Entries are de-duplicated on `projectId` + `crewMemberId`. If the same person on the same project is added again, the app validates the new link and keeps the token with the later expiry; the older token is discarded.
+4. The entry is stored. Entries are de-duplicated on `projectId` + `crewMemberId`. If the same person on the same project is added again (a new SMS, or someone taps an old one), the app validates both tokens and keeps the one the server reports as active. If both are valid, the later expiry wins as a tie-break only. A token the server reports as expired or revoked is never kept, however late its date.
 
 ## Checking that a link still works
 
 - When the app starts and when it returns to the foreground, it checks each link in the background with one cheap call, for example `GET /crew/me`, sent with that link's token.
   - `200`: the link is valid. Refresh the cached display data and the expiry date.
   - `410`, or an explicit "revoked" response: **final**. The link is dead. Mark it revoked (or expired when the server says it ran out) and do not retry.
-  - `401`: not final. It can mean a mistyped or rotated token or a temporary state. Re-check once on the next start before showing the link as dead.
+  - `401`: not final at first. It can mean a mistyped or rotated token or a temporary state. Re-check once on the next start. After a second `401` the link is shown as "needs a new link" and offers "Request a new link".
   - Network error or `5xx`: keep the previous status. Being offline never counts as expired.
 - The device clock only drives the warning text ("ends in 3 days"). The server decides whether a link works.
 - Checks are rate-limited: at most one per link every few hours, spread out rather than fired all at once, with back-off after errors. Only the active link loads full data; the others are only checked.
@@ -70,7 +73,7 @@ What this means, plainly:
 - **There is no consent step.** Sending the link is the only agreement.
 - **It cannot be revoked separately.** Cutting off the delegate means revoking the colleague's own link, which also cuts off the colleague.
 
-Phase 1 is acceptable only with the colleague's explicit agreement, for a trusted person on the same team. The app helps by labelling these links clearly and by asking for confirmation before submitting (see below).
+Phase 1 is acceptable only with the colleague's explicit agreement, for a trusted person on the same team. It also needs a legal and data-protection review before launch: the terms of use must allow sharing a link this way, and handing someone access to a colleague's payroll data is a data-protection question for production and Crewser, not only a technical one. The app helps by labelling these links clearly and by asking for confirmation before submitting (see below).
 
 ### Phase 2: a proper delegation grant (needs a backend change)
 
@@ -93,10 +96,10 @@ The delegate then holds a token of their own with that restricted scope, and the
 
 - Each draft belongs to a wallet `entryId` (the random local id above), is saved automatically as the user types, and is **kept when the user switches** to another link.
 - A queued send looks up its token from its own wallet entry at the moment it is sent. It never uses whichever link happens to be active.
-- Switching link cancels in-flight requests that belong to the previous link.
-- Each submission carries an idempotency key made from the entry and the date, so a retry after a bad connection cannot create a second submission. If the API does not already treat a repeat submission for the same day as an update, accepting this key is a small backend addition.
+- Switching link cancels only reads that belong to the previous link. Writes already on their way are allowed to finish, or are retried later with the same key, so a switch can never lose an hours entry.
+- Each submission carries an idempotency key made from the entry, the date and the draft revision (or a hash of the content). A retry of the same send after a bad connection cannot create a second submission. A resubmit on the same day with changed content has a new key and counts as an update. If the API does not already treat a repeat submission for the same day as an update, accepting this key is a small backend addition.
 - An expired link that still has unsent drafts stays in the list and offers "Request a new link". The drafts are not lost.
-- Removing a link asks whether to keep or discard its unsent drafts.
+- Removing a link asks whether to keep or discard its unsent drafts. Drafts that are kept are parked: stored encrypted, kept for a limited time (for example 30 days), and they cannot be sent until the link has been added again.
 
 ## Removing a link
 
@@ -109,7 +112,7 @@ The delegate then holds a token of their own with that restricted scope, and the
 - **Storage on the web.** IndexedDB can be read by any script that runs in the page, so a cross-site-scripting bug would expose every stored token. On the web this needs a strict CSP, or tokens kept in an HttpOnly cookie scoped per project instead of in script-readable storage. Browser storage should be treated as the weakest place a token can live.
 - **Storage on phones.** On iOS use the Keychain with "this device only" accessibility. On Android use Keystore-backed encrypted storage and exclude it from cloud backup and device transfer.
 - **Cached data counts too.** Names, phone numbers, call sheets and notes are as sensitive as the token. They get the same protection and are wiped when the link is removed.
-- **Logs and reports.** Tokens are never written to console logs, analytics or crash reports, and are redacted from server logs and error reports. Where a log needs to refer to a link, it uses a short, non-reversible identifier.
+- **Logs and reports.** Tokens are never written to console logs, analytics or crash reports, and are redacted from server logs and error reports. Where a log needs to refer to a link, it uses the random wallet `entryId`, never the token or any hash of it.
 - **Optional app lock.** An optional app lock or biometric prompt protects a phone that is lent out, lost or unlocked.
 - **Expiry and revocation.** Tokens have an end date set by production and can be revoked on the server. The device clock never overrides the server.
 
