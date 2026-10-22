@@ -1,6 +1,8 @@
 import { useRef, type CSSProperties } from 'react';
+import '../styles/calendar.css';
 import { useDemo } from '../store';
-import { notes as allNotes, today, type Note, type NoteType } from '../mock';
+import { docs, notes as allNotes, today, workdays, type Doc, type Note, type NoteType } from '../mock';
+import { ActingAs } from '../components/ActingAs';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
@@ -8,9 +10,32 @@ import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, m
 import { sortNotes, TYPE_LABEL } from '../lib/notes';
 import { chipStyle, TYPE_COLOR } from '../lib/noteStyle';
 import { useScrollRestore } from '../lib/scroll';
+import { useSubmitted } from '../lib/useSubmitted';
 
 const LEGEND: NoteType[] = ['appointment', 'flight', 'hotel', 'rental', 'plain'];
 const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
+
+/** The call sheet for each shoot day; a day with one is a shoot day. */
+const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
+
+/** Shoot days up to today whose hours have not gone to production: logged as a draft, or not logged yet. */
+function hoursNotSent(iso: string, submitted: string[]): boolean {
+  if (iso > today.date || !callSheetByDay.has(iso)) return false;
+  const logged = workdays.find((w) => w.date === iso);
+  if (logged && logged.status !== 'draft') return false;
+  return !submitted.includes(iso);
+}
+
+/** Small marks in the corner of a day: a call sheet is out, hours are still open. */
+function DayMarks({ call, unsent }: { call: boolean; unsent: boolean }) {
+  if (!call && !unsent) return null;
+  return (
+    <span className="day-marks" aria-hidden="true">
+      {unsent && <i className="mark-unsent" />}
+      {call && <Icon name="file" size={11} strokeWidth={2} />}
+    </span>
+  );
+}
 
 /** Up to three dots per day, coloured by note type. */
 function Dots({ notes, onLight }: { notes: Note[]; onLight: boolean }) {
@@ -47,6 +72,9 @@ export function CalendarScreen() {
   const expanded = useDemo((s) => s.expanded.calendar);
   const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const openSheet = useDemo((s) => s.openSheet);
+  const navigate = useDemo((s) => s.navigate);
+  const openLog = useDemo((s) => s.setLogOpen);
+  const submitted = useSubmitted();
 
   const notes = empty ? [] : allNotes;
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
@@ -62,7 +90,17 @@ export function CalendarScreen() {
   const rel = relativeDay(calDate, today.date);
   const dayLabel = rel === 'today' ? `Today · ${fmtDayMonth(calDate)}` : rel === 'tomorrow' ? `Tomorrow · ${fmtDayMonth(calDate)}` : fmtDayMonth(calDate);
   const unit = monthOpen ? 'month' : 'week';
-  const dayAria = (iso: string, n: number) => `${iso === today.date ? 'Today, ' : ''}${fmtDayMonth(iso)}, ${n ? count(n) : 'nothing planned'}`;
+  const dayAria = (iso: string, n: number) =>
+    [
+      `${iso === today.date ? 'Today, ' : ''}${fmtDayMonth(iso)}`,
+      n ? count(n) : 'nothing planned',
+      callSheetByDay.has(iso) && 'call sheet out',
+      hoursNotSent(iso, submitted) && 'hours not sent',
+    ]
+      .filter(Boolean)
+      .join(', ');
+  const callSheet = callSheetByDay.get(calDate);
+  const unsent = hoursNotSent(calDate, submitted);
 
   return (
     <div className="screen" ref={ref}>
@@ -87,6 +125,8 @@ export function CalendarScreen() {
           </button>
         </div>
 
+        <ActingAs />
+
         <div className="cal-panel">
           <Collapse open={!monthOpen}>
             <div className="week-strip" role="group" aria-label="Days of the week">
@@ -107,6 +147,7 @@ export function CalendarScreen() {
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} onLight={isSel} />
+                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted)} />
                     </button>
                   );
                 })}
@@ -136,6 +177,7 @@ export function CalendarScreen() {
                     >
                       <span className="mday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} onLight={isSel} />
+                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted)} />
                     </button>
                   );
                 })}
@@ -172,6 +214,23 @@ export function CalendarScreen() {
             <h2>{dayLabel}</h2>
             {dayNotes.length > 0 && <span>{count(dayNotes.length)}</span>}
           </div>
+          {(callSheet || unsent) && (
+            <div className="day-actions">
+              {callSheet && (
+                <button type="button" className="day-action day-action-sheet" onClick={() => navigate({ name: 'pdf', file: callSheet.file })}>
+                  <Icon name="file" size={16} color="#FFFFFF" />
+                  Call sheet
+                  {callSheet.isNew && <span className="chip-lime chip-lime-sm">new</span>}
+                </button>
+              )}
+              {unsent && (
+                <button type="button" className="day-action day-action-unsent" onClick={() => openLog(true)}>
+                  <Icon name="alert" size={15} color="#6B4A00" />
+                  Hours not sent
+                </button>
+              )}
+            </div>
+          )}
           {dayNotes.length === 0 && <div className="empty-day">Nothing planned for this day</div>}
           {dayNotes.map((n) => (
             <NoteRow key={n.id} note={n} withPrimary open={expanded === n.id} onToggle={() => toggleExpanded('calendar', n.id)} />
