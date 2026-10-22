@@ -213,12 +213,14 @@ const logDefaults = (): LogForm => ({
   logEnd: null,
 });
 
-/** Editing start, end or break after submitting un-sends the day (for the active link): it has to be sent again. */
-const unsendToday = (s: DemoState, changed: boolean): Partial<DemoState> => {
+/** Editing start, end or break after submitting un-sends the day (for the active link): it has to be sent again. Null when nothing was sent. */
+const unsentToday = (s: DemoState): Pick<DemoState, 'submitted'> | null => {
   const sent = s.submitted[s.activeLinkId] ?? [];
-  if (!changed || !sent.includes(today.date)) return {};
+  if (!sent.includes(today.date)) return null;
   return { submitted: { ...s.submitted, [s.activeLinkId]: sent.filter((d) => d !== today.date) } };
 };
+
+const UNSENT_TOAST = 'Hours changed · send again';
 
 const initialState = (): DemoState => ({
   stack: initialStack(),
@@ -375,12 +377,21 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     }
     set({ fontTheme: t });
   },
-  setBreak: (min) =>
-    set((s) => {
-      const breakMin = Math.max(0, Math.min(120, min));
-      return { breakMin, ...unsendToday(s, breakMin !== s.breakMin) };
-    }),
-  setLogTime: (k, v) => set((s) => ({ [k]: v, ...unsendToday(s, v !== s[k]) }) as Pick<DemoState, typeof k>),
+  setBreak: (min) => {
+    const s = get();
+    const breakMin = Math.max(0, Math.min(120, min));
+    if (breakMin === s.breakMin) return;
+    const unsent = unsentToday(s);
+    set({ breakMin, ...unsent });
+    if (unsent) get().showToast(UNSENT_TOAST);
+  },
+  setLogTime: (k, v) => {
+    const s = get();
+    if (v === s[k]) return;
+    const unsent = unsentToday(s);
+    set({ ...({ [k]: v } as Pick<DemoState, 'logStart' | 'logEnd'>), ...unsent });
+    if (unsent) get().showToast(UNSENT_TOAST);
+  },
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
   toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
   shiftCal: (delta) =>

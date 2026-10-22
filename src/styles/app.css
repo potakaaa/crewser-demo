@@ -1954,7 +1954,7 @@
 }
 .tab-label {
   flex: none;
-  margin-left: 6px;
+  margin-left: 6px; /* = LABEL_GAP in TabBar.tsx */
   white-space: nowrap;
   font-size: var(--fs-sm);
   font-weight: 600;
@@ -1969,8 +1969,10 @@
   transform: none;
   transition-delay: 120ms, 0ms;
 }
+/* Hidden but still laid out, so the first measure can read each label's width. */
 .tabbar:not(.is-measured) .tab-label {
-  display: none;
+  position: absolute;
+  visibility: hidden;
 }
 .log-btn {
   flex: none;
