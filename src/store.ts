@@ -158,6 +158,8 @@ interface DemoState {
   splash: boolean;
   /** Days submitted from this prototype (draft → submitted), per crew link. Read it with useSubmitted(). */
   submitted: Record<string, string[]>;
+  /** Half-typed Log forms of the other links, so A → B → A keeps A's start, end and break. */
+  logs: Record<string, LogForm>;
   /** The open sheet has its own browser-history entry, so Back closes it. */
   sheetPushed: boolean;
   /** The light sheet has scrolled under the status bar: show dark status bar text. */
@@ -198,10 +200,17 @@ interface Actions {
 export type NavDir = 'push' | 'pop' | 'tab' | 'none';
 
 /** Log sheet defaults for a crew link: today's call time, the usual break, wrap still open. */
-const logDefaults = () => ({
+/** The Log sheet's form. The active link's form lives in the top-level fields; the others wait in `logs`. */
+interface LogForm {
+  breakMin: number;
+  logStart: string;
+  logEnd: string | null;
+}
+
+const logDefaults = (): LogForm => ({
   breakMin: today.defaultBreakMin,
   logStart: todayPlan(today.defaultBreakMin).call,
-  logEnd: null as string | null,
+  logEnd: null,
 });
 
 const initialState = (): DemoState => ({
@@ -224,6 +233,7 @@ const initialState = (): DemoState => ({
   navDir: 'none',
   splash: true,
   submitted: {},
+  logs: {},
   sheetPushed: false,
   statusDark: false,
   toast: null,
@@ -246,7 +256,9 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   navigate: (r) => {
     const { stack, sheet, sheetPushed } = get();
     if (sameRoute(stack[stack.length - 1]?.route, r)) return;
-    history.pushState(null, '', routeToHash(r));
+    // Leaving a sheet's tab for another tab: take over the sheet's history entry instead of adding a dead one.
+    if (isTab(r) && sheetPushed) history.replaceState(null, '', routeToHash(r));
+    else history.pushState(null, '', routeToHash(r));
     set({
       stack: isTab(r)
         ? [{ route: r, pushed: true }]
@@ -329,14 +341,22 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   setActiveLink: (id) => {
     const link = linkById(id);
     if (!link) return;
+    if (link.status === 'revoked') {
+      get().showToast(`Production removed this access to ${link.projectName}. Ask them for a new link.`);
+      return;
+    }
     if (link.status === 'expired') {
       get().showToast(`The link for ${link.projectName} has expired. Ask production for a new one.`);
       return;
     }
     if (id === get().activeLinkId) return;
-    // Another person's day starts clean: no open sheet or log form, default times.
+    // Close what is open and swap the Log form: park this link's, bring back the other's (or defaults).
     dropSheet(get().sheetPushed);
-    set({ activeLinkId: id, sheet: null, sheetPushed: false, logOpen: false, ...logDefaults() });
+    set((s) => {
+      const parked = { ...s.logs, [s.activeLinkId]: { breakMin: s.breakMin, logStart: s.logStart, logEnd: s.logEnd } };
+      const { [id]: next = logDefaults(), ...rest } = parked;
+      return { activeLinkId: id, sheet: null, sheetPushed: false, logOpen: false, logs: rest, ...next };
+    });
   },
   completeMasterData: () => set({ masterDataDone: true }),
   setFontTheme: (t) => {
@@ -348,7 +368,16 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     set({ fontTheme: t });
   },
   setBreak: (min) => set({ breakMin: Math.max(0, Math.min(120, min)) }),
-  setLogTime: (k, v) => set({ [k]: v } as Pick<DemoState, typeof k>),
+  setLogTime: (k, v) =>
+    set((s) => {
+      // Taking the end back means the day is no longer finished: it is no longer sent either.
+      const sent = s.submitted[s.activeLinkId] ?? [];
+      const unsend = k === 'logEnd' && v === null && sent.includes(today.date);
+      return {
+        [k]: v,
+        ...(unsend ? { submitted: { ...s.submitted, [s.activeLinkId]: sent.filter((d) => d !== today.date) } } : {}),
+      } as Pick<DemoState, typeof k>;
+    }),
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
   toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
   shiftCal: (delta) =>

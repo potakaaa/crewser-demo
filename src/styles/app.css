@@ -2324,6 +2324,20 @@
   line-height: 1.55;
   color: var(--text-2);
 }
+.log-send {
+  margin-bottom: calc(-1 * var(--sp-3));
+  text-align: center;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+.log-confirm {
+  padding: 10px var(--sp-3);
+  border-radius: var(--r-control);
+  background: var(--amber-surface);
+  color: var(--amber-text);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
 .log-dialog .btn-lime {
   flex: none;
   min-height: 52px;

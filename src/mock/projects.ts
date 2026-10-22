@@ -47,6 +47,20 @@ const rawLinks: Omit<CrewLink, 'status'>[] = [
     expiresAt: '2026-10-02T23:59:00+02:00',
   },
   {
+    id: 'lk-seeblick-me',
+    projectId: 'p-seeblick',
+    projectName: 'Seeblick (TV movie)',
+    production: 'Alpenblick TV',
+    personName: 'Focus Florentina',
+    initials: 'FF',
+    department: 'Camera',
+    position: '1st AC',
+    isMe: true,
+    token: 'cw_demo_seeblick_florentina',
+    expiresAt: '2026-12-15T23:59:00+01:00',
+    revokedAt: '2026-10-12T10:20:00+02:00',
+  },
+  {
     id: 'lk-ferry-bianca',
     projectId: 'p-ferry',
     projectName: 'The Last Ferry',
@@ -81,15 +95,14 @@ const DAY_MS = 86_400_000;
 const EXPIRING_DAYS = 7;
 
 /** Status follows from the end date and the frozen demo date, never from a stored label. */
-export function linkStatus(expiresAt: string, now = NOW): LinkStatus {
-  const left = Date.parse(expiresAt) - now;
-  if (left <= 0) return 'expired';
+export function linkStatus(link: Pick<CrewLink, 'expiresAt' | 'revokedAt'>, now = NOW): LinkStatus {
+  if (link.revokedAt) return 'revoked';
+  const left = Date.parse(link.expiresAt) - now;
+  // An unreadable date is never trusted as valid.
+  if (!(left > 0)) return 'expired';
   return left <= EXPIRING_DAYS * DAY_MS ? 'expiring' : 'active';
 }
 
-/** Whole days left, rounded up; 0 when the link has ended. */
-export const linkDaysLeft = (expiresAt: string, now = NOW) => Math.max(0, Math.ceil((Date.parse(expiresAt) - now) / DAY_MS));
-
-export const links: CrewLink[] = rawLinks.map((l) => ({ ...l, status: linkStatus(l.expiresAt) }));
+export const links: CrewLink[] = rawLinks.map((l) => ({ ...l, status: linkStatus(l) }));
 
 export const linkById = (id: string) => links.find((l) => l.id === id);

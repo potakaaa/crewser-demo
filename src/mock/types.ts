@@ -128,7 +128,8 @@ export interface PdfDoc {
   line: string;
 }
 
-export type LinkStatus = 'active' | 'expiring' | 'expired';
+/** revoked = production removed the access; expired = the end date passed. The server decides, the clock only warns. */
+export type LinkStatus = 'active' | 'expiring' | 'expired' | 'revoked';
 
 /**
  * One crew link (SMS access link) to one project. A link belongs to one crew member;
@@ -149,6 +150,8 @@ export interface CrewLink {
   token: string;
   /** ISO date-time the link stops working. */
   expiresAt: string;
+  /** ISO date-time production revoked the link, when it did. Wins over the end date. */
+  revokedAt?: string;
   status: LinkStatus;
 }
 

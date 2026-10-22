@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDemo } from '../store';
+import { useActiveLink, useDemo } from '../store';
 import { Icon } from './Icon';
 import { BottomSheet } from './BottomSheet';
 import { Collapse } from './Layout';
@@ -41,7 +41,11 @@ export function LogSheet() {
   const setTime = useDemo((s) => s.setLogTime);
   const toast = useDemo((s) => s.showToast);
   const submitDay = useDemo((s) => s.submitDay);
+  const offline = useDemo((s) => s.offline);
+  const link = useActiveLink();
   const [editing, setEditing] = useState<Field | null>(null);
+  /** Entering hours for someone else: the first tap on Submit asks, the second sends. */
+  const [confirming, setConfirming] = useState(false);
   const plan = todayPlan(breakMin);
   const close = () => setOpen(false);
 
@@ -50,10 +54,14 @@ export function LogSheet() {
     if (open) setEditing(null);
   }, [open]);
 
-  const toggle = (f: Field) => {
-    if (f === 'end' && !end) setTime('logEnd', plan.wrap ?? '22:00');
-    setEditing((cur) => (cur === f ? null : f));
-  };
+  // Any change to the hours, or another person, withdraws a pending confirmation.
+  useEffect(() => {
+    setConfirming(false);
+  }, [open, start, end, breakMin, link.id]);
+
+  // Opening the End tile only previews the planned wrap on the wheel. The end counts as set
+  // once the user turns the wheel or taps a chip, so a plan is never sent by accident.
+  const toggle = (f: Field) => setEditing((cur) => (cur === f ? null : f));
 
   const quick: { label: string; value: string }[] =
     editing === 'start'
@@ -68,16 +76,33 @@ export function LogSheet() {
   const current = editing === 'start' ? start : (end ?? plan.wrap ?? '22:00');
   const endInfo = end ? worked(start, end, breakMin) : null;
 
+  const forName = link.isMe ? '' : ` for ${link.personName}`;
+  const sendLine =
+    end && endInfo ? `${fmtDayMonth(today.date)} · ${start}–${end}${endInfo.overnight ? ' (next day)' : ''} · ${fmtH(endInfo.hours)} h` : null;
+
   const save = () => {
+    if (!end) {
+      close();
+      toast(link.isMe ? `Start time ${start} saved. Have a good shoot!` : `Start time${forName} saved`);
+      return;
+    }
+    if (!link.isMe && !confirming) {
+      setConfirming(true);
+      return;
+    }
     close();
-    // An end time means the day is over: it goes to production and the dashboard shows it as done.
-    if (end) submitDay(today.date);
-    if (end && endInfo) toast(`Workday saved: ${start}–${end}, ${fmtH(endInfo.hours)} h`);
-    else toast(`Start time ${start} saved. Have a good shoot!`);
+    // An end time the user set means the day is over: it goes to production and the dashboard shows it as done.
+    submitDay(today.date);
+    toast(offline ? `Saved on this phone${forName}, sends when you're online` : `Hours${forName} sent to production`);
   };
 
   return (
-    <BottomSheet open={open} onClose={close} title="Log today" subtitle={`${fmtDayMonth(today.date)} · Shoot day ${today.shootDay}`}>
+    <BottomSheet
+      open={open}
+      onClose={close}
+      title={link.isMe ? 'Log today' : `Hours for ${link.personName}`}
+      subtitle={`${fmtDayMonth(today.date)} · Shoot day ${today.shootDay}${link.isMe ? '' : ` · ${link.position}`}`}
+    >
       <div className="log-times">
         <button type="button" className="time-tile" data-active={editing === 'start'} aria-expanded={editing === 'start'} aria-controls="log-picker" onClick={() => toggle('start')}>
           <span className="tt-k">Start</span>
@@ -152,8 +177,14 @@ export function LogSheet() {
         {summary(start, end, breakMin)}
       </p>
 
+      {sendLine && <p className="log-send">{sendLine}</p>}
+      {confirming && (
+        <p className="log-confirm" role="status">
+          You are sending hours for {link.personName}, not for yourself.
+        </p>
+      )}
       <button type="button" className="btn btn-lime btn-lg" onClick={save}>
-        {end ? 'Save workday' : 'Save start time'}
+        {!end ? 'Save start time' : confirming ? `Submit for ${link.personName}` : 'Submit hours'}
       </button>
       <button type="button" className="text-btn" onClick={() => toast('The full workday view is not part of this demo')}>
         Open full workday
