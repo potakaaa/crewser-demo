@@ -38,7 +38,7 @@ export function metricCopy(o: HoursOverview, metric: HoursMetric) {
     case 'days':
       return {
         label: 'Shoot days after today',
-        short: 'Days to go',
+        short: 'Days left',
         value: String(o.shootLeft),
         unit: '',
         sentence: `Today is day ${today.shootDay} of ${project.totalShootDays}.`,
