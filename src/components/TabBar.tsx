@@ -10,24 +10,21 @@ const TABS: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
 
-/** Full names for screen readers; the visible label is the short one. */
-const ARIA: Record<TabName, string> = {
-  dashboard: 'Dashboard',
-  calendar: 'Calendar',
-  documents: 'Documents',
-  contacts: 'Contacts',
-  settings: 'Settings',
-};
+
 
 // Five tabs plus the Log button have to fit a 375 px phone, so the active tab stays compact.
 const ICON = 22;
-const PAD_L = 10;
-const PAD_R = 10;
-const LABEL_GAP = 6;
+const PAD_L = 8;
+const PAD_R = 8;
+const LABEL_GAP = 5;
+/** Inactive tabs never get narrower than this; if the label would squeeze them, the active tab goes icon-only. */
+const MIN_TAB = 40;
 
 interface Layout {
   w: number[];
   x: number[];
+  /** False on narrow phones: all five tabs are equal, icon-only. */
+  label: boolean;
 }
 
 /**
@@ -58,12 +55,15 @@ export function TabBar({ hidden }: { hidden: boolean }) {
       const inner = nav.clientWidth - padL - parseFloat(cs.paddingRight);
       const gap = parseFloat(cs.columnGap) || 0;
       const labelW = labelRefs.current[active]?.scrollWidth ?? 60;
-      const activeW = PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
-      const otherW = (inner - activeW - gap * (TABS.length - 1)) / (TABS.length - 1);
+      const room = inner - gap * (TABS.length - 1);
+      let activeW = PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
+      let otherW = (room - activeW) / (TABS.length - 1);
+      const label = otherW >= MIN_TAB;
+      if (!label) activeW = otherW = room / TABS.length;
       const w = TABS.map((_, i) => (i === active ? activeW : otherW));
       const x: number[] = [];
       w.reduce((acc, v) => (x.push(acc), acc + v + gap), padL);
-      setLayout({ w, x });
+      setLayout({ w, x, label });
     };
     measure();
     void document.fonts?.ready.then(measure);
@@ -87,7 +87,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
           {TABS.map((t, i) => {
             const on = i === active;
             const style: CSSProperties | undefined = layout
-              ? { width: layout.w[i], paddingLeft: on ? PAD_L : (layout.w[i] - ICON) / 2 }
+              ? { width: layout.w[i], paddingLeft: on && layout.label ? PAD_L : (layout.w[i] - ICON) / 2 }
               : undefined;
             return (
               <button
@@ -96,14 +96,14 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                 className="tab"
                 style={style}
                 aria-current={on && idx >= 0 ? 'page' : undefined}
-                aria-label={ARIA[t.name]}
-                title={on ? undefined : ARIA[t.name]}
+                aria-label={t.label}
+                title={on ? undefined : t.label}
                 onClick={() => navigate({ name: t.name })}
               >
                 <span className="tab-icon">
                   <Icon name={t.icon} size={ICON} color={on ? '#111A1B' : '#3F5155'} strokeWidth={on ? 1.8 : 1.6} />
                 </span>
-                <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on}>
+                <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on && (layout?.label ?? true)}>
                   {t.label}
                 </span>
               </button>

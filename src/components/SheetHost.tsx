@@ -52,9 +52,10 @@ export function SheetHost() {
   const shown = sheet ?? last.current;
   if (!shown) return null;
   const meta = META[shown.kind](shown.id);
+  const contentKey = `${shown.kind}:${shown.id ?? ''}`;
   return (
-    <BottomSheet open={sheet !== null} onClose={close} title={meta.title} subtitle={meta.subtitle} tone={meta.tone}>
-      <Body sheet={shown} />
+    <BottomSheet open={sheet !== null} onClose={close} title={meta.title} subtitle={meta.subtitle} tone={meta.tone} contentKey={contentKey}>
+      <Body key={contentKey} sheet={shown} />
     </BottomSheet>
   );
 }
