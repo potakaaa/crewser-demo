@@ -29,9 +29,9 @@ const callsheets: Doc[] = SHOOT_DAYS.map((d) => ({
 
 const others: Doc[] = [
   { id: 'sched', file: 'Shooting-Schedule_v4.pdf', title: 'Shooting schedule', kind: 'schedule', updated: '2026-10-16T17:10', size: '348 KB', isNew: true },
-  { id: 'oneliner', file: 'One-liner_v3.pdf', title: 'Script one-liner', kind: 'other', updated: '2026-10-05T11:20', size: '96 KB' },
+  { id: 'oneliner', file: 'One-liner_v3.pdf', title: 'Script one-liner', kind: 'schedule', updated: '2026-10-05T11:20', size: '96 KB' },
   { id: 'risk', file: 'Risk-Assessment_Madeira.pdf', title: 'Risk assessment · Madeira', kind: 'safety', updated: '2026-10-14T09:45', size: '412 KB' },
-  { id: 'map', file: 'Location-Map_Funchal.pdf', title: 'Location map · Funchal', kind: 'other', updated: '2026-10-13T15:30', size: '1.2 MB' },
+  { id: 'map', file: 'Location-Map_Funchal.pdf', title: 'Location map · Funchal', kind: 'safety', updated: '2026-10-13T15:30', size: '1.2 MB' },
   { id: 'crewlist', file: 'Crew-List_v6.pdf', title: 'Crew list', kind: 'other', updated: '2026-10-15T12:00', size: '134 KB' },
 ];
 
