@@ -1,14 +1,16 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { notes, person, today } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../components/Layout';
 import { ContentCard, NoteRow } from '../components/NoteCards';
-import { Timeline } from '../components/Timeline';
+import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { Wordmark } from '../components/Brand';
 import { smartNotes } from '../lib/notes';
+import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
 
 export function DashboardScreen() {
@@ -26,6 +28,12 @@ export function DashboardScreen() {
   const link = useActiveLink();
   const sn = smartNotes(empty ? [] : notes);
   const hasNotes = sn.top.length + sn.restCount > 0;
+  const scrub = useMemo(() => buildScrub(empty ? [] : notes), [empty]);
+  // The note under the ruler's playhead; it only changes when the note does, never per pixel.
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const ruler = useRef<TimelineHandle>(null);
+  const backToNow = useCallback(() => ruler.current?.backToNow(), []);
+  useEffect(() => setPreview(null), [scrub]);
 
   return (
     <div className="screen" ref={ref}>
@@ -49,11 +57,11 @@ export function DashboardScreen() {
           </button>
         </div>
         {offline && <OfflineBanner tone="dark" />}
-        <Timeline />
-        <TodayCard note={sn.hero} />
+        <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
+        <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />
       </GradientHeader>
 
-      <Sheet>
+      <Sheet className="sheet-dash">
         {!masterDataDone && (
           <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
             <span className="master-icon">
@@ -61,7 +69,7 @@ export function DashboardScreen() {
             </span>
             <span className="master-text">
               <span className="master-t1">Submit your master data</span>
-              <span className="master-t2">Production needs it once, before your first payout.</span>
+              <span className="master-t2">Needed once, before your first payout.</span>
             </span>
             <Icon name="right" size={18} color="#111A1B" />
           </button>
@@ -73,7 +81,7 @@ export function DashboardScreen() {
 
         {hasNotes ? (
           <section className="stack" aria-label="Smart notes">
-            <SectionHead title="Smart notes" sub="Call times and travel first, then the rest." link="Calendar" onLink={() => navigate({ name: 'calendar' })} />
+            <SectionHead title="Smart notes" link="Calendar" onLink={() => navigate({ name: 'calendar' })} />
             {sn.top.map((n) => (
               <ContentCard key={n.id} note={n} />
             ))}

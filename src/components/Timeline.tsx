@@ -1,48 +1,68 @@
-import { useEffect, useMemo, useRef, type CSSProperties, type RefObject } from 'react';
-import { useDemo } from '../store';
-import { notes } from '../mock';
-import { Icon } from './Icon';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState, type KeyboardEvent, type Ref } from 'react';
 import { TYPE_COLOR } from '../lib/noteStyle';
-import { buildTimeline } from '../lib/timeline';
-import { TYPE_LABEL } from '../lib/notes';
+import { previewAt, previewLine, samePreview, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
-/** Fastest fling that still counts, px per ms: a flick moves about one marker, not the whole strip. */
-const MAX_FLING = 1.2;
+/** Fastest fling that still counts, px per ms. */
+const MAX_FLING = 1.6;
+/** A pause this long before release means the finger had stopped: no fling. */
+const STALE_MS = 80;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+export interface TimelineHandle {
+  /** Scroll the playhead back to Now. */
+  backToNow: () => void;
+}
+
 /**
- * Drag-to-scroll for mouse users (touch and trackpads scroll natively). While dragging, CSS
- * snapping is off; on release the strip glides to the snap point the swipe was heading for.
- * Everything happens on the DOM node, so React never re-renders while you drag.
+ * Everything that moves the ruler. Touch and trackpads scroll it natively; this adds mouse drag
+ * (with a short fling), the mouse wheel, and tells `onScrub` the scroll position once per frame.
+ * It works on the DOM node, so React never re-renders while the ruler moves.
  */
-function useDragScroll(ref: RefObject<HTMLDivElement | null>) {
+function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
+  const onScrubRef = useRef(onScrub);
   useEffect(() => {
-    const el = ref.current;
+    onScrubRef.current = onScrub;
+  });
+
+  useEffect(() => {
     if (!el) return;
-    let startX = 0;
-    let startLeft = 0;
+    let frame = 0;
+    const report = () => {
+      frame = 0;
+      onScrubRef.current(el.scrollLeft);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(report);
+    };
+
     let pointer: number | null = null;
     let dragging = false;
     let swallowClick = false;
+    let startX = 0;
+    let startLeft = 0;
     let lastX = 0;
     let lastT = 0;
-    let velocity = 0; // px per ms, positive = content moving left (scrollLeft growing)
-    let restore = 0;
+    let velocity = 0; // px per ms, positive = scrollLeft growing
 
-    const snapPoints = () => {
-      const pad = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0;
-      const max = el.scrollWidth - el.clientWidth;
-      return Array.from(el.querySelectorAll<HTMLElement>('.tl-seg')).map((seg) => ({
-        start: Math.min(Math.max(seg.offsetLeft - pad, 0), max),
-        end: Math.min(Math.max(seg.offsetLeft + seg.offsetWidth - el.clientWidth + pad, 0), max),
-      }));
+    const endDrag = (e?: PointerEvent) => {
+      if (pointer === null) return;
+      const wasDragging = dragging;
+      pointer = null;
+      dragging = false;
+      delete el.dataset.drag;
+      if (!wasDragging) return;
+      // A finger that stopped before lifting must not fling with the speed it had earlier.
+      const fresh = e ? e.timeStamp - lastT < STALE_MS : false;
+      if (fresh && !reducedMotion()) {
+        const projected = el.scrollLeft + Math.max(-MAX_FLING, Math.min(MAX_FLING, velocity)) * 200;
+        el.scrollTo({ left: projected, behavior: 'smooth' });
+      }
     };
 
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse' || e.button !== 0) return;
-      window.clearTimeout(restore);
       pointer = e.pointerId;
       startX = lastX = e.clientX;
       startLeft = el.scrollLeft;
@@ -54,14 +74,19 @@ function useDragScroll(ref: RefObject<HTMLDivElement | null>) {
 
     const onMove = (e: PointerEvent) => {
       if (e.pointerId !== pointer) return;
+      // The button was released somewhere we did not hear about (outside the window, say).
+      if (e.buttons === 0) {
+        endDrag();
+        return;
+      }
       const dx = e.clientX - startX;
       if (!dragging) {
         if (Math.abs(dx) < DRAG_THRESHOLD) return;
         dragging = true;
         swallowClick = true;
         el.dataset.drag = 'true';
-        el.style.scrollSnapType = 'none';
         el.setPointerCapture(e.pointerId);
+        el.scrollTo({ left: el.scrollLeft, behavior: 'auto' }); // cancel a glide in progress
       }
       el.scrollLeft = startLeft - dx;
       const dt = e.timeStamp - lastT;
@@ -71,22 +96,20 @@ function useDragScroll(ref: RefObject<HTMLDivElement | null>) {
     };
 
     const onUp = (e: PointerEvent) => {
-      if (e.pointerId !== pointer) return;
-      pointer = null;
-      if (!dragging) return;
-      dragging = false;
-      delete el.dataset.drag;
-      // Keep going a little in the swipe direction, then land on a snap point
-      // (or stay put when that spot is inside a segment wider than the screen).
-      const projected = el.scrollLeft + Math.max(-MAX_FLING, Math.min(MAX_FLING, velocity)) * 220;
-      const points = snapPoints();
-      const inFreeZone = points.some((p) => p.end > p.start && projected > p.start && projected < p.end);
-      const target = inFreeZone
-        ? projected
-        : points.reduce((best, p) => (Math.abs(p.start - projected) < Math.abs(best - projected) ? p.start : best), points[0]?.start ?? 0);
-      const smooth = !reducedMotion();
-      el.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
-      restore = window.setTimeout(() => (el.style.scrollSnapType = ''), smooth ? 420 : 0);
+      if (e.pointerId === pointer) endDrag(e);
+    };
+    const onLost = (e: PointerEvent) => {
+      if (e.pointerId === pointer) endDrag();
+    };
+
+    // A mouse wheel only scrolls up and down; here it scrubs. Trackpads send small fractional
+    // steps, so they keep scrolling the page and use two-finger sideways swipes for the ruler.
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.deltaX !== 0) return;
+      const notched = e.deltaMode !== 0 || (Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 50);
+      if (!notched) return;
+      e.preventDefault();
+      el.scrollBy({ left: e.deltaY * (e.deltaMode === 1 ? 16 : 1) * 0.6, behavior: 'auto' });
     };
 
     const onClickCapture = (e: MouseEvent) => {
@@ -96,64 +119,140 @@ function useDragScroll(ref: RefObject<HTMLDivElement | null>) {
       e.stopPropagation();
     };
 
+    el.addEventListener('scroll', onScroll, { passive: true });
     el.addEventListener('pointerdown', onDown);
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerup', onUp);
     el.addEventListener('pointercancel', onUp);
+    el.addEventListener('lostpointercapture', onLost);
+    el.addEventListener('wheel', onWheel, { passive: false });
     el.addEventListener('click', onClickCapture, true);
     return () => {
-      window.clearTimeout(restore);
+      if (frame) cancelAnimationFrame(frame);
+      el.removeEventListener('scroll', onScroll);
       el.removeEventListener('pointerdown', onDown);
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerup', onUp);
       el.removeEventListener('pointercancel', onUp);
+      el.removeEventListener('lostpointercapture', onLost);
+      el.removeEventListener('wheel', onWheel);
       el.removeEventListener('click', onClickCapture, true);
     };
-  }, [ref]);
+  }, [el]);
 }
 
-/** What is coming up: Now, +2 h, +4 h, Tonight, Tomorrow, In 2 days. Scrolls sideways, snaps to each marker. */
-export function Timeline() {
-  const empty = useDemo((s) => s.empty);
-  const openSheet = useDemo((s) => s.openSheet);
-  const ref = useRef<HTMLDivElement>(null);
-  useDragScroll(ref);
-  const segments = useMemo(() => buildTimeline(empty ? [] : notes), [empty]);
+/**
+ * A slim ruler to preview what is coming: drag, swipe or scroll it and the top card follows the
+ * playhead. No cards on it, only marks and a dot where a note falls. The parent owns the preview
+ * (it changes only when the note under the playhead changes); the ruler position stays in the DOM.
+ */
+export function Timeline({
+  scrub,
+  preview,
+  onPreview,
+  handle,
+}: {
+  scrub: Scrub;
+  preview: Preview | null;
+  onPreview: (p: Preview | null) => void;
+  handle?: Ref<TimelineHandle>;
+}) {
+  // A callback ref in state, so the listeners attach again when the ruler comes back (toggling Empty).
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
+  const shown = useRef<Preview | null>(null);
+  const tickRef = useRef<HTMLSpanElement>(null);
 
-  if (segments.every((s) => s.chips.length === 0)) return null;
+  const onScrub = useCallback(
+    (x: number) => {
+      const next = previewAt(scrub, x);
+      if (samePreview(next, shown.current)) return;
+      const crossed = next && (!shown.current || next.index !== shown.current.index);
+      shown.current = next;
+      onPreview(next);
+      if (!crossed) return;
+      // A tick when the playhead reaches a note: a flash on the playhead, and a buzz where supported.
+      const tick = tickRef.current;
+      if (tick && !reducedMotion()) {
+        tick.classList.remove('tl-tick-on');
+        void tick.offsetWidth;
+        tick.classList.add('tl-tick-on');
+      }
+      try {
+        navigator.vibrate?.(6);
+      } catch {
+        /* vibration is optional */
+      }
+    },
+    [scrub, onPreview],
+  );
+  useScrubber(el, onScrub);
+
+  // The parent's preview is the truth: a reset from outside (Back to now) lets the next scroll report again.
+  useEffect(() => {
+    shown.current = preview;
+  }, [preview]);
+
+  const backToNow = useCallback(() => {
+    el?.scrollTo({ left: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  }, [el]);
+  useImperativeHandle(handle, () => ({ backToNow }), [backToNow]);
+
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (!el) return;
+    const x = el.scrollLeft;
+    let to: number | null = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = scrub.stops.find((s) => s.x > x + 1.5)?.x ?? x;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = [...scrub.stops].reverse().find((s) => s.x < x - 1.5)?.x ?? 0;
+    else if (e.key === 'Home') to = 0;
+    else if (e.key === 'End') to = scrub.stops[scrub.stops.length - 1]?.x ?? 0;
+    if (to === null) return;
+    e.preventDefault();
+    el.scrollTo({ left: to, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  };
+
+  if (!scrub.stops.length) return null;
+  const line = preview ? previewLine(scrub, preview) : 'Now. Nothing previewed.';
+  const current = preview && scrub.stops[preview.index];
   return (
-    <section className="tl" aria-label="Coming up">
-      <div className="tl-scroll" ref={ref} tabIndex={0}>
-        {segments.map((seg) => (
-          <div className="tl-seg" key={seg.key} style={{ '--n': seg.chips.length } as CSSProperties} data-now={seg.label === 'Now'}>
-            <div className="tl-mark">
-              <strong>{seg.label}</strong>
-              {seg.sub && <span>{seg.sub}</span>}
-            </div>
-            <span className="tl-axis" aria-hidden="true" />
-            <div className="tl-chips">
-              {seg.chips.map(({ note, time, title, rel, next }) => (
-                <button
-                  type="button"
-                  key={note.id}
-                  className="tl-chip"
-                  data-next={next}
-                  aria-label={`${time}, ${title}, ${TYPE_LABEL[note.type]}, ${rel}. Open`}
-                  onClick={() => openSheet('note', note.id)}
-                >
-                  <span className="tl-icon" style={{ color: TYPE_COLOR[note.type].dot }}>
-                    <Icon name={note.type} size={16} />
-                  </span>
-                  <span className="tl-text">
-                    <span className="tl-time num">{time}</span>
-                    <span className="tl-title">{title}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
+    <section className="tl" aria-label="Preview what is coming up">
+      <div
+        className="tl-scroll"
+        ref={setEl}
+        tabIndex={0}
+        role="slider"
+        aria-label="Preview upcoming notes. Left and right arrows move between notes."
+        aria-orientation="horizontal"
+        aria-valuemin={0}
+        aria-valuemax={scrub.stops.length}
+        aria-valuenow={preview ? Math.min(preview.index + 1, scrub.stops.length) : 0}
+        aria-valuetext={preview ? line : 'Now'}
+        onKeyDown={onKeyDown}
+      >
+        <div className="tl-track">
+          <div className="tl-ruler" style={{ width: scrub.length }}>
+            {scrub.marks.map((m) => (
+              <span className="tl-mark" key={m.key} data-now={m.x === 0} style={{ left: m.x }}>
+                <span className="tl-label">{m.label}</span>
+              </span>
+            ))}
+            {scrub.stops.map((s, i) => (
+              <span
+                className="tl-dot"
+                key={s.note.id}
+                data-on={preview?.index === i}
+                style={{ left: s.x, background: TYPE_COLOR[s.note.type].dot }}
+                aria-hidden="true"
+              />
+            ))}
           </div>
-        ))}
+        </div>
       </div>
+      <span className="tl-head" aria-hidden="true">
+        <span className="tl-tick" ref={tickRef} />
+      </span>
+      <p className="sr-only" aria-live="polite" role="status">
+        {preview ? `${line}${current ? `: ${current.note.title}` : ''}` : ''}
+      </p>
     </section>
   );
 }

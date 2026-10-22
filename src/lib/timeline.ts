@@ -1,94 +1,133 @@
 import { notes as allNotes, today } from '../mock';
 import type { Note } from '../mock';
-import { addDays, diffDays, fmtCountdown, fmtDayMonth, fmtDayShort, relativeDay, toMinutes } from './dates';
+import { diffDays, fmtCountdown, toMinutes, weekday } from './dates';
 import { sortNotes } from './notes';
 
 const HOUR = 60;
 const DAY = 24 * HOUR;
 /** "Tonight" starts here. */
 const TONIGHT = 18 * HOUR;
-/** Days past tomorrow the strip looks ahead. */
-const LOOKAHEAD_DAYS = 14;
+/** Pixels between two neighbouring ruler marks. Past the last mark a day is one gap. */
+export const MARK_GAP = 84;
+/** The ruler runs on this long after the last note, so the playhead can pass it. */
+const TAIL = 12 * HOUR;
+/** Closer to Now than this (px) counts as "back at Now". */
+export const REST_PX = 4;
+/** A note further than this past the playhead is "nothing else until …". */
+const QUIET = 3 * HOUR;
 
-export interface TimelineChip {
-  note: Note;
-  /** "11:00" or "All day" */
-  time: string;
-  /** Short title: the part before " · ". */
-  title: string;
-  /** "in 2 h 20 min", "tomorrow" */
-  rel: string;
-  /** The next thing coming up. */
-  next: boolean;
+export interface RulerMark {
+  key: string;
+  /** "Now" · "+2 h" · "Tonight" · "Tomorrow" · "+2 days" */
+  label: string;
+  /** Minutes from now. */
+  min: number;
+  x: number;
 }
 
-export interface TimelineSegment {
-  key: string;
-  /** "Now" · "+2 h" · "Tonight" · "Tomorrow" · "In 2 days" */
-  label: string;
-  /** "Mon 19 Oct" under day markers. */
-  sub?: string;
-  chips: TimelineChip[];
+export interface ScrubStop {
+  note: Note;
+  /** Minutes from now. */
+  min: number;
+  /** Position on the ruler, px from Now. */
+  x: number;
+  /** "Tue 08:00" · "Tue, all day" */
+  when: string;
+  /** "in 4 h" · "in 2 days" */
+  rel: string;
+}
+
+export interface Scrub {
+  marks: RulerMark[];
+  stops: ScrubStop[];
+  /** Ruler length in px, Now to the end. */
+  length: number;
+  minAt: (x: number) => number;
+}
+
+/** Which note the playhead is on. index === stops.length means nothing is left. */
+export interface Preview {
+  index: number;
+  /** The note is a long way past the playhead. */
+  quiet: boolean;
+}
+
+/** "in 20 min" · "in 4 h" · "in 2 days": short enough for a one-line caption. */
+function shortRel(min: number): string {
+  if (min <= 0) return 'now';
+  if (min < HOUR) return `in ${min} min`;
+  if (min < 6 * HOUR) return fmtCountdown(min);
+  if (min < 36 * HOUR) return `in ${Math.round(min / HOUR)} h`;
+  return `in ${Math.round(min / DAY)} days`;
 }
 
 /**
- * Relative markers from "now" to the last dated note. Day markers after tomorrow
- * only appear when something happens that day, so the strip stays short.
- * Chips sit in the segment their time falls into, in time order.
+ * The ruler behind the preview scrubber. Marks sit evenly apart (Now, +2 h, +4 h, Tonight,
+ * Tomorrow, +2 days) and time between them is stretched to fit, so the next few hours get
+ * the room. Notes land on it by their time; all-day notes at the start of their day.
  */
-export function buildTimeline(list: Note[] = allNotes): TimelineSegment[] {
+export function buildScrub(list: Note[] = allNotes): Scrub {
   const nowMin = toMinutes(today.time);
   /** Minutes since today 00:00; all-day notes count from the start of their day. */
   const at = (n: Note) => diffDays(n.day!, today.date) * DAY + (n.kind === 'time' ? toMinutes(n.time!) : 0);
-  // Notes that already happened drop off; today's all-day notes stay under "Now".
+  // Notes that already happened drop off; today's all-day notes stay at Now.
   const upcoming = sortNotes(list).filter((n) => n.day && diffDays(n.day, today.date) >= 0 && (n.kind !== 'time' || at(n) >= nowMin));
-  const next = upcoming.find((n) => n.kind === 'time');
 
-  interface Span {
-    key: string;
-    label: string;
-    sub?: string;
-    from: number;
-    to: number;
-    /** Shown even when empty, so the strip always reads "now → tomorrow". */
-    always: boolean;
-  }
-  const spans: Span[] = [];
-  const edges = [nowMin, ...[2, 4].map((h) => nowMin + h * HOUR).filter((m) => m < TONIGHT), ...(TONIGHT > nowMin ? [TONIGHT] : [])];
-  edges.forEach((from, i) => {
-    const label = i === 0 ? 'Now' : from === TONIGHT ? 'Tonight' : `+${(from - nowMin) / HOUR} h`;
-    spans.push({ key: `h${i}`, label, sub: i === 0 ? today.time : undefined, from: i === 0 ? -Infinity : from, to: edges[i + 1] ?? DAY, always: true });
+  const mins: { label: string; min: number }[] = [{ label: 'Now', min: 0 }];
+  [2, 4].forEach((h) => nowMin + h * HOUR < TONIGHT && mins.push({ label: `+${h} h`, min: h * HOUR }));
+  if (TONIGHT > nowMin) mins.push({ label: 'Tonight', min: TONIGHT - nowMin });
+  mins.push({ label: 'Tomorrow', min: DAY - nowMin }, { label: '+2 days', min: 2 * DAY - nowMin });
+  const marks = mins.map<RulerMark>((m, i) => ({ key: `m${i}`, ...m, x: i * MARK_GAP }));
+  const last = marks[marks.length - 1];
+
+  const xAt = (min: number) => {
+    if (min <= 0) return 0;
+    for (let i = 1; i < marks.length; i++) {
+      if (min <= marks[i].min) return marks[i - 1].x + ((min - marks[i - 1].min) / (marks[i].min - marks[i - 1].min)) * MARK_GAP;
+    }
+    return last.x + ((min - last.min) / DAY) * MARK_GAP;
+  };
+  const minAt = (x: number) => {
+    if (x <= 0) return 0;
+    for (let i = 1; i < marks.length; i++) {
+      if (x <= marks[i].x) return marks[i - 1].min + ((x - marks[i - 1].x) / MARK_GAP) * (marks[i].min - marks[i - 1].min);
+    }
+    return last.min + ((x - last.x) / MARK_GAP) * DAY;
+  };
+
+  const stops = upcoming.map<ScrubStop>((n) => {
+    const min = Math.max(at(n) - nowMin, 0);
+    const day = weekday(n.day!);
+    return {
+      note: n,
+      min,
+      x: xAt(min),
+      when: n.kind === 'time' ? `${day} ${n.time}` : `${day}, all day`,
+      rel: shortRel(min),
+    };
   });
-  for (let d = 1; d <= LOOKAHEAD_DAYS; d++) {
-    const iso = addDays(today.date, d);
-    spans.push({
-      key: `d${d}`,
-      label: d === 1 ? 'Tomorrow' : `In ${d} days`,
-      sub: d === 1 ? fmtDayMonth(iso) : fmtDayShort(iso),
-      from: d * DAY,
-      to: (d + 1) * DAY,
-      always: d === 1,
-    });
-  }
 
-  return spans
-    .map((sp) => ({
-      always: sp.always,
-      seg: {
-        key: sp.key,
-        label: sp.label,
-        sub: sp.sub,
-        chips: upcoming
-          .filter((n) => at(n) >= sp.from && at(n) < sp.to)
-          .map<TimelineChip>((n) => ({
-            note: n,
-            time: n.kind === 'time' ? n.time! : 'All day',
-            title: n.title.split(' · ')[0],
-            rel: n.day === today.date && n.kind === 'time' ? fmtCountdown(at(n) - nowMin) : relativeDay(n.day!, today.date),
-            next: n === next,
-          })),
-      } satisfies TimelineSegment,
-    }))
-    .filter((x) => x.always || x.seg.chips.length > 0)
-    .map((x) => x.seg);
+  const end = Math.max(last.min, (stops[stops.length - 1]?.min ?? 0) + TAIL);
+  return { marks, stops, length: Math.ceil(xAt(end)), minAt };
+}
+
+/** The note at or after the playhead, or null while it rests on Now. */
+export function previewAt(s: Scrub, x: number): Preview | null {
+  if (x < REST_PX) return null;
+  // One px of slack: scrollLeft is rounded to the screen's pixel grid.
+  const index = s.stops.findIndex((st) => st.x >= x - 1);
+  const i = index < 0 ? s.stops.length : index;
+  return { index: i, quiet: i < s.stops.length && s.stops[i].min - s.minAt(x) > QUIET };
+}
+
+export const samePreview = (a: Preview | null, b: Preview | null) => a === b || (!!a && !!b && a.index === b.index && a.quiet === b.quiet);
+
+/** The caption under the card: "Preview · in 4 h · Tue 08:00" or "Nothing else until Tue 08:00". */
+export function previewLine(s: Scrub, p: Preview): string {
+  const stop = s.stops[p.index];
+  if (!stop) {
+    const lastStop = s.stops[s.stops.length - 1];
+    return lastStop ? `Nothing else after ${lastStop.when}` : 'Nothing else coming up';
+  }
+  return p.quiet ? `Nothing else until ${stop.when}` : `Preview · ${stop.rel} · ${stop.when}`;
 }

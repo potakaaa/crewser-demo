@@ -117,10 +117,4 @@ export function cardTiles(n: Note): CardTile[] {
   return tiles;
 }
 
-/** First sentence of the note text, for the one-line note on a card. */
-export const firstSentence = (text: string) => {
-  const m = text.match(/^[^.!?\n]*[.!?]?/);
-  return (m ? m[0] : text).trim();
-};
-
 export const dayStub = (n: Note) => (n.day ? fmtDayShort(n.day) : '');

@@ -1,107 +1,232 @@
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { docs, today, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
-import { addDays, fmtCountdown } from '../lib/dates';
+import { addDays, fmtCountdown, fmtDayShort } from '../lib/dates';
 import { useSubmitted } from '../lib/useSubmitted';
-import { minutesUntil } from '../lib/notes';
+import { minutesUntil, TYPE_LABEL } from '../lib/notes';
+import { previewLine, type Preview, type Scrub } from '../lib/timeline';
 
 const callSheetFor = (day: string) => docs.find((d) => d.kind === 'callsheet' && d.day === day);
 
 /** "Call sheet · Shoot day 7" without the repeated "Call sheet". */
 const shortTitle = (title: string) => title.replace(/^Call sheet · /, '');
 
+/** Fade time of the swap, in ms; matches `.xf-in` / `.xf-out` in dashboard.css. */
+const FADE_MS = 180;
+
+/** Cross-fades between versions of `children` when `id` changes. The old one fades out on top while the new one fades in. */
+function Crossfade({ id, children }: { id: string; children: ReactNode }) {
+  const [seen, setSeen] = useState(id);
+  const [leaving, setLeaving] = useState<{ id: string; node: ReactNode } | null>(null);
+  const last = useRef<ReactNode>(children);
+  if (seen !== id) {
+    setSeen(id);
+    setLeaving({ id: seen, node: last.current });
+  }
+  useEffect(() => {
+    last.current = children;
+  });
+  useEffect(() => {
+    if (!leaving) return;
+    const t = window.setTimeout(() => setLeaving(null), FADE_MS + 40);
+    return () => window.clearTimeout(t);
+  }, [leaving]);
+  return (
+    <div className="xf">
+      <div className="xf-in" key={id}>
+        {children}
+      </div>
+      {leaving && (
+        <div className="xf-out" key={`out-${leaving.id}`} aria-hidden="true" inert>
+          {leaving.node}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** What the swappable top part of the card shows. */
+interface Urgent {
+  key: string;
+  tag: string;
+  tone: 'lime' | 'soft';
+  meta: string;
+  time?: string;
+  /** All-day notes have no clock time; the label is smaller. */
+  timeSmall?: boolean;
+  title: string;
+  sub?: string;
+  place?: string;
+  noteId?: string;
+}
+
+const placeOf = (n: Note) => n.facts.find((f) => f.action === 'map')?.value;
+
+function heroUrgent(n: Note): Urgent {
+  const wrap = n.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
+  const minutes = minutesUntil(n);
+  const countdown = minutes > 0 && minutes !== Infinity ? fmtCountdown(minutes) : 'Call time';
+  return {
+    key: `hero-${n.id}`,
+    tag: 'TODAY',
+    tone: 'lime',
+    meta: wrap ? `${countdown} · wrap ${wrap}` : `${countdown} · wrap to be confirmed`,
+    time: n.time,
+    title: n.title,
+    sub: n.subtitle,
+    place: placeOf(n) ?? n.subtitle,
+    noteId: n.id,
+  };
+}
+
+function stopUrgent(n: Note, index: number): Urgent {
+  return {
+    key: `stop-${index}`,
+    tag: n.day === today.date ? 'TODAY' : fmtDayShort(n.day!).toUpperCase(),
+    tone: 'soft',
+    meta: TYPE_LABEL[n.type],
+    time: n.kind === 'time' ? n.time : 'All day',
+    timeSmall: n.kind !== 'time',
+    title: n.title,
+    sub: n.subtitle,
+    place: placeOf(n),
+    noteId: n.id,
+  };
+}
+
+function UrgentBody({ u }: { u: Urgent }) {
+  const a = useNoteActions();
+  const place = u.place;
+  return (
+    <div className="today-urgent">
+      <div className="today-top">
+        <span className={u.tone === 'lime' ? 'chip-lime' : 'chip-quiet'}>{u.tag}</span>
+        <span className="today-meta">{u.meta}</span>
+        <span className="spacer" />
+        {place && u.tone === 'lime' && (
+          <button type="button" className="icon-btn icon-btn-chip today-ib" aria-label={`Directions to ${place}`} onClick={a.directions}>
+            <Icon name="nav" size={17} color="#111A1B" />
+          </button>
+        )}
+      </div>
+      <button type="button" className="today-main" data-hero={u.tone === 'lime'} onClick={() => u.noteId && a.openNote(u.noteId)} aria-label={`${u.time ? `${u.time}, ` : ''}${u.title}. Open details`}>
+        {u.time && <span className={`today-time num${u.timeSmall ? ' today-time-sm' : ''}`}>{u.time}</span>}
+        <span className="today-titles">
+          <span className="today-t1">{u.title}</span>
+          {u.sub && <span className="today-t2">{u.sub}</span>}
+        </span>
+        <Icon name="right" size={18} color="#54686C" />
+      </button>
+    </div>
+  );
+}
+
+function NothingLeft() {
+  return (
+    <div className="today-urgent">
+      <div className="today-top">
+        <span className="chip-quiet">ALL CLEAR</span>
+      </div>
+      <div className="today-main today-main-empty">
+        <span className="today-titles">
+          <span className="today-t1">Nothing else scheduled</span>
+          <span className="today-t2">Production has not sent anything after this.</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function NothingToday() {
+  return (
+    <div className="today-urgent">
+      <div className="today-top">
+        <span className="chip-quiet">TODAY</span>
+        <span className="today-meta">Shoot day {today.shootDay}</span>
+      </div>
+      <div className="today-main today-main-empty">
+        <span className="today-titles">
+          <span className="today-t1">Nothing on your sheet yet</span>
+          <span className="today-t2">Call times and travel from production show up here.</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /**
  * The one card for the day: when to be where, today's call sheet, and Submit hours.
- * Submit hours sits here because the end of the day is the one moment nobody can plan for.
+ * The top part is the note the ruler's playhead is on (today's call at rest). The call sheet and
+ * Submit hours row below never changes, so the end of the day is one tap away while you look ahead.
  */
-export function TodayCard({ note }: { note: Note | undefined }) {
+export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undefined; scrub: Scrub; preview: Preview | null; onBack: () => void }) {
   const a = useNoteActions();
   const setLogOpen = useDemo((s) => s.setLogOpen);
   const submitted = useSubmitted().includes(today.date);
   const sheet = callSheetFor(today.date);
   const tomorrow = callSheetFor(addDays(today.date, 1));
-  const wrap = note?.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
-  const place = note?.facts.find((f) => f.action === 'map')?.value ?? note?.subtitle;
-  const minutes = note ? minutesUntil(note) : Infinity;
+
+  let key: string;
+  let body: ReactNode;
+  if (preview) {
+    const stop = scrub.stops[preview.index];
+    key = stop ? `stop-${preview.index}` : 'none';
+    body = stop ? <UrgentBody u={stopUrgent(stop.note, preview.index)} /> : <NothingLeft />;
+  } else if (hero) {
+    const u = heroUrgent(hero);
+    key = u.key;
+    body = <UrgentBody u={u} />;
+  } else {
+    key = 'empty';
+    body = <NothingToday />;
+  }
 
   return (
     <div className="today-card">
-      {note ? (
-        <>
-          <div className="today-top">
-            <span className="chip-lime">TODAY</span>
-            <span className="today-meta">
-              Shoot day {today.shootDay}
-              {minutes > 0 && minutes !== Infinity ? ` · ${fmtCountdown(minutes)}` : ''}
-            </span>
-            <span className="spacer" />
-            <button type="button" className="icon-btn icon-btn-soft today-arrow" aria-label="Open details" onClick={() => a.openNote(note.id)}>
-              <Icon name="arrowUpRight" size={18} color="#111A1B" strokeWidth={1.8} />
+      <Crossfade id={key}>{body}</Crossfade>
+      <div className="today-line">
+        {preview ? (
+          <>
+            <span className="today-preview">{previewLine(scrub, preview)}</span>
+            <button type="button" className="pill-btn" onClick={onBack}>
+              Back to now
             </button>
-          </div>
-          <div className="today-main">
-            <span className="today-time num">{note.time}</span>
-            <span className="today-titles">
-              <span className="today-t1">{note.title}</span>
-              <span className="today-t2">Call{wrap ? ` · wrap ${wrap}` : ' · wrap to be confirmed'}</span>
-            </span>
-          </div>
-          {place && (
-            <div className="today-pin">
-              <Icon name="pin" size={16} color="#3F5155" />
-              <span className="today-place">{place}</span>
-              <button type="button" className="icon-btn icon-btn-chip copy-btn copy-btn-sm" aria-label={`Copy address: ${place}`} onClick={() => a.copy(place)}>
-                <Icon name="copy" size={17} color="#111A1B" />
-              </button>
-              <button type="button" className="icon-btn icon-btn-chip copy-btn copy-btn-sm" aria-label={`Directions to ${place}`} onClick={a.directions}>
-                <Icon name="nav" size={17} color="#111A1B" />
-              </button>
-            </div>
-          )}
-          {sheet && (
-            <button type="button" className="btn btn-soft btn-md today-sheet" onClick={() => a.openPdf(sheet.file)}>
-              <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
-              Call sheet · {shortTitle(sheet.title)}
-            </button>
-          )}
-          {tomorrow && (
-            <button type="button" className="today-tmrw" onClick={() => a.openPdf(tomorrow.file)}>
-              <span className="today-dot" aria-hidden="true" />
-              <span>Tomorrow's call sheet is out</span>
-              <strong>Open</strong>
-            </button>
-          )}
-        </>
-      ) : (
-        <div className="today-empty">
-          <span className="empty-icon">
-            <Icon name="calendar" size={24} color="#2A3B3F" />
-          </span>
-          <strong>Nothing on your sheet yet</strong>
-          <span>When production sends the call sheet or travel info, it shows up here.</span>
-        </div>
-      )}
-
-      {submitted ? (
-        <div className="today-done" role="status">
-          <span className="today-done-icon">
-            <Icon name="check" size={20} color="#2B3300" strokeWidth={2} />
-          </span>
-          <span className="today-done-text">
-            <strong>Hours submitted</strong>
-            <span>Production will approve them.</span>
-          </span>
-          <button type="button" className="link-btn" onClick={() => setLogOpen(true)}>
-            Review
+          </>
+        ) : tomorrow ? (
+          <button type="button" className="today-tmrw" onClick={() => a.openPdf(tomorrow.file)}>
+            <span className="today-dot" aria-hidden="true" />
+            <span>Tomorrow's call sheet is out</span>
+            <strong>Open</strong>
           </button>
-        </div>
-      ) : (
-        <button type="button" className="btn btn-lime btn-xl today-submit" onClick={() => setLogOpen(true)}>
-          <Icon name="logTime" size={20} color="#111A1B" strokeWidth={1.8} />
-          Submit hours
-        </button>
-      )}
+        ) : (
+          <span className="today-hint">Slide the ruler above to preview what is next.</span>
+        )}
+      </div>
+
+      <div className="today-actions">
+        {sheet && (
+          <button type="button" className="btn btn-soft btn-md today-sheet" onClick={() => a.openPdf(sheet.file)}>
+            <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
+            Call sheet
+            <span className="today-sheet-day">{shortTitle(sheet.title).replace('Shoot day ', 'Day ')}</span>
+          </button>
+        )}
+        {submitted ? (
+          <div className="today-sent" role="status">
+            <button type="button" className="btn btn-md today-sent-btn" onClick={() => setLogOpen(true)} aria-label="Hours submitted. Review">
+              <Icon name="check" size={18} color="#2B3300" strokeWidth={2.2} />
+              Submitted
+            </button>
+          </div>
+        ) : (
+          <button type="button" className="btn btn-lime btn-md today-submit" onClick={() => setLogOpen(true)}>
+            <Icon name="logTime" size={18} color="#111A1B" strokeWidth={1.8} />
+            Submit hours
+          </button>
+        )}
+      </div>
     </div>
   );
 }

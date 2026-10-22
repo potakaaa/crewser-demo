@@ -5,7 +5,7 @@ import { QrPreview } from './QrPreview';
 import { CrewSection } from './CrewStack';
 import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
-import { cardSubtitle, cardTiles, dayStub, firstSentence, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
+import { cardSubtitle, cardTiles, dayStub, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
 
 /** Codes and addresses are worth copying; "to be confirmed" is not. */
 export const isCopyable = (f: Pick<Fact, 'action' | 'unconfirmed'>) => !f.unconfirmed && (f.action === 'copy' || f.action === 'map');
@@ -64,14 +64,16 @@ function FactTile({ tile }: { tile: CardTile }) {
   );
 }
 
-/** A top smart note: header row, fact tiles, one-line note and an action. */
+/**
+ * A top smart note, kept short so a few fit on a screen: the header row, the two facts you
+ * most often act on, and one action. The rest (QR code, note text, crew) is one tap away in the sheet.
+ */
 export function ContentCard({ note }: { note: Note }) {
   const a = useNoteActions();
-  const text = firstSentence(note.text);
-  const tiles = cardTiles(note);
+  const tiles = cardTiles(note).slice(0, 2);
   const pa = note.primaryAction;
   return (
-    <article className="ccard">
+    <article className="ccard ccard-compact">
       <button type="button" className="ccard-head" onClick={() => a.openNote(note.id)} aria-label={`${note.title}, ${cardSubtitle(note)}, ${dayStub(note)} ${timeText(note)}. Open details`}>
         <span className="stub">
           <span className="stub-time">{timeText(note)}</span>
@@ -86,22 +88,23 @@ export function ContentCard({ note }: { note: Note }) {
         </span>
         <Icon name="right" size={18} color="#54686C" />
       </button>
-      <div className="ccard-body">
-        <div className="tiles">
-          {tiles.map((t) => (
-            <FactTile key={t.key} tile={t} />
-          ))}
+      {(tiles.length > 0 || pa) && (
+        <div className="ccard-body">
+          {tiles.length > 0 && (
+            <div className="tiles">
+              {tiles.map((t) => (
+                <FactTile key={t.key} tile={{ ...t, wide: tiles.length === 1 }} />
+              ))}
+            </div>
+          )}
+          {pa && (
+            <button type="button" className="btn btn-ink" onClick={() => a.primary(note)}>
+              <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+              {pa.label}
+            </button>
+          )}
         </div>
-        {hasScanCode(note) && <QrPreview note={note} />}
-        {text && <p className="ccard-note">{text}</p>}
-        <CrewSection note={note} />
-        {pa && (
-          <button type="button" className="btn btn-ink" onClick={() => a.primary(note)}>
-            <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
-            {pa.label}
-          </button>
-        )}
-      </div>
+      )}
     </article>
   );
 }
