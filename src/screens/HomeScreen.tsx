@@ -61,7 +61,7 @@ function NextUpCard({ note }: { note: Note }) {
 function WeekSection() {
   const navigate = useDemo((s) => s.navigate);
   const s = weekStats;
-  const goStats = () => navigate({ name: 'stats' });
+  const goStats = () => navigate({ name: 'dashboard' });
   return (
     <section className="stack" aria-label="Your week">
       <SectionHead title="Your week" sub={`Last 7 days · ${s.rangeLabel}`} link="All statistics" onLink={goStats} />

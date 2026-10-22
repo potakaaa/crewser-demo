@@ -2510,7 +2510,7 @@
   bottom: max(22px, calc(var(--sab) + 6px));
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   transition:
     transform var(--t-nav) var(--ease-ios),
     opacity var(--t-med) ease;
@@ -2526,8 +2526,8 @@
   min-width: 0;
   height: 64px;
   display: flex;
-  gap: 6px;
-  padding: 9px 10px;
+  gap: 2px;
+  padding: 9px 6px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
   background: rgba(255, 255, 255, 0.72);
@@ -2542,7 +2542,7 @@
   position: relative;
   z-index: 1;
   flex: 1 1 0;
-  min-width: 44px;
+  min-width: 36px;
   height: 44px;
   display: flex;
   align-items: center;
@@ -2592,7 +2592,7 @@
   flex: none;
   margin-left: var(--sp-2);
   white-space: nowrap;
-  font-size: var(--fs-md);
+  font-size: var(--fs-sm);
   font-weight: 600;
   opacity: 0;
   transform: translateX(-6px);
@@ -2611,7 +2611,7 @@
 
 .log-btn {
   flex: none;
-  width: 64px;
+  width: 56px;
   height: 64px;
   display: flex;
   flex-direction: column;
@@ -2661,6 +2661,19 @@
   background: none;
 }
 
+.log-dialog-soft {
+  background: var(--sheet);
+}
+.note-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  border-radius: var(--r-card);
+  background: var(--brand-surface);
+  color: #ffffff;
+}
 .log-dialog {
   max-height: 88%;
   display: flex;
@@ -3386,46 +3399,6 @@
   color: #a84e1e !important;
 }
 
-.pay-lines {
-  display: flex;
-  flex-direction: column;
-}
-.pay-line {
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  padding: 10px 0;
-  border-top: 1px solid var(--hairline);
-  font-size: var(--fs-base);
-}
-.pay-line:first-child {
-  border-top: 0;
-}
-.pay-line > span {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-weight: 500;
-}
-.pay-line small {
-  font-size: var(--fs-sm);
-  font-weight: 400;
-  color: var(--text-2);
-}
-.pay-line strong {
-  font-weight: 600;
-  white-space: nowrap;
-}
-.pay-total {
-  border-top: 1.5px solid var(--ink);
-  font-size: 15px;
-}
-.pay-total strong {
-  font-size: 18px;
-  letter-spacing: -0.02em;
-}
 
 /* Approval status chips */
 .status-chip {

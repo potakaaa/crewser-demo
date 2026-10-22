@@ -8,6 +8,8 @@ interface Props {
   onClose: () => void;
   title: string;
   subtitle?: ReactNode;
+  /** 'soft' puts white cards on the light sheet colour instead of a white sheet. */
+  tone?: 'white' | 'soft';
   children: ReactNode;
 }
 
@@ -45,7 +47,7 @@ export function BottomSheet(props: Props) {
   return <SheetBody {...props} closing={closing} />;
 }
 
-function SheetBody({ onClose, title, subtitle, children, closing }: Props & { closing: boolean }) {
+function SheetBody({ onClose, title, subtitle, tone = 'white', children, closing }: Props & { closing: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useRef(`sheet-${Math.random().toString(36).slice(2, 8)}`).current;
 
@@ -75,7 +77,7 @@ function SheetBody({ onClose, title, subtitle, children, closing }: Props & { cl
   return (
     <div className={`scrim${closing ? ' closing' : ''}`}>
       <button type="button" className="scrim-hit" tabIndex={-1} aria-hidden="true" onClick={onClose} />
-      <div ref={ref} className="log-dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} onKeyDown={onKeyDown}>
+      <div ref={ref} className={`log-dialog${tone === 'soft' ? ' log-dialog-soft' : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} onKeyDown={onKeyDown}>
         <span className="grabber" aria-hidden="true" />
         <div className="log-head">
           <div className="log-titles">

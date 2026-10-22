@@ -3,15 +3,27 @@ import { useDemo, useRoute, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
-  { name: 'home', label: 'Home', icon: 'home' },
+  { name: 'dashboard', label: 'Home', icon: 'dashboard' },
   { name: 'calendar', label: 'Calendar', icon: 'calendar' },
-  { name: 'stats', label: 'Stats', icon: 'stats' },
+  { name: 'documents', label: 'Docs', icon: 'documents' },
+  { name: 'contacts', label: 'Contacts', icon: 'contacts' },
+  { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
 
+/** Full names for screen readers; the visible label is the short one. */
+const ARIA: Record<TabName, string> = {
+  dashboard: 'Dashboard',
+  calendar: 'Calendar',
+  documents: 'Documents',
+  contacts: 'Contacts',
+  settings: 'Settings',
+};
+
+// Five tabs plus the Log button have to fit a 375 px phone, so the active tab stays compact.
 const ICON = 22;
-const PAD_L = 14;
-const PAD_R = 16;
-const LABEL_GAP = 8;
+const PAD_L = 12;
+const PAD_R = 12;
+const LABEL_GAP = 6;
 
 interface Layout {
   w: number[];
@@ -84,8 +96,8 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                 className="tab"
                 style={style}
                 aria-current={on && idx >= 0 ? 'page' : undefined}
-                aria-label={t.label}
-                title={on ? undefined : t.label}
+                aria-label={ARIA[t.name]}
+                title={on ? undefined : ARIA[t.name]}
                 onClick={() => navigate({ name: t.name })}
               >
                 <span className="tab-icon">

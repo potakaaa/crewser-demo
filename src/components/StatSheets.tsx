@@ -1,9 +1,9 @@
 import { useRef, type ReactNode } from 'react';
 import { useDemo, type StatSheetKind } from '../store';
-import { contract } from '../mock';
+import { project } from '../mock';
 import type { ApprovalStatus } from '../mock';
 import { BottomSheet } from './BottomSheet';
-import { fmtH, fmtMoney, hourlyRate, nightRange, type PeriodStats } from '../lib/stats';
+import { fmtH, nightRange, type PeriodStats } from '../lib/stats';
 import { useStats } from '../lib/useStats';
 import { fmtDayShort } from '../lib/dates';
 
@@ -42,7 +42,6 @@ const TITLES: Record<StatSheetKind, string> = {
   night: 'Night hours',
   rest: 'Rest between shifts',
   approvals: 'Approvals',
-  pay: 'Estimated pay',
 };
 
 function Body({ kind, s }: { kind: StatSheetKind; s: PeriodStats }) {
@@ -63,7 +62,7 @@ function Body({ kind, s }: { kind: StatSheetKind; s: PeriodStats }) {
             ))}
           </div>
           <p className="sheet-note">
-            Hours past {s.dailyTarget} h a day count as overtime and are paid at {contract.overtimeRate * 100}%: about {fmtMoney(s.pay.overtime, { approx: true })} in this period.
+            Hours past {s.dailyTarget} h a day count as overtime in this period.
           </p>
         </>
       );
@@ -99,7 +98,7 @@ function Body({ kind, s }: { kind: StatSheetKind; s: PeriodStats }) {
             ))}
           </div>
           <p className="sheet-note">
-            Night work counts from 22:00 to 06:00 and earns +{contract.nightSurcharge * 100}% on top: about {fmtMoney(s.pay.night, { approx: true })} in this period.
+            Night work counts from 22:00 to 06:00 in this period.
           </p>
         </>
       );
@@ -120,7 +119,7 @@ function Body({ kind, s }: { kind: StatSheetKind; s: PeriodStats }) {
             ))}
           </div>
           <p className="sheet-note">
-            You need at least {contract.minRestHours} h between wrap and the next call. Shorter rests are flagged to production with your timesheet.
+            You need at least {project.minRestHours} h between wrap and the next call. Shorter rests are flagged to production with your timesheet.
           </p>
         </>
       );
@@ -152,60 +151,6 @@ function Body({ kind, s }: { kind: StatSheetKind; s: PeriodStats }) {
             ))}
           </div>
           <p className="sheet-note">Production approves your days before payroll. Approved days can't be edited any more.</p>
-        </>
-      );
-    case 'pay':
-      return (
-        <>
-          <div className="pay-lines">
-            <div className="pay-line">
-              <span>
-                Base
-                <small>
-                  {fmtH(s.total - s.overtime)} h × {fmtMoney(hourlyRate, { cents: true })}
-                </small>
-              </span>
-              <strong>{fmtMoney(s.pay.base, { cents: true })}</strong>
-            </div>
-            <div className="pay-line">
-              <span>
-                Overtime {contract.overtimeRate * 100}%
-                <small>
-                  {fmtH(s.overtime)} h × {fmtMoney(hourlyRate * contract.overtimeRate, { cents: true })}
-                </small>
-              </span>
-              <strong>{fmtMoney(s.pay.overtime, { cents: true })}</strong>
-            </div>
-            <div className="pay-line">
-              <span>
-                Night surcharge +{contract.nightSurcharge * 100}%
-                <small>
-                  {fmtH(s.night)} h × {fmtMoney(hourlyRate * contract.nightSurcharge, { cents: true })}
-                </small>
-              </span>
-              <strong>{fmtMoney(s.pay.night, { cents: true })}</strong>
-            </div>
-            <div className="pay-line">
-              <span>
-                Per diem
-                <small>
-                  {fmtMoney(contract.perDiem, { cents: true })} a day from {fmtDayShort(contract.perDiemFrom)} in Madeira
-                </small>
-              </span>
-              <strong>{fmtMoney(s.pay.perDiem, { cents: true })}</strong>
-            </div>
-            <div className="pay-line pay-total">
-              <span>Estimated total</span>
-              <strong>{fmtMoney(s.pay.total, { approx: true, cents: true })}</strong>
-            </div>
-            <div className="pay-line">
-              <span>Approved so far</span>
-              <strong>{fmtMoney(s.approvedPay, { cents: true })}</strong>
-            </div>
-          </div>
-          <p className="sheet-note">
-            Before tax and social security, from your deal memo ({fmtMoney(contract.dailyRate)} for a {s.dailyTarget} h day). Production calculates the final payout.
-          </p>
         </>
       );
   }

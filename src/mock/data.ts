@@ -1,4 +1,5 @@
-import type { Contract, PdfDoc, Person, Project, Today, WorkDay } from './types';
+import { docPdfs } from './documents';
+import type { PdfDoc, Person, Project, Today, WorkDay } from './types';
 
 /**
  * Every logged day so far: camera prep at the rental house, then shoot days 1–6.
@@ -17,16 +18,6 @@ export const workdays: WorkDay[] = [
   { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '23:00', breakMin: 30, status: 'draft' },
 ];
 
-export const contract: Contract = {
-  currency: 'EUR',
-  dailyRate: 420,
-  overtimeRate: 1.5,
-  nightSurcharge: 0.5,
-  perDiem: 26.4,
-  perDiemFrom: '2026-10-21',
-  minRestHours: 11,
-};
-
 export const person: Person = {
   id: 'ff',
   firstName: 'Florentina',
@@ -36,9 +27,10 @@ export const person: Person = {
 };
 
 export const project: Project = {
-  name: '[Project name]',
+  name: 'The Last Ferry',
   dailyTargetHours: 10,
   totalShootDays: 12,
+  minRestHours: 11,
   dayLabels: { '2026-10-21': 'travel to Madeira' },
 };
 
@@ -64,4 +56,5 @@ export const pdfs: Record<string, PdfDoc> = {
     title: 'Van, 9 seats',
     line: 'FNC-4471 · 21 Oct 16:30 – 26 Oct 14:00',
   },
+  ...docPdfs,
 };

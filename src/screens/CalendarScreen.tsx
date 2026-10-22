@@ -46,7 +46,7 @@ export function CalendarScreen() {
   const toggleMonth = useDemo((s) => s.toggleCalMonth);
   const expanded = useDemo((s) => s.expanded.calendar);
   const toggleExpanded = useDemo((s) => s.toggleExpanded);
-  const navigate = useDemo((s) => s.navigate);
+  const openSheet = useDemo((s) => s.openSheet);
 
   const notes = empty ? [] : allNotes;
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
@@ -156,7 +156,7 @@ export function CalendarScreen() {
       <Sheet className="sheet-cal">
         {offline && <OfflineBanner tone="light" />}
         {undated.length > 0 && (
-          <button type="button" className="undated-row" onClick={() => navigate({ name: 'note', id: undated[0].id })}>
+          <button type="button" className="undated-row" onClick={() => openSheet('note', undated[0].id)}>
             <span className="chip-icon" style={chipStyle(undated[0].type)}>
               <Icon name={undated[0].type} size={18} />
             </span>

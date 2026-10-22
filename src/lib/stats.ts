@@ -1,17 +1,9 @@
-import { contract, notes, project, today, workdays } from '../mock';
+import { notes, project, today, workdays } from '../mock';
 import type { ApprovalStatus, DayKind, WorkDay } from '../mock';
 import { addDays, fmtDayShort, isoWeek, mondayOf, rangeLabel, toMinutes, weekday } from './dates';
 
 /** 10.25 → "10.25", 12.0 → "12", 7.50 → "7.5" */
 export const fmtH = (n: number) => String(Math.round(n * 100) / 100);
-
-/** €3,066 · ~€3,066 · €472.50 (cents only when there are any) */
-export function fmtMoney(n: number, opts: { approx?: boolean; cents?: boolean } = {}) {
-  const rounded = Math.round(n * 100) / 100;
-  const withCents = opts.cents && !Number.isInteger(rounded);
-  const s = rounded.toLocaleString('en-US', { minimumFractionDigits: withCents ? 2 : 0, maximumFractionDigits: withCents ? 2 : 0 });
-  return `${opts.approx ? '~' : ''}€${s}`;
-}
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 const overlap = (a0: number, a1: number, b0: number, b1: number) => Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
@@ -19,16 +11,6 @@ const overlap = (a0: number, a1: number, b0: number, b1: number) => Math.max(0, 
 /** Night work counts from 22:00 to 06:00. */
 const NIGHT_FROM = 22 * 60;
 const NIGHT_TO = 6 * 60;
-
-export const hourlyRate = contract.dailyRate / project.dailyTargetHours;
-
-export interface DayPay {
-  base: number;
-  overtime: number;
-  night: number;
-  perDiem: number;
-  total: number;
-}
 
 export interface DayStat {
   date: string;
@@ -48,7 +30,6 @@ export interface DayStat {
   regular: number;
   overtime: number;
   night: number;
-  pay: DayPay;
 }
 
 export interface Rest {
@@ -86,14 +67,12 @@ export interface PeriodStats {
   shortest: Rest | undefined;
   shortRests: Rest[];
   approvals: Record<ApprovalStatus, DayStat[]>;
-  pay: DayPay;
-  approvedPay: number;
   prepDays: number;
   shootDays: number;
   summary: string;
 }
 
-/** Turn a logged shift into hours, overtime, night hours and pay. */
+/** Turn a logged shift into hours, overtime and night hours. */
 export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalStatus): DayStat {
   const short = fmtDayShort(date);
   const empty: DayStat = {
@@ -108,7 +87,6 @@ export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalSta
     regular: 0,
     overtime: 0,
     night: 0,
-    pay: { base: 0, overtime: 0, night: 0, perDiem: 0, total: 0 },
   };
   if (!wd) return empty;
   const startMin = toMinutes(wd.start);
@@ -119,14 +97,6 @@ export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalSta
   const regular = Math.min(hours, target);
   const overtime = Math.max(hours - target, 0);
   const night = (overlap(startMin, endMin, NIGHT_FROM, 24 * 60 + NIGHT_TO) + overlap(startMin, endMin, 0, NIGHT_TO)) / 60;
-  const pay = {
-    base: regular * hourlyRate,
-    overtime: overtime * hourlyRate * contract.overtimeRate,
-    night: night * hourlyRate * contract.nightSurcharge,
-    perDiem: date >= contract.perDiemFrom ? contract.perDiem : 0,
-    total: 0,
-  };
-  pay.total = pay.base + pay.overtime + pay.night + pay.perDiem;
   return {
     ...empty,
     worked: true,
@@ -141,7 +111,6 @@ export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalSta
     regular,
     overtime,
     night,
-    pay,
   };
 }
 
@@ -167,7 +136,7 @@ function allRests(submitted: string[]): Rest[] {
     const from = shifts[i];
     const gapMin = (toEpochMin(to.date) + to.startMin) - (toEpochMin(from.date) + from.endMin);
     const hours = gapMin / 60;
-    return { from, to, hours, short: hours < contract.minRestHours };
+    return { from, to, hours, short: hours < project.minRestHours };
   });
 }
 
@@ -200,13 +169,6 @@ export function computeStats(period: Period, submitted: string[] = []): PeriodSt
     submitted: worked.filter((d) => d.status === 'submitted'),
     draft: worked.filter((d) => d.status === 'draft'),
   };
-  const pay: DayPay = {
-    base: sum(worked.map((d) => d.pay.base)),
-    overtime: sum(worked.map((d) => d.pay.overtime)),
-    night: sum(worked.map((d) => d.pay.night)),
-    perDiem: sum(worked.map((d) => d.pay.perDiem)),
-    total: sum(worked.map((d) => d.pay.total)),
-  };
   const label = period.kind === 'week' ? `CW ${isoWeek(period.monday)}` : 'Whole project';
   return {
     period,
@@ -232,8 +194,6 @@ export function computeStats(period: Period, submitted: string[] = []): PeriodSt
     shortest,
     shortRests: rests.filter((r) => r.short),
     approvals,
-    pay,
-    approvedPay: sum(approvals.approved.map((d) => d.pay.total)),
     prepDays: worked.filter((d) => d.kind === 'prep').length,
     shootDays: worked.filter((d) => d.kind === 'shoot').length,
     summary:

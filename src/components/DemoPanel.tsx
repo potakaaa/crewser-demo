@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useDemo, type NoteAccent, type Route } from '../store';
+import { FONT_THEMES, useDemo, type NoteAccent, type Route } from '../store';
 import { Wordmark } from './Brand';
 
-const JUMPS: { label: string; route?: Route; log?: boolean }[] = [
-  { label: 'Home', route: { name: 'home' } },
+const JUMPS: { label: string; route?: Route; note?: string; log?: boolean }[] = [
+  { label: 'Dashboard', route: { name: 'dashboard' } },
   { label: 'Calendar', route: { name: 'calendar' } },
-  { label: 'Statistics', route: { name: 'stats' } },
-  { label: 'Flight detail', route: { name: 'note', id: 'fl' } },
+  { label: 'Documents', route: { name: 'documents' } },
+  { label: 'Contacts', route: { name: 'contacts' } },
+  { label: 'Settings', route: { name: 'settings' } },
+  { label: 'Flight note', note: 'fl' },
   { label: 'Boarding pass', route: { name: 'ticket' } },
   { label: 'Ticket PDF', route: { name: 'pdf', file: 'Ticket_OS487.pdf' } },
   { label: 'Log sheet', log: true },
@@ -45,6 +47,9 @@ export function DemoPanel() {
   const reset = useDemo((s) => s.reset);
   const accent = useDemo((s) => s.noteAccent);
   const setAccent = useDemo((s) => s.setNoteAccent);
+  const font = useDemo((s) => s.fontTheme);
+  const setFont = useDemo((s) => s.setFontTheme);
+  const openSheet = useDemo((s) => s.openSheet);
 
   return (
     <aside className="side">
@@ -77,6 +82,15 @@ export function DemoPanel() {
             </button>
           ))}
         </div>
+        <p className="dp-h">Headline font</p>
+        <div className="dp-accents" role="radiogroup" aria-label="Headline font">
+          {FONT_THEMES.map((f) => (
+            <button type="button" key={f.value} role="radio" aria-checked={font === f.value} className="dp-accent" onClick={() => setFont(f.value)}>
+              <span>{f.label}</span>
+              <small>{f.hint}</small>
+            </button>
+          ))}
+        </div>
         <p className="dp-h">Jump to</p>
         <div className="dp-jumps">
           {JUMPS.map((j) => (
@@ -86,8 +100,12 @@ export function DemoPanel() {
               className="dp-jump"
               onClick={() => {
                 if (j.route) navigate(j.route);
+                if (j.note) {
+                  navigate({ name: 'dashboard' });
+                  openSheet('note', j.note);
+                }
                 if (j.log) {
-                  navigate({ name: 'home' });
+                  navigate({ name: 'dashboard' });
                   setLogOpen(true);
                 }
               }}

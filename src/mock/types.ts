@@ -81,23 +81,6 @@ export interface WorkDay {
   status: ApprovalStatus;
 }
 
-/** Deal-memo numbers used for the pay estimate. */
-export interface Contract {
-  currency: 'EUR';
-  /** Pay for one day at the daily target. */
-  dailyRate: number;
-  /** Multiplier on the hourly rate for hours past the daily target (1.5 = 150 %). */
-  overtimeRate: number;
-  /** Extra on the hourly rate for night hours, 22:00–06:00 (0.5 = +50 %). */
-  nightSurcharge: number;
-  /** Per diem per day away from home. */
-  perDiem: number;
-  /** First day per diem is paid (travel to Madeira). */
-  perDiemFrom: string;
-  /** Minimum rest between two shifts, in hours. */
-  minRestHours: number;
-}
-
 export interface CrewMember {
   id: string;
   name: string;
@@ -122,6 +105,8 @@ export interface Project {
   name: string;
   dailyTargetHours: number;
   totalShootDays: number;
+  /** Minimum rest between two shifts, in hours. */
+  minRestHours: number;
   /** Optional subtitles for day groups in the notes list. */
   dayLabels: Record<string, string>;
 }
@@ -141,4 +126,59 @@ export interface PdfDoc {
   kicker: string;
   title: string;
   line: string;
+}
+
+export type LinkStatus = 'active' | 'expiring' | 'expired';
+
+/**
+ * One crew link (SMS access link) to one project. A link belongs to one crew member;
+ * the gaffer may hold links for colleagues to enter their hours.
+ */
+export interface CrewLink {
+  id: string;
+  projectId: string;
+  projectName: string;
+  production: string;
+  personName: string;
+  initials: string;
+  department: string;
+  position: string;
+  /** True when the link is the app user's own. */
+  isMe: boolean;
+  /** Opaque access token from the link (mock value). */
+  token: string;
+  /** ISO date-time the link stops working. */
+  expiresAt: string;
+  status: LinkStatus;
+}
+
+export type DocKind = 'callsheet' | 'schedule' | 'safety' | 'other';
+
+/** A file production shared with the crew. Every `file` is also a key in `pdfs`. */
+export interface Doc {
+  id: string;
+  file: string;
+  title: string;
+  kind: DocKind;
+  /** ISO date the document is for (call sheets). */
+  day?: string;
+  shootDay?: number;
+  /** ISO date-time of the last update. */
+  updated: string;
+  /** "184 KB" */
+  size: string;
+  isNew?: boolean;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  initials: string;
+  position: string;
+  department: string;
+  phone: string;
+  email: string;
+  /** Avatar background, a pale tint so the ink initials stay readable. */
+  tint: string;
+  pinned?: boolean;
 }

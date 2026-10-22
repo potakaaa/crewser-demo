@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
 import { useDemo, type StatSheetKind } from '../store';
-import { contract, project, today } from '../mock';
+import { project, today } from '../mock';
 import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, Sheet } from '../components/Layout';
 import { StatsBarChart } from '../components/Charts';
 import { StatusChip } from '../components/StatSheets';
-import { CURRENT_WEEK, FIRST_WEEK, fmtH, fmtMoney, previousWeekTotal } from '../lib/stats';
+import { CURRENT_WEEK, FIRST_WEEK, fmtH, previousWeekTotal } from '../lib/stats';
 import { useStats } from '../lib/useStats';
 import { useScrollRestore } from '../lib/scroll';
 import { fmtDayMonth, isoWeek } from '../lib/dates';
@@ -162,7 +162,7 @@ export function StatsScreen() {
                       <div className="warn-line warn-dark">
                         <Icon name="alert" size={16} color="#F4C35A" strokeWidth={1.8} />
                         <span className="warn-text">
-                          <strong>{fmtH(restBefore.hours)} h rest</strong> before this day · min {contract.minRestHours} h
+                          <strong>{fmtH(restBefore.hours)} h rest</strong> before this day · min {project.minRestHours} h
                         </span>
                       </div>
                     )}
@@ -200,7 +200,7 @@ export function StatsScreen() {
               tone={shortRest ? 'stat-warn' : ''}
               label="Rest"
               value={shortRest ? <span className="text-rust">{fmtH(shortRest.hours)} h</span> : s.shortest ? `${fmtH(s.shortest.hours)} h` : '—'}
-              note={shortRest ? `Too short · ${shortRest.to.short}` : `Always ${contract.minRestHours} h or more`}
+              note={shortRest ? `Too short · ${shortRest.to.short}` : `Always ${project.minRestHours} h or more`}
               aria={`Shortest rest ${s.shortest ? fmtH(s.shortest.hours) : 'none'} hours. Show all rests`}
             />
 
@@ -240,15 +240,6 @@ export function StatsScreen() {
                 </div>
               )}
             </section>
-
-            <StatTile
-              sheet="pay"
-              label="Estimated pay"
-              value={fmtMoney(s.pay.total, { approx: true })}
-              note={`Before tax · ${fmtMoney(s.approvedPay)} approved so far`}
-              aria={`Estimated pay ${fmtMoney(s.pay.total, { approx: true })}. Show breakdown`}
-              tone="span-2 stat-wide"
-            />
 
             <section className="tile-white span-2 days-tile" aria-label="Days on project">
               <div className="ring" role="img" aria-label={`Shoot day ${today.shootDay} of ${project.totalShootDays}`}>
