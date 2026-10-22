@@ -90,9 +90,9 @@ export interface HoursOverview {
  * The three big numbers on the dashboard and everything the hours sheet lists under them.
  * Today's shift counts once it has been sent (it lives in the Log sheet, not in the mock days).
  */
-export function hoursOverview(submitted: string[] = [], shift?: TodayShift | null): HoursOverview {
+export function hoursOverview(submitted: string[] = [], shift?: TodayShift | null, logged: WorkDay[] = workdays): HoursOverview {
   const from = addDays(today.date, -6);
-  const days: WorkDay[] = [...workdays];
+  const days: WorkDay[] = [...logged];
   if (shift?.end && submitted.includes(today.date) && !days.some((w) => w.date === today.date)) {
     days.push({ date: today.date, kind: 'shoot', start: shift.start, end: shift.end, breakMin: shift.breakMin, status: 'draft' });
   }

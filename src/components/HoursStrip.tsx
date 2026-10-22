@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { project, today } from '../mock';
+import { project, today, workdaysFor } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useSubmitted } from '../lib/useSubmitted';
@@ -12,7 +12,8 @@ export const useHoursOverview = () => {
   const start = useDemo((s) => s.logStart);
   const end = useDemo((s) => s.logEnd);
   const breakMin = useDemo((s) => s.breakMin);
-  return useMemo(() => hoursOverview(submitted, { start, end, breakMin }), [submitted, start, end, breakMin]);
+  const linkId = useDemo((s) => s.activeLinkId);
+  return useMemo(() => hoursOverview(submitted, { start, end, breakMin }, workdaysFor(linkId)), [submitted, start, end, breakMin, linkId]);
 };
 
 /** The number, unit and one plain sentence behind each tile; the hours sheet reuses them. */

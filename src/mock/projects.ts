@@ -1,5 +1,5 @@
-import { today } from './data';
-import type { CrewLink, LinkStatus } from './types';
+import { today, workdays } from './data';
+import type { CrewLink, LinkStatus, WorkDay } from './types';
 
 /**
  * Crew links the phone holds. Each link is its own credential for one person on one
@@ -108,3 +108,26 @@ export function linkStatus(link: Pick<CrewLink, 'expiresAt' | 'revokedAt'>, now 
 export const links: CrewLink[] = rawLinks.map((l) => ({ ...l, status: linkStatus(l) }));
 
 export const linkById = (id: string) => links.find((l) => l.id === id);
+
+/** Hours already logged for the colleagues the 1st AC enters hours for. Their own numbers, not the app user's. */
+const workdaysByLink: Record<string, WorkDay[]> = {
+  'lk-ferry-bianca': [
+    { date: '2026-10-12', kind: 'shoot', start: '07:00', end: '18:30', breakMin: 45, status: 'approved' },
+    { date: '2026-10-13', kind: 'shoot', start: '07:00', end: '19:00', breakMin: 45, status: 'approved' },
+    { date: '2026-10-14', kind: 'shoot', start: '06:30', end: '18:30', breakMin: 30, status: 'approved' },
+    { date: '2026-10-15', kind: 'shoot', start: '08:00', end: '18:30', breakMin: 30, status: 'approved' },
+    { date: '2026-10-16', kind: 'shoot', start: '11:30', end: '00:00', breakMin: 30, status: 'submitted' },
+    { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '22:30', breakMin: 30, status: 'submitted' },
+  ],
+  'lk-ferry-samir': [
+    { date: '2026-10-12', kind: 'shoot', start: '07:00', end: '18:00', breakMin: 45, status: 'approved' },
+    { date: '2026-10-13', kind: 'shoot', start: '07:00', end: '18:30', breakMin: 45, status: 'approved' },
+    { date: '2026-10-14', kind: 'shoot', start: '06:30', end: '18:00', breakMin: 30, status: 'approved' },
+    { date: '2026-10-15', kind: 'shoot', start: '08:00', end: '19:00', breakMin: 30, status: 'approved' },
+    { date: '2026-10-16', kind: 'shoot', start: '11:30', end: '23:30', breakMin: 30, status: 'submitted' },
+    { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '22:00', breakMin: 30, status: 'draft' },
+  ],
+};
+
+/** The logged days of one crew link; the app user's own links share `workdays`. */
+export const workdaysFor = (linkId: string): WorkDay[] => workdaysByLink[linkId] ?? workdays;

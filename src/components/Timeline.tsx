@@ -103,12 +103,14 @@ function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
       if (e.pointerId === pointer) endDrag();
     };
 
-    // A mouse wheel only scrolls up and down; here it scrubs. Only real wheel notches count: line steps,
-    // or whole multiples of 100 px. Trackpad swipes and their momentum send other values, so the page
-    // keeps scrolling. And once the ruler is at its end in that direction the wheel goes back to the page.
+    // A mouse wheel only scrolls up and down; here it scrubs. Only wheel notches count: line steps,
+    // a legacy delta in steps of 120, or a whole-pixel step of 40 or more. Small or fractional
+    // values are a trackpad and its momentum, so the page keeps scrolling. And once the ruler is at its end in that direction the wheel goes back to the page.
     const onWheel = (e: WheelEvent) => {
       if (e.ctrlKey || e.deltaX !== 0 || e.deltaY === 0) return;
-      const notched = e.deltaMode === 1 || (e.deltaMode === 0 && e.deltaY % 100 === 0);
+      // Chrome and Safari also report the legacy wheelDeltaY: 120 per notch on a mouse wheel.
+      const legacy = (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY ?? 0;
+      const notched = e.deltaMode === 1 || (legacy !== 0 && legacy % 120 === 0) || (e.deltaMode === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
       if (!notched) return;
       const atStart = el.scrollLeft <= 0 && e.deltaY < 0;
       const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1 && e.deltaY > 0;
