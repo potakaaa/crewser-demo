@@ -101,6 +101,9 @@ export function CalendarScreen() {
       .join(', ');
   const callSheet = callSheetByDay.get(calDate);
   const unsent = hoursNotSent(calDate, submitted);
+  const isToday = calDate === today.date;
+  // The Hours sheet only offers Send for logged drafts; a past shoot day nobody logged has nothing to send.
+  const loggedDraft = workdays.some((w) => w.date === calDate && w.status === 'draft');
 
   return (
     <div className="screen" ref={ref}>
@@ -223,16 +226,22 @@ export function CalendarScreen() {
                   {callSheet.isNew && <span className="chip-lime chip-lime-sm">new</span>}
                 </button>
               )}
-              {unsent && (
+              {unsent && (isToday || loggedDraft) && (
                 <button
                   type="button"
                   className="day-action day-action-unsent"
-                  // Only today can be logged in the Log sheet; earlier days are already logged and just need sending.
-                  onClick={() => (calDate === today.date ? openLog(true) : openSheet('hours', 'week'))}
+                  // Only today can be logged in the Log sheet; earlier logged days just need sending.
+                  onClick={() => (isToday ? openLog(true) : openSheet('hours', 'week'))}
                 >
                   <Icon name="alert" size={15} color="#6B4A00" />
-                  {calDate === today.date ? 'Hours not sent' : 'Hours not sent · Send'}
+                  {isToday ? 'Hours not sent' : 'Hours not sent · Send'}
                 </button>
+              )}
+              {unsent && !isToday && !loggedDraft && (
+                <span className="day-action day-action-unsent" role="note">
+                  <Icon name="alert" size={15} color="#6B4A00" />
+                  Hours not sent
+                </span>
               )}
             </div>
           )}

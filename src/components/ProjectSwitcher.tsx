@@ -18,7 +18,7 @@ function groupLinks(links: CrewLink[], activeId: string) {
 function validity(l: CrewLink) {
   const end = l.expiresAt.slice(0, 10);
   const n = diffDays(end, today.date);
-  if (l.status === 'revoked') return { chip: 'Access removed', sub: `Removed ${fmtDayMonth((l.revokedAt ?? l.expiresAt).slice(0, 10))}` };
+  if (l.status === 'revoked') return { chip: 'Access removed', sub: `Removed ${fmtDayMonth(l.revokedAt!.slice(0, 10))}` };
   if (l.status === 'expired') return { chip: 'Expired', sub: `Ended ${fmtDayMonth(end)}` };
   if (l.status === 'expiring') return { chip: n <= 0 ? 'Expires today' : n === 1 ? 'Expires tomorrow' : `Expires in ${n} days`, sub: `Ends ${fmtDayMonth(end)}` };
   return { chip: null, sub: `Valid until ${fmtDayMonth(end)}` };
@@ -30,7 +30,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
   return (
     <button
       type="button"
-      className={`lrow${active ? ' is-active' : ''}${blocked ? ' is-expired' : ''}`}
+      className={`lrow${active ? ' is-active' : ''}${blocked ? ' is-blocked' : ''}`}
       aria-pressed={active}
       aria-disabled={blocked}
       onClick={() => onPick(link)}
@@ -54,7 +54,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
           Active
         </span>
       ) : v.chip ? (
-        <span className={`lchip ${blocked ? 'lchip-expired' : 'lchip-warn'}`}>{v.chip}</span>
+        <span className={`lchip ${blocked ? 'lchip-blocked' : 'lchip-warn'}`}>{v.chip}</span>
       ) : (
         <span className="lradio" aria-hidden="true" />
       )}

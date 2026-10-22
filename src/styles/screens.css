@@ -793,10 +793,10 @@
   font-weight: 500;
   color: var(--teal);
 }
-.lrow.is-expired .lrow-av {
+.lrow.is-blocked .lrow-av {
   opacity: 0.5;
 }
-.lrow.is-expired {
+.lrow.is-blocked {
   cursor: default;
 }
 .lchip {
@@ -818,7 +818,7 @@
   background: var(--amber-surface);
   color: var(--amber-text);
 }
-.lchip-expired {
+.lchip-blocked {
   background: var(--chip);
   color: var(--text-3);
 }
