@@ -25,17 +25,24 @@ export interface DayStat {
   overtime: number;
 }
 
+/**
+ * Minutes worked between two clock times, minus the break. An end before the start runs past midnight
+ * (`overnight`); the same time twice is an empty shift, not a full day; never below 0.
+ */
+export function netMinutes(start: string, end: string, breakMin: number): { minutes: number; overnight: boolean } {
+  const startMin = toMinutes(start);
+  const overnight = toMinutes(end) < startMin;
+  const endMin = toMinutes(end) + (overnight ? 24 * 60 : 0);
+  return { minutes: Math.max(endMin - startMin - breakMin, 0), overnight };
+}
+
 /** Turn a logged shift into hours and overtime. */
 export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalStatus): DayStat {
   const empty: DayStat = { date, weekday: weekday(date), short: fmtDayShort(date), worked: false, overnight: false, breakMin: 0, hours: 0, overtime: 0 };
   if (!wd) return empty;
-  const startMin = toMinutes(wd.start);
-  let endMin = toMinutes(wd.end);
-  // An end before the start runs past midnight; the same time twice is an empty shift, not a full day.
-  const overnight = endMin < startMin;
-  if (overnight) endMin += 24 * 60;
+  const { minutes, overnight } = netMinutes(wd.start, wd.end, wd.breakMin);
   // Rounded to the 2 decimals the rows show, so totals always add up to what is on screen.
-  const hours = Math.round((Math.max(endMin - startMin - wd.breakMin, 0) / 60) * 100) / 100;
+  const hours = Math.round((minutes / 60) * 100) / 100;
   return {
     ...empty,
     worked: true,
