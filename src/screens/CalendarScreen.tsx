@@ -1,7 +1,7 @@
 import { useRef, type CSSProperties } from 'react';
 import '../styles/calendar.css';
 import { useDemo } from '../store';
-import { docs, notes as allNotes, today, workdays, type Doc, type Note, type NoteType } from '../mock';
+import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
 import { ActingAs } from '../components/ActingAs';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
@@ -19,7 +19,7 @@ const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
 const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
 
 /** Shoot days up to today whose hours have not gone to production: logged as a draft, or not logged yet. */
-function hoursNotSent(iso: string, submitted: string[]): boolean {
+function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): boolean {
   if (iso > today.date || !callSheetByDay.has(iso)) return false;
   const logged = workdays.find((w) => w.date === iso);
   if (logged && logged.status !== 'draft') return false;
@@ -75,6 +75,8 @@ export function CalendarScreen() {
   const navigate = useDemo((s) => s.navigate);
   const openLog = useDemo((s) => s.setLogOpen);
   const submitted = useSubmitted();
+  // The logged days belong to the crew link in use, so a colleague's link shows their hours, not yours.
+  const workdays = workdaysFor(useDemo((s) => s.activeLinkId));
 
   const notes = empty ? [] : allNotes;
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
@@ -95,12 +97,12 @@ export function CalendarScreen() {
       `${iso === today.date ? 'Today, ' : ''}${fmtDayMonth(iso)}`,
       n ? count(n) : 'nothing planned',
       callSheetByDay.has(iso) && 'call sheet out',
-      hoursNotSent(iso, submitted) && 'hours not sent',
+      hoursNotSent(iso, submitted, workdays) && 'hours not sent',
     ]
       .filter(Boolean)
       .join(', ');
   const callSheet = callSheetByDay.get(calDate);
-  const unsent = hoursNotSent(calDate, submitted);
+  const unsent = hoursNotSent(calDate, submitted, workdays);
   const isToday = calDate === today.date;
   // The Hours sheet only offers Send for logged drafts; a past shoot day nobody logged has nothing to send.
   const loggedDraft = workdays.some((w) => w.date === calDate && w.status === 'draft');
@@ -150,7 +152,7 @@ export function CalendarScreen() {
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} onLight={isSel} />
-                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted)} />
+                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
@@ -180,7 +182,7 @@ export function CalendarScreen() {
                     >
                       <span className="mday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} onLight={isSel} />
-                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted)} />
+                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
