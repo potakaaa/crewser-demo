@@ -39,7 +39,7 @@ The app keeps a small "wallet" on the device. Each entry holds only what is need
 | `crewMemberId` | Which person the link belongs to |
 | `token` | The secret from the SMS link |
 | `expiresAt` | When the link stops working, as the server last reported it |
-| `status` | `active`, `expired`, `revoked` or `needs_new_link` (shown as "needs a new link" after a second `401`, see below), as the server last reported it |
+| `status` | `active`, `expired` or `revoked` as the server last reported it, or `needs_new_link`, which the app sets itself (shown as "needs a new link") after a second `401`. The server never sends it; the app keeps a per-link "401 seen once" flag, see below |
 
 Display data (project name, person name, department) is cached next to it so the switcher works offline. It is never treated as authoritative.
 
@@ -57,7 +57,7 @@ Display data (project name, person name, department) is cached next to it so the
   - `410`, or an explicit "revoked" response: **final**. The link is dead. Mark it revoked (or expired when the server says it ran out) and do not retry.
   - `401`: not final at first. It can mean a mistyped or rotated token or a temporary state. Re-check once on the next start. After a second `401` the link is shown as "needs a new link" and offers "Request a new link".
   - Network error or `5xx`: keep the previous status. Being offline never counts as expired.
-- "Request a new link" is open to anyone who can type a phone number, so it is built to resist abuse. Requests are rate-limited per phone number and per device, the one-time code is short-lived and single-use, and the reply is the same whether or not the number belongs to a crew member. That keeps the endpoint from being used to guess crew phone numbers or to send unwanted SMS.
+- "Request a new link" is open to anyone who can type a phone number, so it should be built to resist abuse. The proposal: requests are rate-limited per phone number and per device, the one-time code is short-lived and single-use, and the reply is the same whether or not the number belongs to a crew member. These are design requirements for the backend, not existing behaviour. They keep the endpoint from being used to guess crew phone numbers or to send unwanted SMS.
 - The device clock only drives the warning text ("ends in 3 days"). The server decides whether a link works.
 - Checks are rate-limited: at most one per link every few hours, spread out rather than fired all at once, with back-off after errors. Only the active link loads full data; the others are only checked.
 
