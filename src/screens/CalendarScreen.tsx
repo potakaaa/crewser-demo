@@ -7,7 +7,7 @@ import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
 import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
-import { sortNotes, TYPE_LABEL } from '../lib/notes';
+import { sortNotes, TYPE_LABEL, undatedNotes } from '../lib/notes';
 import { chipStyle, TYPE_COLOR } from '../lib/noteStyle';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
@@ -86,7 +86,7 @@ export function CalendarScreen() {
   const grid = monthGrid(calMonth);
 
   const dayNotes = notesOn(calDate);
-  const undated = notes.filter((n) => n.kind === 'undated');
+  const undated = undatedNotes(notes);
   const rel = relativeDay(calDate, today.date);
   const dayLabel = rel === 'today' ? `Today · ${fmtDayMonth(calDate)}` : rel === 'tomorrow' ? `Tomorrow · ${fmtDayMonth(calDate)}` : fmtDayMonth(calDate);
   const unit = monthOpen ? 'month' : 'week';
