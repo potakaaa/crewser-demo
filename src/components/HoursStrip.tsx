@@ -3,13 +3,16 @@ import { project, today } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useSubmitted } from '../lib/useSubmitted';
-import { fmtBig, hoursOverview, type HoursOverview } from '../lib/stats';
+import { fmtH, hoursOverview, type HoursOverview } from '../lib/stats';
 
 export type HoursMetric = 'week' | 'overtime' | 'days';
 
 export const useHoursOverview = () => {
   const submitted = useSubmitted();
-  return useMemo(() => hoursOverview(submitted), [submitted]);
+  const start = useDemo((s) => s.logStart);
+  const end = useDemo((s) => s.logEnd);
+  const breakMin = useDemo((s) => s.breakMin);
+  return useMemo(() => hoursOverview(submitted, { start, end, breakMin }), [submitted, start, end, breakMin]);
 };
 
 /** The number, unit and one plain sentence behind each tile; the hours sheet reuses them. */
@@ -20,22 +23,22 @@ export function metricCopy(o: HoursOverview, metric: HoursMetric) {
       return {
         label: 'Last 7 days',
         short: 'Last 7 days',
-        value: fmtBig(o.weekTotal),
+        value: fmtH(o.weekTotal),
         unit: 'h',
-        sentence: `${n(o.weekDays.length, 'day', 'days')} worked in the last 7 days, ${o.rangeLabel}.`,
+        sentence: `${n(o.weekDays.length, 'day', 'days')} worked, ${o.rangeLabel}.`,
       };
     case 'overtime':
       return {
         label: 'Overtime',
         short: 'Overtime',
-        value: `+${fmtBig(o.overtime)}`,
+        value: `+${fmtH(o.overtime)}`,
         unit: 'h',
-        sentence: `Hours past your ${project.dailyTargetHours} h day, on ${n(o.overtimeDays.length, 'day', 'days')}.`,
+        sentence: `Hours past your ${project.dailyTargetHours} h day, on ${n(o.overtimeDays.length, 'day', 'days')} in the last 7 days.`,
       };
     case 'days':
       return {
-        label: 'Shoot days left',
-        short: 'Days left',
+        label: 'Shoot days after today',
+        short: 'Days to go',
         value: String(o.shootLeft),
         unit: '',
         sentence: `Today is day ${today.shootDay} of ${project.totalShootDays}.`,
@@ -80,7 +83,7 @@ export function HoursStrip() {
   const tile = (metric: HoursMetric, className: string) => {
     const c = metricCopy(o, metric);
     return (
-      <button type="button" className={`hs-tile ${className}`} onClick={() => openSheet('hours', metric)} aria-label={`${c.label}: ${c.value} ${c.unit}. ${c.sentence} Open details`}>
+      <button type="button" className={`hs-tile ${className}`} data-after-master={metric === 'week' || undefined} onClick={() => openSheet('hours', metric)} aria-label={`${c.label}: ${[c.value, c.unit].filter(Boolean).join(' ')}. ${c.sentence} Open details`}>
         <span className="hs-k">{c.short}</span>
         <span className="hs-v num">
           {c.value}

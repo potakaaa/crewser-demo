@@ -15,21 +15,23 @@ const isMetric = (id?: string): id is HoursMetric => METRICS.includes(id as Hour
 /** Sheet title and subtitle, used by SheetHost. */
 export function hoursSheetMeta(id?: string) {
   const metric: HoursMetric = isMetric(id) ? id : 'week';
-  const title = { week: 'Hours this week', overtime: 'Overtime', days: 'Shoot days' }[metric];
-  return { title, subtitle: metric === 'days' ? `Day ${today.shootDay} of ${project.totalShootDays}` : `Last 7 days · ${hoursOverview().rangeLabel}` };
+  const title = { week: 'Last 7 days', overtime: 'Overtime', days: 'Shoot days' }[metric];
+  return { title, subtitle: metric === 'days' ? `Day ${today.shootDay} of ${project.totalShootDays}` : hoursOverview().rangeLabel };
 }
 
 function Row({ day, hours }: { day: DayStat; hours: string }) {
+  const status = day.status ?? 'draft';
   return (
     <li className="hsheet-row">
       <span className="hsheet-day">
         <strong>{day.short}</strong>
         <span>
           {day.start}–{day.end}
+          {day.overnight && ' next day'}
         </span>
       </span>
       <span className="hsheet-h num">{hours}</span>
-      <span className={`hsheet-status hsheet-${day.status}`}>{STATUS_LABEL[day.status ?? 'draft']}</span>
+      <span className={`hsheet-status hsheet-${status}`}>{STATUS_LABEL[status]}</span>
     </li>
   );
 }
@@ -45,7 +47,7 @@ export function HoursSheet({ id }: { id?: string }) {
     metric === 'overtime'
       ? o.overtimeDays.map((d) => <Row key={d.date} day={d} hours={`+${fmtH(d.overtime)} h`} />)
       : (metric === 'days' ? o.shootDone : o.weekDays).map((d) => <Row key={d.date} day={d} hours={`${fmtH(d.hours)} h`} />);
-  const listTitle = metric === 'overtime' ? `Days over ${target} h` : metric === 'days' ? 'Shoot days so far' : 'Last 7 days';
+  const listTitle = metric === 'overtime' ? `Days over ${target} h` : metric === 'days' ? 'Shoot days so far' : `Days worked, ${o.rangeLabel}`;
 
   return (
     <>
