@@ -372,6 +372,7 @@
   gap: 14px;
   min-height: 76px;
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--lime);
   color: var(--ink);
