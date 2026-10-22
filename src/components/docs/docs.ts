@@ -3,13 +3,8 @@ import { diffDays, fmtDayMonth } from '../../lib/dates';
 
 export type DocGroup = 'callsheet' | 'schedule' | 'safety' | 'other';
 
-/** Where a file belongs on the Documents screen. The one-liner is a schedule, the map is a safety file. */
-export function groupOf(d: Doc): DocGroup {
-  if (d.kind === 'callsheet') return 'callsheet';
-  if (d.kind === 'schedule' || d.id === 'oneliner') return 'schedule';
-  if (d.kind === 'safety' || d.id === 'map') return 'safety';
-  return 'other';
-}
+/** Where a file belongs on the Documents screen: one group per document kind. */
+export const groupOf = (d: Doc): DocGroup => d.kind;
 
 export const GROUP_TITLE: Record<DocGroup, string> = {
   callsheet: 'Call sheets',
