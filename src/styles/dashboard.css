@@ -639,6 +639,19 @@
   min-height: 36px;
   padding: 0 var(--sp-4);
 }
+/* 36 px to look at, 44 px to hit: an invisible band above and below, clear of the text beside it. */
+.hs-nudge .hs-nudge-btn {
+  position: relative;
+  overflow: visible;
+}
+.hs-nudge .hs-nudge-btn::after {
+  border-radius: inherit;
+}
+.hs-nudge .hs-nudge-btn::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
 
 /* ───────── Info pocket ───────── */
 .pocket {
