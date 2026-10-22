@@ -2697,6 +2697,10 @@
 .sheet-scroll::-webkit-scrollbar {
   display: none;
 }
+/* Sections keep their height and the sheet scrolls; otherwise overflow:hidden cards (facts) get squeezed to nothing. */
+.sheet-scroll > * {
+  flex-shrink: 0;
+}
 .sheet-note {
   padding: 14px var(--sp-4);
   border-radius: var(--r-control);

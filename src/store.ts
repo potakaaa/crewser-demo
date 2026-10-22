@@ -47,9 +47,10 @@ function safeDecode(v: string): string | null {
   }
 }
 
+/** The route name is case-insensitive and a trailing slash is fine (#/Calendar/); the argument (a note id, a file name) is kept as written. */
 const parseHash = (hash: string) => {
-  const m = hash.replace(/^#\/?/, '').match(/^([a-z]+)(?:[/-](.+))?$/);
-  return { head: m?.[1], arg: m?.[2]?.replace(/\/$/, '') };
+  const m = hash.replace(/^#\/?/, '').match(/^([a-z]+)(?:[/-](.*))?$/i);
+  return { head: m?.[1].toLowerCase(), arg: m?.[2]?.replace(/\/$/, '') || undefined };
 };
 
 /** Rewrite an old or loose hash (#home, #stats, #ticket...) to its canonical form, so the address bar matches the screen. */
