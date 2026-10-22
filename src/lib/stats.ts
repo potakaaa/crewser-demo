@@ -111,11 +111,13 @@ export function hoursOverview(submitted: string[] = [], shift?: TodayShift | nul
   };
 }
 
-/** Today's planned shift, taken from the shoot-day note's call and wrap facts. */
-export function todayPlan(breakMin: number) {
+/**
+ * Today's planned call and wrap, taken from the shoot-day note's facts. The break argument is not used
+ * any more (net hours come from netMinutes); callers can drop it.
+ */
+export function todayPlan(_breakMin?: number) {
   const shoot = notes.find((n) => n.day === today.date && n.type === 'appointment' && n.kind === 'time');
   const call = shoot?.facts.find((f) => f.label === 'Call')?.value ?? shoot?.time ?? '—';
   const wrap = shoot?.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
-  const net = wrap ? (toMinutes(wrap) - toMinutes(call) - breakMin) / 60 : 0;
-  return { call, wrap, net, overTarget: net - project.dailyTargetHours };
+  return { call, wrap };
 }

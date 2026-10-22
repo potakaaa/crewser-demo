@@ -77,7 +77,7 @@ export function UnsentNudge({ o }: { o: HoursOverview }) {
   );
 }
 
-/** Three big numbers in one row: the last 7 days, overtime, shoot days left. Each opens the hours sheet. */
+/** Three big numbers in one row: the last 7 days, overtime, shoot days after today (the "Days left" tile). Each opens the hours sheet. */
 export function HoursStrip() {
   const openSheet = useDemo((s) => s.openSheet);
   const o = useHoursOverview();
