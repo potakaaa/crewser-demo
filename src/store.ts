@@ -99,11 +99,11 @@ export type FontTheme = 'inter' | 'screenplay' | 'poster' | 'editorial' | 'credi
 
 /** Headline and numeral typefaces to try out; body text stays Inter. Settings and the demo panel list these. */
 export const FONT_THEMES: { value: FontTheme; label: string; hint: string; sample: string }[] = [
-  { value: 'inter', label: 'Inter', hint: 'Clean and neutral, the current look', sample: '08:40' },
-  { value: 'screenplay', label: 'Screenplay', hint: 'Courier Prime, like a script page', sample: '08:40' },
-  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall film-poster capitals', sample: '08:40' },
-  { value: 'editorial', label: 'Editorial', hint: 'Fraunces, a warm magazine serif', sample: '08:40' },
-  { value: 'credits', label: 'Credits', hint: 'Syne, wide and a bit rebellious', sample: '08:40' },
+  { value: 'inter', label: 'Inter', hint: 'Clean and neutral', sample: '08:40' },
+  { value: 'screenplay', label: 'Screenplay', hint: 'Courier Prime, script page', sample: '08:40' },
+  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall capitals', sample: '08:40' },
+  { value: 'editorial', label: 'Editorial', hint: 'Fraunces, a warm serif', sample: '08:40' },
+  { value: 'credits', label: 'Credits', hint: 'Syne, wide and rebellious', sample: '08:40' },
 ];
 
 const FONT_KEY = 'crewser-font-theme';
@@ -199,7 +199,6 @@ interface Actions {
 
 export type NavDir = 'push' | 'pop' | 'tab' | 'none';
 
-/** Log sheet defaults for a crew link: today's call time, the usual break, wrap still open. */
 /** The Log sheet's form. The active link's form lives in the top-level fields; the others wait in `logs`. */
 interface LogForm {
   breakMin: number;
@@ -207,11 +206,19 @@ interface LogForm {
   logEnd: string | null;
 }
 
+/** Log sheet defaults for a crew link: today's call time, the usual break, wrap still open. */
 const logDefaults = (): LogForm => ({
   breakMin: today.defaultBreakMin,
   logStart: todayPlan(today.defaultBreakMin).call,
   logEnd: null,
 });
+
+/** Editing start, end or break after submitting un-sends the day (for the active link): it has to be sent again. */
+const unsendToday = (s: DemoState, changed: boolean): Partial<DemoState> => {
+  const sent = s.submitted[s.activeLinkId] ?? [];
+  if (!changed || !sent.includes(today.date)) return {};
+  return { submitted: { ...s.submitted, [s.activeLinkId]: sent.filter((d) => d !== today.date) } };
+};
 
 const initialState = (): DemoState => ({
   stack: initialStack(),
@@ -368,17 +375,12 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     }
     set({ fontTheme: t });
   },
-  setBreak: (min) => set({ breakMin: Math.max(0, Math.min(120, min)) }),
-  setLogTime: (k, v) =>
+  setBreak: (min) =>
     set((s) => {
-      // Taking the end back means the day is no longer finished: it is no longer sent either.
-      const sent = s.submitted[s.activeLinkId] ?? [];
-      const unsend = k === 'logEnd' && v === null && sent.includes(today.date);
-      return {
-        [k]: v,
-        ...(unsend ? { submitted: { ...s.submitted, [s.activeLinkId]: sent.filter((d) => d !== today.date) } } : {}),
-      } as Pick<DemoState, typeof k>;
+      const breakMin = Math.max(0, Math.min(120, min));
+      return { breakMin, ...unsendToday(s, breakMin !== s.breakMin) };
     }),
+  setLogTime: (k, v) => set((s) => ({ [k]: v, ...unsendToday(s, v !== s[k]) }) as Pick<DemoState, typeof k>),
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
   toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
   shiftCal: (delta) =>
