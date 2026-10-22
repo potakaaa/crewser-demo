@@ -103,15 +103,20 @@ function useScrubber(el: HTMLDivElement | null, onScrub: (x: number) => void) {
       if (e.pointerId === pointer) endDrag();
     };
 
-    // A mouse wheel only scrolls up and down; here it scrubs. Only wheel notches count: line steps,
-    // a legacy delta in steps of 120, or a whole-pixel step of 40 or more. Small or fractional
-    // values are a trackpad and its momentum, so the page keeps scrolling. And once the ruler is at its end in that direction the wheel goes back to the page.
+    // A mouse wheel only scrolls up and down; here it scrubs, but only where that cannot be mistaken for
+    // the page scrolling. A notch is a line step, or exactly 120 in the legacy wheelDeltaY that is not
+    // just 3x the delta (Chrome and Safari fake that for trackpads). Everything else, a trackpad's swipes
+    // and momentum included, is left to the page, and so is any notch right after one. Sideways
+    // swipes and Shift+wheel arrive as deltaX and scroll the ruler natively.
+    let lastOther = -Infinity;
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.deltaX !== 0 || e.deltaY === 0) return;
-      // Chrome and Safari also report the legacy wheelDeltaY: 120 per notch on a mouse wheel.
       const legacy = (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY ?? 0;
-      const notched = e.deltaMode === 1 || (legacy !== 0 && legacy % 120 === 0) || (e.deltaMode === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
-      if (!notched) return;
+      const notched = e.deltaX === 0 && !e.ctrlKey && (e.deltaMode === 1 || (e.deltaMode === 0 && Math.abs(legacy) === 120 && legacy !== -3 * e.deltaY));
+      if (!notched) {
+        lastOther = e.timeStamp;
+        return;
+      }
+      if (!e.cancelable || e.timeStamp - lastOther < 150) return;
       const atStart = el.scrollLeft <= 0 && e.deltaY < 0;
       const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1 && e.deltaY > 0;
       if (atStart || atEnd) return;
