@@ -1,20 +1,20 @@
-import { docs, today, type Doc } from '../../mock';
+import { docs, today, type Doc, type DocKind } from '../../mock';
 import { diffDays, fmtDayMonth } from '../../lib/dates';
 
-export type DocGroup = 'callsheet' | 'schedule' | 'safety' | 'other';
-
-/** Where a file belongs on the Documents screen: one group per document kind. */
-export const groupOf = (d: Doc): DocGroup => d.kind;
-
-export const GROUP_TITLE: Record<DocGroup, string> = {
+export const KIND_TITLE: Record<DocKind, string> = {
   callsheet: 'Call sheets',
   schedule: 'Schedules',
   safety: 'Location & safety',
   other: 'Other files',
 };
 
+/** A call sheet always belongs to a day. */
+export type CallSheet = Doc & { kind: 'callsheet'; day: string };
+
 /** Call sheets by day, newest first. */
-export const callSheets = docs.filter((d) => d.kind === 'callsheet').sort((a, b) => (b.day ?? '').localeCompare(a.day ?? ''));
+export const callSheets = docs
+  .filter((d): d is CallSheet => d.kind === 'callsheet' && !!d.day)
+  .sort((a, b) => b.day.localeCompare(a.day));
 
 /** "today 07:55" · "yesterday 20:20" · "Fri 16 Oct" */
 export function updatedLabel(iso: string): string {

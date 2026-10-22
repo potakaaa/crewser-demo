@@ -1,20 +1,13 @@
-import { useMemo, useState } from 'react';
-import { useDemo } from '../store';
-import { CONTACT_DEPARTMENTS, contacts, person, project, type Contact } from '../mock';
+import { useMemo, useRef, useState } from 'react';
+import { useActiveLink, useDemo } from '../store';
+import { CONTACT_DEPARTMENTS, contacts, person, type Contact } from '../mock';
+import { ActingAs } from '../components/ActingAs';
 import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
 import { useContactActions } from '../components/contacts/useContactActions';
+import { matchesContact } from '../components/contacts/search';
 import { useScrollRestore } from '../lib/scroll';
-
-const digits = (s: string) => s.replace(/\D/g, '');
-
-function matches(c: Contact, q: string): boolean {
-  const text = `${c.name} ${c.position} ${c.department}`.toLowerCase();
-  if (text.includes(q)) return true;
-  const d = digits(q);
-  return d.length >= 3 && digits(c.phone).includes(d);
-}
 
 /** Round quick action next to a row; sits beside (not inside) the row button. */
 function QuickButtons({ c, onDark = false }: { c: Contact; onDark?: boolean }) {
@@ -94,13 +87,15 @@ function Office({ office, others }: { office: Contact; others: Contact[] }) {
 export function ContactsScreen() {
   const ref = useScrollRestore<HTMLDivElement>('contacts', useDemo((s) => s.setStatusDark));
   const [query, setQuery] = useState('');
-  const q = query.trim().toLowerCase();
+  const input = useRef<HTMLInputElement>(null);
+  const projectName = useActiveLink().projectName;
+  const q = query.trim();
 
   const office = contacts.find((c) => c.id === 'office');
   const pinned = contacts.filter((c) => c.pinned);
   const groups = useMemo(() => {
     // Pinned people sit in the office card until you search.
-    const pool = contacts.filter((c) => (q ? matches(c, q) : !c.pinned));
+    const pool = contacts.filter((c) => (q ? matchesContact(c, q) : !c.pinned));
     return CONTACT_DEPARTMENTS.map((department) => ({ department, members: pool.filter((c) => c.department === department) })).filter(
       (g) => g.members.length > 0,
     );
@@ -111,12 +106,16 @@ export function ContactsScreen() {
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <ScreenTitle eyebrow={`${project.name} · ${contacts.length - 1} people`} title="Contacts" />
+        <ScreenTitle eyebrow={`${projectName} · ${contacts.length - 1} people`} title="Contacts" />
+        <ActingAs />
         <div className="searchbox">
           <Icon name="search" size={18} color="#C4CFD0" />
-          <input type="search" aria-label="Search contacts" placeholder="Name, position or department" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <input ref={input} type="search" aria-label="Search contacts" placeholder="Name, position or department" value={query} onChange={(e) => setQuery(e.target.value)} />
           {query && (
-            <button type="button" className="searchbox-clear" aria-label="Clear search" onClick={() => setQuery('')}>
+            <button type="button" className="searchbox-clear" aria-label="Clear search" onClick={() => {
+                setQuery('');
+                input.current?.focus();
+              }}>
               <Icon name="close" size={16} color="#FFFFFF" />
             </button>
           )}
@@ -129,7 +128,10 @@ export function ContactsScreen() {
           <section className="cdept" key={g.department} aria-label={g.department}>
             <h2 className="cdept-h">
               {g.department}
-              <span>{g.members.length}</span>
+              <span>
+                {g.members.length}
+                <span className="sr-only"> people</span>
+              </span>
             </h2>
             <div className="dlist">
               {g.members.map((c) => (
@@ -138,9 +140,12 @@ export function ContactsScreen() {
             </div>
           </section>
         ))}
+        <p className="sr-only" role="status">
+          {q ? `${total} ${total === 1 ? 'person' : 'people'} found` : ''}
+        </p>
         {q && total === 0 && (
-          <div className="empty-light" role="status">
-            <strong>No one matches “{query.trim()}”</strong>
+          <div className="empty-light">
+            <strong>No one matches “{q}”</strong>
             <span>Try a first name, a position like “Gaffer” or a department.</span>
           </div>
         )}

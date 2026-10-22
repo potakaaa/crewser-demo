@@ -7,8 +7,12 @@ interface Prefs {
   toggle: (k: 'callSheetOut' | 'hoursReminder') => void;
 }
 
+const defaults = { callSheetOut: true, hoursReminder: true };
+
 export const usePrefs = create<Prefs>()((set) => ({
-  callSheetOut: true,
-  hoursReminder: true,
+  ...defaults,
   toggle: (k) => set((s) => ({ [k]: !s[k] }) as Pick<Prefs, typeof k>),
 }));
+
+/** Back to the starting switches; the store's reset() calls this. */
+export const resetPrefs = () => usePrefs.setState(defaults);

@@ -1,10 +1,10 @@
 import { useDemo } from '../store';
-import { links, today, type CrewLink } from '../mock';
+import { today, type CrewLink } from '../mock';
 import { Icon } from './Icon';
 import { diffDays, fmtDayMonth } from '../lib/dates';
 
 /** Project groups, the one in use first. Inside a group you come first, then your colleagues. */
-function groupLinks(activeId: string) {
+function groupLinks(links: CrewLink[], activeId: string) {
   const ids = [...new Set(links.map((l) => l.projectId))];
   const activeProject = links.find((l) => l.id === activeId)?.projectId;
   ids.sort((a, b) => Number(b === activeProject) - Number(a === activeProject));
@@ -14,12 +14,13 @@ function groupLinks(activeId: string) {
   });
 }
 
-/** "Expires in 3 days" · "Expires tomorrow" · "Valid until 30 Nov" */
+/** Chip text and the line under the name for one link. */
 function validity(l: CrewLink) {
-  const n = diffDays(l.expiresAt.slice(0, 10), today.date);
-  if (l.status === 'expired') return { chip: 'Expired', sub: `Ended ${fmtDayMonth(l.expiresAt.slice(0, 10))}` };
-  if (l.status === 'expiring') return { chip: n <= 0 ? 'Expires today' : n === 1 ? 'Expires tomorrow' : `Expires in ${n} days`, sub: `Ends ${fmtDayMonth(l.expiresAt.slice(0, 10))}` };
-  return { chip: null, sub: `Valid until ${fmtDayMonth(l.expiresAt.slice(0, 10))}` };
+  const end = l.expiresAt.slice(0, 10);
+  const n = diffDays(end, today.date);
+  if (l.status === 'expired') return { chip: 'Expired', sub: `Ended ${fmtDayMonth(end)}` };
+  if (l.status === 'expiring') return { chip: n <= 0 ? 'Expires today' : n === 1 ? 'Expires tomorrow' : `Expires in ${n} days`, sub: `Ends ${fmtDayMonth(end)}` };
+  return { chip: null, sub: `Valid until ${fmtDayMonth(end)}` };
 }
 
 function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; onPick: (l: CrewLink) => void }) {
@@ -29,8 +30,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
     <button
       type="button"
       className={`lrow${active ? ' is-active' : ''}${expired ? ' is-expired' : ''}`}
-      role="radio"
-      aria-checked={active}
+      aria-pressed={active}
       aria-disabled={expired}
       onClick={() => onPick(link)}
     >
@@ -42,8 +42,10 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
           {link.isMe ? 'You' : link.personName}
           {!link.isMe && <span className="lrow-role"> · {link.department}</span>}
         </span>
-        <span className="lrow-sub">{link.isMe ? `${link.position} · ${v.sub}` : `${link.position} · hours entered by you`}</span>
-        {expired && <span className="lrow-ask">Ask production for a new link</span>}
+        <span className="lrow-sub">
+          {link.position} · {v.sub}
+        </span>
+        {expired && <span className="lrow-ask">{link.isMe ? 'Ask production for a new link' : 'Ask them or production for a new link'}</span>}
       </span>
       {active ? (
         <span className="lchip lchip-active">
@@ -61,6 +63,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
 
 /** Body of the 'project' sheet: every crew link on this phone, grouped by project and person. */
 export function ProjectSwitcher() {
+  const links = useDemo((s) => s.links);
   const activeId = useDemo((s) => s.activeLinkId);
   const setActiveLink = useDemo((s) => s.setActiveLink);
   const closeSheet = useDemo((s) => s.closeSheet);
@@ -76,14 +79,14 @@ export function ProjectSwitcher() {
 
   return (
     <div className="switcher">
-      <p className="lintro">One crew link is one person on one project. As gaffer you can also hold links for your team and enter their hours.</p>
-      {groupLinks(activeId).map((g) => (
+      <p className="lintro">One crew link is one person on one project. As head of department you can also hold links for your team and enter their hours.</p>
+      {groupLinks(links, activeId).map((g) => (
         <section className="lgroup" key={g.projectId} aria-label={g.name}>
           <div className="lgroup-h">
             <strong>{g.name}</strong>
             <span>{g.production}</span>
           </div>
-          <div className="dlist" role="radiogroup" aria-label={`${g.name} crew links`}>
+          <div className="dlist">
             {g.members.map((l) => (
               <LinkRow key={l.id} link={l} active={l.id === activeId} onPick={pick} />
             ))}

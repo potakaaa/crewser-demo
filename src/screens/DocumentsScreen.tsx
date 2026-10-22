@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useDemo } from '../store';
-import { docs, project, today, type Doc } from '../mock';
+import { useActiveLink, useDemo } from '../store';
+import { docs, today, type Doc, type DocKind } from '../mock';
+import { ActingAs } from '../components/ActingAs';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
-import { callSheets, dayWord, groupOf, GROUP_TITLE, updatedLabel, type DocGroup } from '../components/docs/docs';
+import { callSheets, dayWord, KIND_TITLE, updatedLabel, type CallSheet } from '../components/docs/docs';
 import { fmtDayMonth } from '../lib/dates';
 import { useScrollRestore } from '../lib/scroll';
 
-type Filter = 'all' | DocGroup;
+type Filter = 'all' | DocKind;
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -22,9 +23,9 @@ const RECENT = 3;
 
 function DocRow({ doc }: { doc: Doc }) {
   const navigate = useDemo((s) => s.navigate);
-  const isSheet = doc.kind === 'callsheet' && doc.day;
-  const title = isSheet ? `Shoot day ${doc.shootDay}` : doc.title;
-  const meta = isSheet ? `${fmtDayMonth(doc.day!)} · ${doc.size}` : `Updated ${updatedLabel(doc.updated)} · ${doc.size}`;
+  const day = doc.kind === 'callsheet' ? doc.day : undefined;
+  const title = day && doc.shootDay ? `Shoot day ${doc.shootDay}` : doc.title;
+  const meta = day ? `${fmtDayMonth(day)} · ${doc.size}` : `Updated ${updatedLabel(doc.updated)} · ${doc.size}`;
   return (
     <button type="button" className="drow" onClick={() => navigate({ name: 'pdf', file: doc.file })}>
       <span className="chip-icon">
@@ -39,7 +40,7 @@ function DocRow({ doc }: { doc: Doc }) {
               <span className="sr-only">new</span>
             </>
           )}
-          {isSheet && doc.day === today.date && <span className="drow-today">Today</span>}
+          {day === today.date && <span className="drow-today">Today</span>}
         </span>
         <span className="drow-meta">{meta}</span>
       </span>
@@ -48,20 +49,21 @@ function DocRow({ doc }: { doc: Doc }) {
   );
 }
 
-function PinnedCallSheet({ doc }: { doc: Doc }) {
+function PinnedCallSheet({ doc }: { doc: CallSheet }) {
   const navigate = useDemo((s) => s.navigate);
+  const projectName = useActiveLink().projectName;
   return (
     <button type="button" className="dpin" onClick={() => navigate({ name: 'pdf', file: doc.file })}>
       <span className="dpin-top">
         <span className="dpin-kicker">
           <Icon name="pin" size={15} color="#C4CFD0" />
-          {dayWord(doc.day!)} · Shoot day {doc.shootDay}
+          {dayWord(doc.day)}{doc.shootDay ? ` · Shoot day ${doc.shootDay}` : ''}
         </span>
         {doc.isNew && <span className="chip-lime chip-lime-sm">new</span>}
       </span>
-      <span className="dpin-title">{fmtDayMonth(doc.day!)} · call sheet</span>
+      <span className="dpin-title">{fmtDayMonth(doc.day)} · call sheet</span>
       <span className="dpin-meta">
-        {project.name} · updated {updatedLabel(doc.updated)} · {doc.size}
+        {projectName} · updated {updatedLabel(doc.updated)} · {doc.size}
       </span>
       <span className="dpin-cta">
         Open call sheet
@@ -71,13 +73,13 @@ function PinnedCallSheet({ doc }: { doc: Doc }) {
   );
 }
 
-function CallSheetSection({ filtered }: { filtered: Doc[] }) {
+function CallSheetSection({ filtered }: { filtered: CallSheet[] }) {
   const [older, setOlder] = useState(false);
   const recent = filtered.slice(0, RECENT);
   const rest = filtered.slice(RECENT);
   return (
-    <section className="stack" aria-label={GROUP_TITLE.callsheet}>
-      <SectionHead title={GROUP_TITLE.callsheet} sub="By day, newest first" />
+    <section className="stack" aria-label={KIND_TITLE.callsheet}>
+      <SectionHead title={KIND_TITLE.callsheet} sub="By day, newest first" />
       <div className="dlist">
         {recent.map((d) => (
           <DocRow key={d.id} doc={d} />
@@ -107,12 +109,13 @@ function CallSheetSection({ filtered }: { filtered: Doc[] }) {
 export function DocumentsScreen() {
   const ref = useScrollRestore<HTMLDivElement>('documents', useDemo((s) => s.setStatusDark));
   const [filter, setFilter] = useState<Filter>('all');
+  const projectName = useActiveLink().projectName;
 
   const latest = callSheets[0];
   const rest = callSheets.slice(1);
-  const show = (g: DocGroup) => filter === 'all' || filter === g;
-  const groupDocs = (g: DocGroup) => docs.filter((d) => groupOf(d) === g);
-  const sections: { group: Exclude<DocGroup, 'callsheet'>; sub: string }[] = [
+  const show = (k: DocKind) => filter === 'all' || filter === k;
+  const kindDocs = (k: DocKind) => docs.filter((d) => d.kind === k);
+  const sections: { group: Exclude<DocKind, 'callsheet'>; sub: string }[] = [
     { group: 'schedule', sub: 'Shoot plan and script overview' },
     { group: 'safety', sub: 'Know where you are and what to watch' },
     { group: 'other', sub: 'Everything else production shared' },
@@ -122,7 +125,8 @@ export function DocumentsScreen() {
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <ScreenTitle eyebrow={`${project.name} · ${docs.length} files`} title="Documents" />
+        <ScreenTitle eyebrow={`${projectName} · ${docs.length} files`} title="Documents" />
+        <ActingAs />
         <div className="fchips" role="group" aria-label="Filter documents">
           {FILTERS.map((f) => (
             <button type="button" key={f.value} className="fchip" aria-pressed={filter === f.value} onClick={() => setFilter(f.value)}>
@@ -136,18 +140,18 @@ export function DocumentsScreen() {
         {latest && show('callsheet') && <PinnedCallSheet doc={latest} />}
         {show('callsheet') && rest.length > 0 && <CallSheetSection filtered={rest} />}
         {sections
-          .filter((s) => show(s.group) && groupDocs(s.group).length > 0)
+          .filter((s) => show(s.group) && kindDocs(s.group).length > 0)
           .map((s) => (
-            <section className="stack" key={s.group} aria-label={GROUP_TITLE[s.group]}>
-              <SectionHead title={GROUP_TITLE[s.group]} sub={s.sub} />
+            <section className="stack" key={s.group} aria-label={KIND_TITLE[s.group]}>
+              <SectionHead title={KIND_TITLE[s.group]} sub={s.sub} />
               <div className="dlist">
-                {groupDocs(s.group).map((d) => (
+                {kindDocs(s.group).map((d) => (
                   <DocRow key={d.id} doc={d} />
                 ))}
               </div>
             </section>
           ))}
-        {filter !== 'all' && filter !== 'callsheet' && groupDocs(filter).length === 0 && <p className="sheet-empty">Nothing here yet.</p>}
+        {filter !== 'all' && kindDocs(filter).length === 0 && <p className="sheet-empty">Nothing here yet.</p>}
       </Sheet>
     </div>
   );

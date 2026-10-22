@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { FONT_THEMES, useActiveLink, useDemo } from '../store';
-import { links } from '../mock';
 import { Icon, type IconName } from '../components/Icon';
 import { GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
@@ -24,14 +23,17 @@ function NavRow({ icon, title, value, onClick }: { icon: IconName; title: string
 }
 
 function SwitchRow({ icon, title, hint, on, onToggle }: { icon: IconName; title: string; hint: string; on: boolean; onToggle: () => void }) {
+  const id = useId();
   return (
-    <button type="button" className="setrow" role="switch" aria-checked={on} onClick={onToggle}>
+    <button type="button" className="setrow" role="switch" aria-checked={on} aria-labelledby={`${id}-t`} aria-describedby={`${id}-h`} onClick={onToggle}>
       <span className="chip-icon">
         <Icon name={icon} size={20} color="#2A3B3F" />
       </span>
       <span className="setrow-main">
-        {title}
-        <span className="setrow-hint">{hint}</span>
+        <span id={`${id}-t`}>{title}</span>
+        <span className="setrow-hint" id={`${id}-h`}>
+          {hint}
+        </span>
       </span>
       <span className="switch" aria-hidden="true">
         <i />
@@ -52,6 +54,10 @@ function Group({ title, sub, children }: { title: string; sub?: string; children
 export function SettingsScreen() {
   const ref = useScrollRestore<HTMLDivElement>('settings', useDemo((s) => s.setStatusDark));
   const link = useActiveLink();
+  const links = useDemo((s) => s.links);
+  // The profile is always you, on the project you are looking at; the banner covers acting for someone else.
+  const own = links.find((l) => l.isMe && l.projectId === link.projectId) ?? links.find((l) => l.isMe) ?? link;
+  const setActiveLink = useDemo((s) => s.setActiveLink);
   const masterDataDone = useDemo((s) => s.masterDataDone);
   const complete = useDemo((s) => s.completeMasterData);
   const fontTheme = useDemo((s) => s.fontTheme);
@@ -59,7 +65,6 @@ export function SettingsScreen() {
   const openSheet = useDemo((s) => s.openSheet);
   const toast = useDemo((s) => s.showToast);
   const { callSheetOut, hoursReminder, toggle } = usePrefs();
-  const validLinks = links.filter((l) => l.status !== 'expired').length;
 
   return (
     <div className="screen" ref={ref}>
@@ -69,16 +74,36 @@ export function SettingsScreen() {
       </GradientHeader>
 
       <Sheet>
+        {!link.isMe && (
+          <section className="setbanner" aria-label="Acting for a colleague">
+            <span className="setbanner-text">
+              <strong>Entering hours for {link.personName}</strong>
+              <span>
+                {link.position} · {link.projectName}. Your own profile is below.
+              </span>
+            </span>
+            <button
+              type="button"
+              className="btn btn-glass setbanner-btn"
+              onClick={() => {
+                setActiveLink(own.id); // refuses an expired link with its own toast
+                if (own.status !== 'expired') toast(`Switched to ${own.projectName}`);
+              }}
+            >
+              Back to me
+            </button>
+          </section>
+        )}
         <section className="setprofile" aria-label="Your profile">
           <div className="setprofile-who">
-            <Avatar initials={link.initials} tint="#C0D6DB" size={56} />
+            <Avatar initials={own.initials} tint="#C0D6DB" size={56} />
             <span className="crow-text">
-              <span className="setprofile-name">{link.personName}</span>
+              <span className="setprofile-name">{own.personName}</span>
               <span className="setprofile-sub">
-                {link.position} · {link.department}
+                {own.position} · {own.department}
               </span>
               <span className="setprofile-sub">
-                {link.projectName} · {link.production}
+                {own.projectName} · {own.production}
               </span>
             </span>
           </div>
@@ -110,16 +135,16 @@ export function SettingsScreen() {
 
         <Group title="Projects" sub="Switch between productions and people you enter hours for.">
           <div className="dlist">
-            <NavRow icon="users" title="Projects & crew links" value={`${validLinks} active`} onClick={() => openSheet('project')} />
+            <NavRow icon="users" title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
           </div>
         </Group>
 
         <Group title="Font" sub="Headlines and numbers. Body text stays Inter.">
-          <div className="fontlist" role="radiogroup" aria-label="Font">
+          <div className="fontlist" role="group" aria-label="Font">
             {FONT_THEMES.map((f) => {
               const on = f.value === fontTheme;
               return (
-                <button type="button" key={f.value} className="fontopt" role="radio" aria-checked={on} onClick={() => setFontTheme(f.value)}>
+                <button type="button" key={f.value} className="fontopt" aria-pressed={on} onClick={() => setFontTheme(f.value)}>
                   <span className="fontopt-sample" data-font={f.value}>
                     {f.sample}
                   </span>
@@ -153,7 +178,7 @@ export function SettingsScreen() {
           </div>
           <p className="setfoot">
             <Icon name="shield" size={16} color="#54686C" />
-            <span>Your data is hosted in Germany (ISO 27001).</span>
+            <span>Data hosted in Germany</span>
           </p>
           <p className="setfoot setfoot-version">Crewser crew app · version {VERSION} (demo)</p>
         </Group>

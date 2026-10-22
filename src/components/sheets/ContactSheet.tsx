@@ -1,4 +1,5 @@
-import { contacts, person, project } from '../../mock';
+import { useActiveLink } from '../../store';
+import { contacts, person } from '../../mock';
 import { Icon } from '../Icon';
 import { Avatar } from '../contacts/Avatar';
 import { useContactActions } from '../contacts/useContactActions';
@@ -6,6 +7,7 @@ import { useContactActions } from '../contacts/useContactActions';
 /** One person from the staff list: who they are, and every way to reach them. */
 export function ContactSheet({ id }: { id?: string }) {
   const act = useContactActions();
+  const projectName = useActiveLink().projectName;
   const c = contacts.find((x) => x.id === id);
   if (!c) return <p className="sheet-empty">This contact is no longer on the staff list.</p>;
 
@@ -18,7 +20,7 @@ export function ContactSheet({ id }: { id?: string }) {
             {c.department}
             {c.id === person.id && <span className="crow-you">You</span>}
           </span>
-          <span className="csheet-proj">{project.name}</span>
+          <span className="csheet-proj">{projectName}</span>
         </span>
       </div>
 
@@ -39,7 +41,7 @@ export function ContactSheet({ id }: { id?: string }) {
 
       <div className="cdetails">
         <div className="cdetail">
-          <span className="cdetail-k">Mobile</span>
+          <span className="cdetail-k">Phone</span>
           <span className="cdetail-v">{c.phone}</span>
           <button type="button" className="cdetail-copy" aria-label={`Copy number ${c.phone}`} onClick={() => act.copy(c.phone, 'Number')}>
             <Icon name="copy" size={18} color="#2C6B72" />
@@ -53,7 +55,7 @@ export function ContactSheet({ id }: { id?: string }) {
           </button>
         </div>
       </div>
-      <p className="sheet-note">Shared by production on the staff list. Only your project crew can see this.</p>
+      <p className="sheet-note">Shared with the crew of this project.</p>
     </div>
   );
 }
