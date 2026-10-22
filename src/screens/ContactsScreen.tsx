@@ -110,7 +110,7 @@ export function ContactsScreen() {
         <ActingAs />
         <div className="searchbox">
           <Icon name="search" size={18} color="#C4CFD0" />
-          <input ref={input} type="search" aria-label="Search contacts" placeholder="Name, position or department" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <input ref={input} type="search" aria-label="Search contacts" placeholder="Search name, role or number" value={query} onChange={(e) => setQuery(e.target.value)} />
           {query && (
             <button type="button" className="searchbox-clear" aria-label="Clear search" onClick={() => {
                 setQuery('');

@@ -42,7 +42,7 @@ export function ContactSheet({ id }: { id?: string }) {
       <div className="cdetails">
         <div className="cdetail">
           <span className="cdetail-k">Phone</span>
-          <span className="cdetail-v">{c.phone}</span>
+          <span className="cdetail-v cdetail-nowrap">{c.phone}</span>
           <button type="button" className="cdetail-copy" aria-label={`Copy number ${c.phone}`} onClick={() => act.copy(c.phone, 'Number')}>
             <Icon name="copy" size={18} color="#2C6B72" />
           </button>

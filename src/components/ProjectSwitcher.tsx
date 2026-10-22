@@ -18,20 +18,21 @@ function groupLinks(links: CrewLink[], activeId: string) {
 function validity(l: CrewLink) {
   const end = l.expiresAt.slice(0, 10);
   const n = diffDays(end, today.date);
+  if (l.status === 'revoked') return { chip: 'Access removed', sub: `Removed ${fmtDayMonth((l.revokedAt ?? l.expiresAt).slice(0, 10))}` };
   if (l.status === 'expired') return { chip: 'Expired', sub: `Ended ${fmtDayMonth(end)}` };
   if (l.status === 'expiring') return { chip: n <= 0 ? 'Expires today' : n === 1 ? 'Expires tomorrow' : `Expires in ${n} days`, sub: `Ends ${fmtDayMonth(end)}` };
   return { chip: null, sub: `Valid until ${fmtDayMonth(end)}` };
 }
 
 function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; onPick: (l: CrewLink) => void }) {
-  const expired = link.status === 'expired';
+  const blocked = link.status === 'expired' || link.status === 'revoked';
   const v = validity(link);
   return (
     <button
       type="button"
-      className={`lrow${active ? ' is-active' : ''}${expired ? ' is-expired' : ''}`}
+      className={`lrow${active ? ' is-active' : ''}${blocked ? ' is-expired' : ''}`}
       aria-pressed={active}
-      aria-disabled={expired}
+      aria-disabled={blocked}
       onClick={() => onPick(link)}
     >
       <span className="lrow-av" aria-hidden="true">
@@ -45,7 +46,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
         <span className="lrow-sub">
           {link.position} · {v.sub}
         </span>
-        {expired && <span className="lrow-ask">{link.isMe ? 'Ask production for a new link' : 'Ask them or production for a new link'}</span>}
+        {blocked && <span className="lrow-ask">{link.isMe ? 'Ask production for a new link' : 'Ask them or production for a new link'}</span>}
       </span>
       {active ? (
         <span className="lchip lchip-active">
@@ -53,7 +54,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
           Active
         </span>
       ) : v.chip ? (
-        <span className={`lchip ${expired ? 'lchip-expired' : 'lchip-warn'}`}>{v.chip}</span>
+        <span className={`lchip ${blocked ? 'lchip-expired' : 'lchip-warn'}`}>{v.chip}</span>
       ) : (
         <span className="lradio" aria-hidden="true" />
       )}
@@ -70,7 +71,7 @@ export function ProjectSwitcher() {
   const toast = useDemo((s) => s.showToast);
 
   const pick = (l: CrewLink) => {
-    if (l.status === 'expired') return setActiveLink(l.id); // the store explains why it can't switch
+    if (l.status === 'expired' || l.status === 'revoked') return setActiveLink(l.id); // the store explains why it can't switch
     if (l.id === activeId) return closeSheet();
     setActiveLink(l.id); // also closes the sheet
     toast(l.isMe ? `Switched to ${l.projectName}` : `Switched to ${l.personName} · ${l.projectName}`);

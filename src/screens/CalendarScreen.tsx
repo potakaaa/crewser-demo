@@ -224,9 +224,14 @@ export function CalendarScreen() {
                 </button>
               )}
               {unsent && (
-                <button type="button" className="day-action day-action-unsent" onClick={() => openLog(true)}>
+                <button
+                  type="button"
+                  className="day-action day-action-unsent"
+                  // Only today can be logged in the Log sheet; earlier days are already logged and just need sending.
+                  onClick={() => (calDate === today.date ? openLog(true) : openSheet('hours', 'week'))}
+                >
                   <Icon name="alert" size={15} color="#6B4A00" />
-                  Hours not sent
+                  {calDate === today.date ? 'Hours not sent' : 'Hours not sent · Send'}
                 </button>
               )}
             </div>
