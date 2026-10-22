@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useDemo, type SheetKind, type SheetState } from '../store';
-import { contacts } from '../mock';
+import { contacts, links } from '../mock';
 import { BottomSheet } from './BottomSheet';
 import { NoteSheet, noteSheetMeta } from './sheets/NoteSheet';
 import { HoursSheet } from './sheets/HoursSheet';
@@ -20,7 +20,7 @@ const META: Record<SheetKind, (id?: string) => Meta> = {
   note: (id) => ({ ...noteSheetMeta(id), tone: 'soft' }),
   hours: () => ({ title: 'Hours' }),
   info: () => ({ title: 'Info' }),
-  project: () => ({ title: 'Your projects' }),
+  project: () => ({ title: 'Your projects', subtitle: `${links.length} crew links on this phone`, tone: 'soft' }),
   contact: (id) => {
     const c = contacts.find((x) => x.id === id);
     return { title: c?.name ?? 'Contact', subtitle: c?.position };
