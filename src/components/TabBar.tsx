@@ -21,8 +21,8 @@ const ARIA: Record<TabName, string> = {
 
 // Five tabs plus the Log button have to fit a 375 px phone, so the active tab stays compact.
 const ICON = 22;
-const PAD_L = 12;
-const PAD_R = 12;
+const PAD_L = 10;
+const PAD_R = 10;
 const LABEL_GAP = 6;
 
 interface Layout {

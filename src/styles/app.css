@@ -334,10 +334,10 @@
 
 .display {
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--fs-2xl);
+  font-weight: var(--display-weight);
+  font-size: calc(var(--fs-2xl) * var(--display-scale));
   line-height: 1.2;
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--display-track);
   text-wrap: balance;
 }
 
@@ -3973,4 +3973,105 @@
   color: var(--ink);
   font: inherit;
   text-align: left;
+}
+
+/* ───────── Font themes ─────────
+   Body text stays Inter. A theme swaps the headline face (--font-display) and the
+   face for big numbers and times (--font-numeral); weights must match what main.tsx loads. */
+.app[data-font='screenplay'] {
+  --font-display: 'Courier Prime', 'Courier New', monospace;
+  --font-numeral: 'Courier Prime', 'Courier New', monospace;
+  --display-weight: 700;
+  --display-track: -0.04em;
+  --display-scale: 0.88;
+  --numeral-weight: 700;
+  --numeral-track: -0.07em;
+  --numeral-scale: 0.82;
+}
+.app[data-font='poster'] {
+  --font-display: 'Bebas Neue', Impact, sans-serif;
+  --font-numeral: 'Bebas Neue', Impact, sans-serif;
+  --display-weight: 400;
+  --display-track: 0.02em;
+  --display-scale: 1.28;
+  --numeral-weight: 400;
+  --numeral-track: 0.015em;
+  --numeral-scale: 1.3;
+}
+.app[data-font='editorial'] {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-numeral: 'Fraunces', Georgia, serif;
+  --display-weight: 600;
+  --display-track: -0.025em;
+  --display-scale: 1.04;
+  --numeral-weight: 500;
+  --numeral-track: -0.04em;
+  --numeral-scale: 1.04;
+}
+.app[data-font='credits'] {
+  --font-display: 'Syne', sans-serif;
+  --font-numeral: 'Syne', sans-serif;
+  --display-weight: 700;
+  --display-track: -0.035em;
+  --display-scale: 0.92;
+  --numeral-weight: 700;
+  --numeral-track: -0.05em;
+  --numeral-scale: 0.88;
+}
+
+/* Big numbers and times. Use .num on anything new; these are the existing ones. */
+.num,
+.nextup-time,
+.kpi-v,
+.route-code,
+.detail-big,
+.duo-card strong,
+.tt-v,
+.stat-v {
+  font-family: var(--font-numeral);
+  font-weight: var(--numeral-weight);
+  letter-spacing: var(--numeral-track);
+}
+.nextup-time,
+.kpi-v {
+  font-size: calc(var(--fs-4xl) * var(--numeral-scale));
+}
+.kpi-v-xl {
+  font-size: calc(38px * var(--numeral-scale));
+}
+.route-code,
+.detail-big {
+  font-size: calc(var(--fs-5xl) * var(--numeral-scale));
+}
+.route-code-md {
+  font-size: calc(var(--fs-4xl) * var(--numeral-scale));
+}
+.route-code-sm {
+  font-size: calc(30px * var(--numeral-scale));
+}
+.duo-card strong {
+  font-size: calc(22px * var(--numeral-scale));
+}
+.tt-v,
+.stat-v {
+  font-size: calc(var(--fs-3xl) * var(--numeral-scale));
+}
+
+/* Headlines other than .display. Use .head on anything new. */
+.head,
+.detail-title,
+.section-titles h2,
+.log-titles h2 {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-track);
+}
+.detail-title {
+  font-size: calc(var(--fs-xl) * var(--display-scale));
+}
+.section-titles h2 {
+  font-size: calc(var(--fs-lg) * var(--display-scale));
+}
+.log-titles h2 {
+  font-size: calc(18px * var(--display-scale));
 }

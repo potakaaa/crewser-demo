@@ -37,6 +37,14 @@
   --focus: #2c6b72;
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   --font-display: var(--font);
+  --font-numeral: var(--font);
+  /* Per-font tuning, switched by .app[data-font]: weight, tracking and size scale for headlines and big numbers. */
+  --display-weight: 600;
+  --display-track: -0.02em;
+  --display-scale: 1;
+  --numeral-weight: 600;
+  --numeral-track: -0.03em;
+  --numeral-scale: 1;
 
   /* Type: small, calm, medium-weight. Big numbers get tight tracking. */
   --fs-xs: 11px; /* labels, chips, chart ticks */
