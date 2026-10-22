@@ -10,13 +10,11 @@ const TABS: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
 
-
-
 // Five tabs plus the Log button have to fit a 375 px phone, so the active tab stays compact.
 const ICON = 22;
 const PAD_L = 8;
 const PAD_R = 8;
-const LABEL_GAP = 5;
+const LABEL_GAP = 6;
 /** Inactive tabs never get narrower than this; if the label would squeeze them, the active tab goes icon-only. */
 const MIN_TAB = 40;
 
@@ -54,11 +52,13 @@ export function TabBar({ hidden }: { hidden: boolean }) {
       const padL = parseFloat(cs.paddingLeft);
       const inner = nav.clientWidth - padL - parseFloat(cs.paddingRight);
       const gap = parseFloat(cs.columnGap) || 0;
-      const labelW = labelRefs.current[active]?.scrollWidth ?? 60;
+      const widths = labelRefs.current.map((el) => el?.scrollWidth ?? 60);
       const room = inner - gap * (TABS.length - 1);
-      let activeW = PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
+      const pill = (labelW: number) => PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
+      // The label mode is decided by the longest label, so every tab behaves the same on a given phone.
+      const label = (room - pill(Math.max(...widths))) / (TABS.length - 1) >= MIN_TAB;
+      let activeW = pill(widths[active]);
       let otherW = (room - activeW) / (TABS.length - 1);
-      const label = otherW >= MIN_TAB;
       if (!label) activeW = otherW = room / TABS.length;
       const w = TABS.map((_, i) => (i === active ? activeW : otherW));
       const x: number[] = [];
