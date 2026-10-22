@@ -71,9 +71,8 @@ export function ProjectSwitcher() {
   const toast = useDemo((s) => s.showToast);
 
   const pick = (l: CrewLink) => {
-    if (l.status === 'expired' || l.status === 'revoked') return setActiveLink(l.id); // the store explains why it can't switch
     if (l.id === activeId) return closeSheet();
-    setActiveLink(l.id); // also closes the sheet
+    if (!setActiveLink(l.id)) return; // expired or revoked: the store explains why and the sheet stays open
     toast(l.isMe ? `Switched to ${l.projectName}` : `Switched to ${l.personName} · ${l.projectName}`);
   };
 

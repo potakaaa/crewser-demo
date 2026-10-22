@@ -86,8 +86,8 @@ export function SettingsScreen() {
               type="button"
               className="btn btn-glass setbanner-btn"
               onClick={() => {
-                setActiveLink(own.id); // refuses an expired or revoked link with its own toast
-                if (own.status === 'active' || own.status === 'expiring') toast(`Switched to ${own.projectName}`);
+                // Refuses an expired or revoked link with its own toast.
+                if (setActiveLink(own.id)) toast(`Switched to ${own.projectName}`);
               }}
             >
               Back to me
