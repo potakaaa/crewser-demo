@@ -60,7 +60,7 @@ export function HoursSheet({ id }: { id?: string }) {
         <p>{c.sentence}</p>
         {metric === 'days' && <p>{`${o.shootDone.length} logged so far, ${o.shootLeft} to go after today.`}</p>}
       </div>
-      <UnsentNudge o={o} />
+      <UnsentNudge o={o} solo />
       <h3 className="hsheet-h3">{listTitle}</h3>
       {rows.length > 0 ? <ul className="hsheet-list">{rows}</ul> : <p className="sheet-empty">Nothing logged yet.</p>}
     </>

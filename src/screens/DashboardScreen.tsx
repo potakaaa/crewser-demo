@@ -71,7 +71,7 @@ export function DashboardScreen() {
         {link.isMe && !masterDataDone && (
           <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
             <span className="master-icon">
-              <Icon name="idCard" size={22} color="#DBF227" />
+              <Icon name="idCard" size={18} color="#111A1B" />
             </span>
             <span className="master-text">
               <span className="master-t1">Submit your master data</span>

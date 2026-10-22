@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { project, today, workdaysFor } from '../mock';
 import { useDemo } from '../store';
-import { Icon } from './Icon';
 import { useSubmitted } from '../lib/useSubmitted';
 import { fmtH, hoursOverview, type HoursOverview } from '../lib/stats';
 
@@ -57,27 +56,26 @@ export function useSubmitUnsent(o: HoursOverview) {
   };
 }
 
-/** Amber nudge when logged days have not been sent yet. */
-export function UnsentNudge({ o }: { o: HoursOverview }) {
+/** A quiet line (amber dot, "Sun 18 not sent", Send) when logged days have not been sent yet. */
+export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
   const submit = useSubmitUnsent(o);
   if (!o.unsent.length) return null;
   const one = o.unsent.length === 1;
   return (
-    <div className="hs-nudge">
-      <span className="hs-nudge-icon">
-        <Icon name="alert" size={16} color="#6B4A00" />
-      </span>
+    <div className={`hs-nudge${solo ? ' hs-nudge-solo' : ''}`}>
+      <span className="hs-nudge-dot" aria-hidden="true" />
       <span className="hs-nudge-text">
-        <strong>{one ? `${o.unsent[0].short} is not sent yet` : `${o.unsent.length} days are not sent yet`}</strong>
+        {one ? `${o.unsent[0].short} not sent` : `${o.unsent.length} days not sent`}
+        <span className="sr-only"> to production yet</span>
       </span>
-      <button type="button" className="btn btn-ink hs-nudge-btn" onClick={submit}>
+      <button type="button" className="hs-send" onClick={submit}>
         Send
       </button>
     </div>
   );
 }
 
-/** Three big numbers in one row: the last 7 days, overtime, shoot days after today (the "Days left" tile). Each opens the hours sheet. */
+/** One calm card, three numbers in a row: the last 7 days, overtime, shoot days after today (the "Days left" tile). Each opens the hours sheet. */
 export function HoursStrip() {
   const openSheet = useDemo((s) => s.openSheet);
   const o = useHoursOverview();
@@ -95,12 +93,14 @@ export function HoursStrip() {
   };
   return (
     <section className="hs" aria-label="Your hours">
-      <div className="hs-grid">
-        {tile('week', 'hs-week')}
-        {tile('overtime', 'hs-ot')}
-        {tile('days', 'hs-days')}
+      <div className="hs-card">
+        <div className="hs-grid">
+          {tile('week', 'hs-week')}
+          {tile('overtime', 'hs-ot')}
+          {tile('days', 'hs-days')}
+        </div>
+        <UnsentNudge o={o} />
       </div>
-      <UnsentNudge o={o} />
     </section>
   );
 }
