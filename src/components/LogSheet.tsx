@@ -20,7 +20,7 @@ const BAD_SPAN = 'End must be after the start plus the break.';
 
 function summary(start: string, end: string | null, breakMin: number) {
   const target = project.dailyTargetHours;
-  const plan = todayPlan(breakMin);
+  const plan = todayPlan();
   const to = end ?? plan.wrap;
   if (!to) return `Starts at ${start}. Wrap is not confirmed yet.`;
   const { hours, overnight, valid } = worked(start, to, breakMin);
@@ -47,7 +47,7 @@ export function LogSheet() {
   const [editing, setEditing] = useState<Field | null>(null);
   /** Entering hours for someone else: the first tap on Submit asks, the second sends. */
   const [confirming, setConfirming] = useState(false);
-  const plan = todayPlan(breakMin);
+  const plan = todayPlan();
   const close = () => setOpen(false);
 
   // Each time the sheet opens, start with the pickers closed.

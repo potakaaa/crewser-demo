@@ -210,7 +210,7 @@ interface LogForm {
 /** Log sheet defaults for a crew link: today's call time, the usual break, wrap still open. */
 const logDefaults = (): LogForm => ({
   breakMin: today.defaultBreakMin,
-  logStart: todayPlan(today.defaultBreakMin).call,
+  logStart: todayPlan().call,
   logEnd: null,
 });
 
