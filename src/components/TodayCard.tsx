@@ -3,9 +3,10 @@ import { docs, today, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
-import { addDays, fmtCountdown, fmtDayShort } from '../lib/dates';
+import { addDays, fmtCountdown, fmtDayMonth, fmtDayShort, toMinutes } from '../lib/dates';
+import { dayStat, shiftLabel } from '../lib/stats';
 import { useSubmitted } from '../lib/useSubmitted';
-import { minutesUntil, TYPE_LABEL } from '../lib/notes';
+import { TYPE_LABEL } from '../lib/notes';
 import { previewLine, type Preview, type Scrub } from '../lib/timeline';
 
 const callSheetFor = (day: string) => docs.find((d) => d.kind === 'callsheet' && d.day === day);
@@ -64,15 +65,35 @@ interface Urgent {
 
 const placeOf = (n: Note) => n.facts.find((f) => f.action === 'map')?.value;
 
-function heroUrgent(n: Note): Urgent {
-  const wrap = n.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
-  const minutes = minutesUntil(n);
-  const countdown = minutes > 0 && minutes !== Infinity ? fmtCountdown(minutes) : 'Call time';
+/** Where today's shift stands, by the app's clock: before the call, on set, or after wrap. */
+type Phase = 'before' | 'during' | 'after';
+
+const wrapOf = (n: Note) => n.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
+
+function phaseOf(n: Note | undefined): Phase {
+  const now = toMinutes(today.time);
+  if (!n?.time || now < toMinutes(n.time)) return 'before';
+  const wrap = wrapOf(n);
+  return wrap && now >= toMinutes(wrap) ? 'after' : 'during';
+}
+
+function heroUrgent(n: Note, phase: Phase): Urgent {
+  const wrap = wrapOf(n);
+  const now = toMinutes(today.time);
+  let meta: string;
+  if (phase === 'before') {
+    const countdown = fmtCountdown(toMinutes(n.time!) - now);
+    meta = wrap ? `${countdown} · wrap ${wrap}` : `${countdown} · wrap to be confirmed`;
+  } else if (phase === 'during') {
+    meta = wrap ? `On set · wrap ${fmtCountdown(toMinutes(wrap) - now)}` : 'On set · wrap to be confirmed';
+  } else {
+    meta = `Wrapped at ${wrap}`;
+  }
   return {
     key: `hero-${n.id}`,
     tag: 'TODAY',
     tone: 'lime',
-    meta: wrap ? `${countdown} · wrap ${wrap}` : `${countdown} · wrap to be confirmed`,
+    meta,
     time: n.time,
     title: n.title,
     sub: n.subtitle,
@@ -165,6 +186,13 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
   const a = useNoteActions();
   const setLogOpen = useDemo((s) => s.setLogOpen);
   const submitted = useSubmitted().includes(today.date);
+  const offline = useDemo((s) => s.offline);
+  const start = useDemo((s) => s.logStart);
+  const end = useDemo((s) => s.logEnd);
+  const breakMin = useDemo((s) => s.breakMin);
+  const phase = phaseOf(hero);
+  // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
+  const sent = submitted && end ? dayStat(today.date, { date: today.date, kind: 'shoot', start, end, breakMin, status: 'submitted' }) : null;
   const sheet = callSheetFor(today.date);
   const tomorrow = callSheetFor(addDays(today.date, 1));
 
@@ -175,7 +203,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
     key = stop ? `stop-${preview.index}` : 'none';
     body = stop ? <UrgentBody u={stopUrgent(stop.note, preview.index)} /> : <NothingLeft />;
   } else if (hero) {
-    const u = heroUrgent(hero);
+    const u = heroUrgent(hero, phase);
     key = u.key;
     body = <UrgentBody u={u} />;
   } else {
@@ -194,6 +222,10 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
               Back to now
             </button>
           </>
+        ) : submitted && offline ? (
+          <span className="today-hint" role="status">
+            Saved on this phone, sends when you're online.
+          </span>
         ) : tomorrow ? (
           <button type="button" className="today-tmrw" onClick={() => a.openPdf(tomorrow.file)}>
             <span className="today-dot" aria-hidden="true" />
@@ -214,14 +246,22 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
           </button>
         )}
         {submitted ? (
-          <div className="today-sent" role="status">
-            <button type="button" className="btn btn-md today-sent-btn" onClick={() => setLogOpen(true)} aria-label="Hours submitted. Review">
+          <div className="today-sent">
+            <button
+              type="button"
+              className="btn btn-md today-sent-btn"
+              onClick={() => setLogOpen(true)}
+              aria-label={sent ? `${offline ? 'Saved on this phone' : 'Sent'}: ${fmtDayMonth(today.date)}, ${shiftLabel(sent).replace(' · ', ', ')}. Review` : 'Hours submitted. Review'}
+            >
               <Icon name="check" size={18} color="#2B3300" strokeWidth={2.2} />
-              Submitted
+              <span className="today-sent-text">
+                <strong>{offline ? 'Saved' : 'Sent'}</strong>
+                {sent && <span>{shiftLabel(sent)}</span>}
+              </span>
             </button>
           </div>
         ) : (
-          <button type="button" className="btn btn-lime btn-md today-submit" onClick={() => setLogOpen(true)}>
+          <button type="button" className={`btn btn-md today-submit ${phase === 'after' ? 'btn-lime' : 'btn-outline'}`} onClick={() => setLogOpen(true)}>
             <Icon name="logTime" size={18} color="#111A1B" strokeWidth={1.8} />
             Submit hours
           </button>

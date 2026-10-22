@@ -2,7 +2,7 @@ import { notes, person } from '../../mock';
 import { useDemo } from '../../store';
 import { Icon } from '../Icon';
 import { chipStyle } from '../../lib/noteStyle';
-import { TYPE_LABEL } from '../../lib/notes';
+import { TYPE_LABEL, undatedNotes } from '../../lib/notes';
 
 /** What production needs once, before the first payout. */
 const MASTER_DATA = ['Personal details', 'Address', 'Tax and social security number', 'Bank account (IBAN)'];
@@ -21,6 +21,11 @@ function MasterData() {
     complete();
     close();
     toast('Master data sent to production. Thank you!');
+    // The card that opened this sheet is gone now, so the sheet cannot hand focus back to it:
+    // put it on the hours strip, which takes its place. Waits out the sheet's closing animation.
+    window.setTimeout(() => {
+      if (document.activeElement === document.body || !document.activeElement) document.querySelector<HTMLElement>('[data-after-master]')?.focus();
+    }, 450);
   };
   return (
     <>
@@ -28,10 +33,11 @@ function MasterData() {
       <ul className="info-checks">
         {MASTER_DATA.map((label) => (
           <li key={label}>
-            <span className="info-check" data-done={done}>
+            <span className="info-check" data-done={done} aria-hidden="true">
               {done && <Icon name="check" size={14} color="#2B3300" strokeWidth={2.2} />}
             </span>
             {label}
+            <span className="sr-only">{done ? ', done' : ', not done yet'}</span>
           </li>
         ))}
       </ul>
@@ -51,7 +57,7 @@ export function InfoSheet({ id }: { id?: string }) {
   const openSheet = useDemo((s) => s.openSheet);
   const empty = useDemo((s) => s.empty);
   if (id === 'master') return <MasterData />;
-  const undated = empty ? [] : notes.filter((n) => !n.day);
+  const undated = undatedNotes(empty ? [] : notes);
   if (!undated.length) return <p className="sheet-empty">No general info yet. Notes without a date from production land here.</p>;
   return (
     <ul className="info-list">

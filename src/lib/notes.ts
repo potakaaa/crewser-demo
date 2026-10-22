@@ -13,6 +13,9 @@ export const TYPE_LABEL: Record<NoteType, string> = {
 const sortKey = (n: Note) => (n.day ? n.day + ' ' + (n.kind === 'time' ? n.time : '00:00') : '9999');
 export const sortNotes = (list: Note[]) => [...list].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
 
+/** Notes without a date, oldest first: they live in the general info pocket, not in the lists. */
+export const undatedNotes = (list: Note[] = allNotes) => sortNotes(list).filter((n) => !n.day);
+
 export const minutesUntil = (n: Note) =>
   n.day === today.date && n.time ? toMinutes(n.time) - toMinutes(today.time) : Infinity;
 
@@ -54,7 +57,7 @@ export interface SmartNotes {
 export function smartNotes(list: Note[] = allNotes): SmartNotes {
   const sorted = sortNotes(list);
   const hero = sorted.find((n) => n.type === 'appointment' && n.kind === 'time' && n.day === today.date);
-  const undated = sorted.filter((n) => !n.day);
+  const undated = undatedNotes(list);
   const upcoming = sorted.filter((n) => n !== hero && n.day && diffDays(n.day, today.date) >= 0);
   const top = upcoming.filter((n) => n.kind === 'time' && PRIORITY_TYPES.includes(n.type)).slice(0, 3);
   const restNotes = upcoming.filter((n) => !top.includes(n));

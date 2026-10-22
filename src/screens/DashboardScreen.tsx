@@ -9,7 +9,9 @@ import { TodayCard } from '../components/TodayCard';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { Wordmark } from '../components/Brand';
+import { ActingAs } from '../components/ActingAs';
 import { smartNotes } from '../lib/notes';
+import { firstNameOf, greeting } from '../lib/greeting';
 import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
 
@@ -40,15 +42,18 @@ export function DashboardScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-home grain-strong gh-dash">
         <div className="home-top">
-          <button type="button" className="dash-who" onClick={() => openSheet('project')} aria-label={`${link.projectName}, switch project`}>
+          <button type="button" className="dash-who" onClick={() => openSheet('project')}>
             <span className="avatar" aria-hidden="true">
               {link.initials}
             </span>
             <span className="home-greet">
-              <span className="home-hello">Good morning, {link.isMe ? person.firstName : link.personName}</span>
+              <span className="home-hello">
+                {greeting()}, {link.isMe ? person.firstName : firstNameOf(link.personName)}
+              </span>
               <span className="home-project">
                 {link.projectName} · Shoot day {today.shootDay}
                 <Icon name="down" size={14} color="#C4CFD0" strokeWidth={2} />
+                <span className="sr-only">. Switch project</span>
               </span>
             </span>
           </button>
@@ -56,13 +61,14 @@ export function DashboardScreen() {
             <Icon name="search" size={20} color="#FFFFFF" />
           </button>
         </div>
+        <ActingAs tone="dark" />
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
         <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />
       </GradientHeader>
 
       <Sheet className="sheet-dash">
-        {!masterDataDone && (
+        {link.isMe && !masterDataDone && (
           <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
             <span className="master-icon">
               <Icon name="idCard" size={22} color="#DBF227" />
