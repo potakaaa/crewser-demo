@@ -6,6 +6,7 @@ import { addDays, fmtDayShort, rangeLabel, toMinutes, weekday } from './dates';
 export const fmtH = (n: number) => String(Math.round(n * 100) / 100);
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export interface DayStat {
   date: string;
@@ -30,9 +31,11 @@ export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalSta
   if (!wd) return empty;
   const startMin = toMinutes(wd.start);
   let endMin = toMinutes(wd.end);
-  const overnight = endMin <= startMin;
+  // An end before the start runs past midnight; the same time twice is an empty shift, not a full day.
+  const overnight = endMin < startMin;
   if (overnight) endMin += 24 * 60;
-  const hours = (endMin - startMin - wd.breakMin) / 60;
+  // Rounded to the 2 decimals the rows show, so totals always add up to what is on screen.
+  const hours = Math.round((Math.max(endMin - startMin - wd.breakMin, 0) / 60) * 100) / 100;
   return {
     ...empty,
     worked: true,
@@ -43,7 +46,7 @@ export function dayStat(date: string, wd?: WorkDay, statusOverride?: ApprovalSta
     end: wd.end,
     breakMin: wd.breakMin,
     hours,
-    overtime: Math.max(hours - project.dailyTargetHours, 0),
+    overtime: Math.round(Math.max(hours - project.dailyTargetHours, 0) * 100) / 100,
   };
 }
 
@@ -92,8 +95,8 @@ export function hoursOverview(submitted: string[] = [], shift?: TodayShift | nul
   return {
     rangeLabel: rangeLabel(from, today.date),
     weekDays,
-    weekTotal: sum(weekDays.map((d) => d.hours)),
-    overtime: sum(weekDays.map((d) => d.overtime)),
+    weekTotal: round2(sum(weekDays.map((d) => d.hours))),
+    overtime: round2(sum(weekDays.map((d) => d.overtime))),
     overtimeDays: weekDays.filter((d) => d.overtime > 0),
     shootDone,
     shootLeft: Math.max(project.totalShootDays - today.shootDay, 0),

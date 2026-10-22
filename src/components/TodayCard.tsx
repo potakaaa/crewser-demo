@@ -70,22 +70,34 @@ type Phase = 'before' | 'during' | 'after';
 
 const wrapOf = (n: Note) => n.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
 
+/** Wrap as minutes since midnight; a wrap at or before the call is the next day (20:00–04:00 wraps at 28:00). */
+function wrapMinutes(n: Note): number | null {
+  const wrap = wrapOf(n);
+  if (!wrap) return null;
+  const m = toMinutes(wrap);
+  return n.time && m <= toMinutes(n.time) ? m + 24 * 60 : m;
+}
+
 function phaseOf(n: Note | undefined): Phase {
   const now = toMinutes(today.time);
   if (!n?.time || now < toMinutes(n.time)) return 'before';
-  const wrap = wrapOf(n);
-  return wrap && now >= toMinutes(wrap) ? 'after' : 'during';
+  const wrap = wrapMinutes(n);
+  return wrap !== null && now >= wrap ? 'after' : 'during';
 }
 
-function heroUrgent(n: Note, phase: Phase): Urgent {
+function heroUrgent(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): Urgent {
   const wrap = wrapOf(n);
+  const wrapMin = wrapMinutes(n);
   const now = toMinutes(today.time);
   let meta: string;
-  if (phase === 'before') {
+  if (sent) {
+    // The day is handled: no countdown or "on set" any more.
+    meta = sent === 'saved' ? 'Saved on this phone' : 'Hours sent';
+  } else if (phase === 'before') {
     const countdown = fmtCountdown(toMinutes(n.time!) - now);
     meta = wrap ? `${countdown} · wrap ${wrap}` : `${countdown} · wrap to be confirmed`;
   } else if (phase === 'during') {
-    meta = wrap ? `On set · wrap ${fmtCountdown(toMinutes(wrap) - now)}` : 'On set · wrap to be confirmed';
+    meta = wrapMin !== null ? `On set · wrap ${fmtCountdown(wrapMin - now)}` : 'On set · wrap to be confirmed';
   } else {
     meta = `Wrapped at ${wrap}`;
   }
@@ -203,7 +215,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
     key = stop ? `stop-${preview.index}` : 'none';
     body = stop ? <UrgentBody u={stopUrgent(stop.note, preview.index)} /> : <NothingLeft />;
   } else if (hero) {
-    const u = heroUrgent(hero, phase);
+    const u = heroUrgent(hero, phase, submitted ? (offline ? 'saved' : 'sent') : null);
     key = u.key;
     body = <UrgentBody u={u} />;
   } else {
@@ -222,10 +234,6 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
               Back to now
             </button>
           </>
-        ) : submitted && offline ? (
-          <span className="today-hint" role="status">
-            Saved on this phone, sends when you're online.
-          </span>
         ) : tomorrow ? (
           <button type="button" className="today-tmrw" onClick={() => a.openPdf(tomorrow.file)}>
             <span className="today-dot" aria-hidden="true" />
@@ -236,6 +244,11 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
           <span className="today-hint">Slide the ruler above to preview what is next.</span>
         )}
       </div>
+
+      {/* Always in the page, so a screen reader hears the change when it fills. */}
+      <p className="sr-only" role="status">
+        {submitted ? (offline ? "Saved on this phone, sends when you're online." : sent ? `Hours sent: ${shiftLabel(sent).replace(' · ', ', ')}.` : 'Hours sent.') : ''}
+      </p>
 
       <div className="today-actions">
         {sheet && (
@@ -255,8 +268,8 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
             >
               <Icon name="check" size={18} color="#2B3300" strokeWidth={2.2} />
               <span className="today-sent-text">
-                <strong>{offline ? 'Saved' : 'Sent'}</strong>
-                {sent && <span>{shiftLabel(sent)}</span>}
+                <strong>{offline ? 'Saved on phone' : 'Sent'}</strong>
+                {offline ? <span>Sends when online</span> : sent && <span>{shiftLabel(sent)}</span>}
               </span>
             </button>
           </div>

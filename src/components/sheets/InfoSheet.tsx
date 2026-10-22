@@ -4,6 +4,11 @@ import { Icon } from '../Icon';
 import { chipStyle } from '../../lib/noteStyle';
 import { TYPE_LABEL, undatedNotes } from '../../lib/notes';
 
+/** The sheet closes in 300 ms (BottomSheet); a little longer, so its own focus hand-back has run first. */
+const FOCUS_AFTER_CLOSE_MS = 450;
+// Not cleared on unmount: this component is gone by the time the timer fires, and that is the point.
+let focusTimer = 0;
+
 /** What production needs once, before the first payout. */
 const MASTER_DATA = ['Personal details', 'Address', 'Tax and social security number', 'Bank account (IBAN)'];
 
@@ -23,9 +28,10 @@ function MasterData() {
     toast('Master data sent to production. Thank you!');
     // The card that opened this sheet is gone now, so the sheet cannot hand focus back to it:
     // put it on the hours strip, which takes its place. Waits out the sheet's closing animation.
-    window.setTimeout(() => {
+    window.clearTimeout(focusTimer);
+    focusTimer = window.setTimeout(() => {
       if (document.activeElement === document.body || !document.activeElement) document.querySelector<HTMLElement>('[data-after-master]')?.focus();
-    }, 450);
+    }, FOCUS_AFTER_CLOSE_MS);
   };
   return (
     <>

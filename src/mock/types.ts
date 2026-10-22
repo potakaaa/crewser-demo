@@ -141,6 +141,8 @@ export interface CrewLink {
   projectName: string;
   production: string;
   personName: string;
+  /** What they are called by: personName is "<nickname> <first name>" in this mock, so the last word is not always safe to guess. */
+  firstName?: string;
   initials: string;
   department: string;
   position: string;

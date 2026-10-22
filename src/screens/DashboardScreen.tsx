@@ -48,7 +48,7 @@ export function DashboardScreen() {
             </span>
             <span className="home-greet">
               <span className="home-hello">
-                {greeting()}, {link.isMe ? person.firstName : firstNameOf(link.personName)}
+                {greeting()}, {link.isMe ? person.firstName : firstNameOf(link)}
               </span>
               <span className="home-project">
                 {link.projectName} · Shoot day {today.shootDay}
