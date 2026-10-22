@@ -62,7 +62,7 @@
   font-weight: 600;
   transition: transform 180ms var(--ease-out);
 }
-.day-action:active {
+button.day-action:active {
   transform: scale(0.97);
 }
 .day-action-sheet {
