@@ -104,12 +104,15 @@ export type FontTheme = 'inter' | 'screenplay' | 'poster' | 'editorial' | 'credi
 
 /** Headline and numeral typefaces to try out; body text stays Inter. Settings and the demo panel list these. */
 export const FONT_THEMES: { value: FontTheme; label: string; hint: string; sample: string }[] = [
+  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall capitals · default', sample: '08:40' },
   { value: 'inter', label: 'Inter', hint: 'Clean and neutral', sample: '08:40' },
   { value: 'screenplay', label: 'Screenplay', hint: 'Courier Prime, script page', sample: '08:40' },
-  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall capitals', sample: '08:40' },
   { value: 'editorial', label: 'Editorial', hint: 'Fraunces, a warm serif', sample: '08:40' },
   { value: 'credits', label: 'Credits', hint: 'Syne, wide and rebellious', sample: '08:40' },
 ];
+
+/** The font theme when nothing is saved, and the one Reset demo goes back to. */
+const DEFAULT_FONT: FontTheme = 'poster';
 
 const FONT_KEY = 'crewser-font-theme';
 
@@ -120,7 +123,7 @@ function loadFontTheme(): FontTheme {
   } catch {
     // Storage can be blocked (private mode); fall back to the default.
   }
-  return 'inter';
+  return DEFAULT_FONT;
 }
 
 export type ExpandList = 'dashboard' | 'calendar';
@@ -483,8 +486,13 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     clearScrollPositions();
     history.replaceState(null, '', routeToHash({ name: 'dashboard' }));
     resetPrefs();
-    const { noteAccent, fontTheme } = get();
-    set({ ...initialState(), stack: [{ route: { name: 'dashboard' }, pushed: false }], sheet: null, navDir: 'tab', splash: false, noteAccent, fontTheme });
+    try {
+      localStorage.removeItem(FONT_KEY);
+    } catch {
+      // Nothing saved to forget.
+    }
+    const { noteAccent } = get();
+    set({ ...initialState(), stack: [{ route: { name: 'dashboard' }, pushed: false }], sheet: null, navDir: 'tab', splash: false, noteAccent });
   },
 }));
 

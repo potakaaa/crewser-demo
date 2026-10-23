@@ -16,8 +16,18 @@ import './styles/dashboard.css';
 import './styles/timeline.css';
 import './styles/screens.css';
 import './styles/notifications.css';
+import bebasUrl from '@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url';
 import App from './App';
 import { installGrain } from './lib/grain';
+
+// Poster (Bebas Neue) is the default font theme: start fetching it now instead of when the first headline renders.
+const preload = document.createElement('link');
+preload.rel = 'preload';
+preload.as = 'font';
+preload.type = 'font/woff2';
+preload.crossOrigin = 'anonymous';
+preload.href = bebasUrl;
+document.head.appendChild(preload);
 
 installGrain();
 
