@@ -948,6 +948,39 @@
   font-weight: 500;
   color: var(--text-3);
 }
+/* A copyable value (flight no., booking code): the value at its own weight with a small copy
+   icon after it. 24 px to look at, 44 px to hit; a soft pill only while pressed. */
+.ccard-fact-copy {
+  --focus: #2c6b72;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: -2px -4px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  transition: background var(--t-fast) ease;
+}
+.ccard-fact-copy::before {
+  content: '';
+  position: absolute;
+  inset: -11px -6px;
+}
+.ccard-fact-copy svg {
+  flex: none;
+  opacity: 0.8;
+}
+.ccard-fact-copy:active {
+  background: var(--soft);
+}
+.ccard-fact-copy:focus-visible {
+  outline-offset: 0;
+}
 .sheet-dash .ccard-compact .btn {
   min-height: 44px;
 }
