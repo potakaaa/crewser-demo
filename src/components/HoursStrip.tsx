@@ -98,7 +98,7 @@ export function HoursStrip() {
   const tile = (metric: HoursMetric) => {
     const c = metricCopy(o, metric);
     return (
-      <button type="button" className="hs-tile" data-after-master={metric === 'week' || undefined} onClick={() => openSheet('hours', metric)} aria-label={`${c.label}: ${[c.value, c.unit].filter(Boolean).join(' ')}. ${c.sentence} Open details`}>
+      <button type="button" className="hs-tile" data-metric={metric} data-after-master={metric === 'week' || undefined} onClick={() => openSheet('hours', metric)} aria-label={`${c.label}: ${[c.value, c.unit].filter(Boolean).join(' ')}. ${c.sentence} Open details`}>
         <span className="hs-k">{c.short}</span>
         <span className="hs-v num">
           {c.value}
