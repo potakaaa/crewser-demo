@@ -54,6 +54,7 @@ export function metricCopy(o: HoursOverview, metric: HoursMetric) {
 export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
   const submitDay = useDemo((s) => s.submitDay);
   const toast = useDemo((s) => s.showToast);
+  const offline = useDemo((s) => s.offline);
   const link = useActiveLink();
   const [confirming, setConfirming] = useState(false);
   const days = o.unsent.map((d) => d.date).join();
@@ -73,7 +74,8 @@ export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
       return;
     }
     o.unsent.forEach((d) => submitDay(d.date));
-    toast(link.isMe ? `${what} sent to production` : `${what} sent${forName}`);
+    // Offline, days are kept on the phone and go out when it is back online (same wording as the Log sheet).
+    toast(offline ? `${what} saved on this phone${forName}, sends when you're online` : link.isMe ? `${what} sent to production` : `${what} sent${forName}`);
   };
   return (
     <div className={`hs-nudge${solo ? ' hs-nudge-solo' : ''}`}>
