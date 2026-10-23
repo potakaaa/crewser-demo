@@ -3,9 +3,9 @@ import { today, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
-import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
+import { fmtCountdown, toMinutes } from '../lib/dates';
 import { useSubmitted } from '../lib/useSubmitted';
-import { quickAction, TYPE_LABEL } from '../lib/notes';
+import { quickAction } from '../lib/notes';
 import { phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { NotePrimaryAction } from './NotePrimaryAction';
 import { previewLine, type Preview, type Scrub } from '../lib/timeline';
@@ -44,12 +44,11 @@ function Crossfade({ id, children }: { id: string; children: ReactNode }) {
   );
 }
 
-/** What the swappable top part of the card shows. */
+/** What the swappable body of the card shows. */
 interface Urgent {
   key: string;
-  tag: string;
-  tone: 'lime' | 'soft';
-  meta: string;
+  /** Today's call (bigger title) as opposed to a note you are previewing. */
+  hero: boolean;
   time?: string;
   /** All-day notes have no clock time; the label is smaller. */
   timeSmall?: boolean;
@@ -58,7 +57,8 @@ interface Urgent {
   note: Note;
 }
 
-function heroUrgent(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): Urgent {
+/** The line next to the TODAY tag: where the shift stands. */
+function heroMeta(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): string {
   const wrap = wrapOf(n);
   const wrapMin = wrapMinutes(n);
   const now = toMinutes(today.time);
@@ -74,11 +74,13 @@ function heroUrgent(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): Urgen
   } else {
     meta = `Wrapped at ${wrap}`;
   }
+  return meta;
+}
+
+function heroUrgent(n: Note): Urgent {
   return {
     key: `hero-${n.id}`,
-    tag: 'TODAY',
-    tone: 'lime',
-    meta,
+    hero: true,
     time: n.time,
     title: n.title,
     sub: n.subtitle,
@@ -89,9 +91,7 @@ function heroUrgent(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): Urgen
 function stopUrgent(n: Note, index: number): Urgent {
   return {
     key: `stop-${index}`,
-    tag: n.day === today.date ? 'TODAY' : fmtDayShort(n.day!).toUpperCase(),
-    tone: 'soft',
-    meta: TYPE_LABEL[n.type],
+    hero: false,
     time: n.kind === 'time' ? n.time : 'All day',
     timeSmall: n.kind !== 'time',
     title: n.title,
@@ -107,7 +107,7 @@ function UrgentBody({ u }: { u: Urgent }) {
   const attachment = !note.primaryAction && quickAction(note);
   return (
     <div className="today-urgent">
-      <button type="button" className="today-main" data-hero={u.tone === 'lime'} onClick={() => a.openNote(note.id)} aria-label={`${u.time ? `${u.time}, ` : ''}${u.title}. Open details`}>
+      <button type="button" className="today-main" data-hero={u.hero} onClick={() => a.openNote(note.id)} aria-label={`${u.time ? `${u.time}, ` : ''}${u.title}. Open details`}>
         {u.time && <span className={`today-time num${u.timeSmall ? ' today-time-sm' : ''}`}>{u.time}</span>}
         <span className="today-titles">
           <span className="today-t1">{u.title}</span>
@@ -151,8 +151,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
   let key: string;
   let body: ReactNode;
   // The tag and meta of what the card shows at rest; while previewing, the Preview line takes their place.
-  let tag = 'TODAY';
-  let tone: Urgent['tone'] | undefined;
+  let tone: 'lime' | undefined;
   let meta = `Shoot day ${today.shootDay}`;
   // A preview from the ruler before this one (Empty was toggled) can point past the stops for one render.
   const stop = preview ? scrub.stops[preview.index] : undefined;
@@ -160,9 +159,10 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
     key = `stop-${preview.index}`;
     body = <UrgentBody u={stopUrgent(stop.note, preview.index)} />;
   } else if (hero) {
-    const u = heroUrgent(hero, phase, submitted ? (offline ? 'saved' : 'sent') : null);
+    const u = heroUrgent(hero);
     key = u.key;
-    ({ tag, tone, meta } = u);
+    tone = 'lime';
+    meta = heroMeta(hero, phase, submitted ? (offline ? 'saved' : 'sent') : null);
     body = <UrgentBody u={u} />;
   } else {
     key = 'empty';
@@ -181,7 +181,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
           </>
         ) : (
           <>
-            <span className="today-tag" data-tone={tone}>{tag}</span>
+            <span className="today-tag" data-tone={tone}>TODAY</span>
             <span className="today-meta">{meta}</span>
           </>
         )}
