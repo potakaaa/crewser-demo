@@ -97,6 +97,22 @@ function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, child
     wasClosing.current = closing;
   }, [closing]);
 
+  // A tapped control can unmount (the nudge's Send), and focus falls to <body>: Esc and the Tab trap would then
+  // never reach the dialog. Take focus back when the sheet's content changes and focus is nowhere. (A mutation
+  // observer, because not every browser fires focusout for an element that is removed while focused.)
+  useEffect(() => {
+    if (closing) return;
+    const root = ref.current;
+    if (!root) return;
+    const observer = new MutationObserver(() => {
+      const active = document.activeElement;
+      if (active && active !== document.body && active !== document.documentElement) return;
+      (root.querySelector<HTMLElement>('[data-autofocus]') ?? root).focus({ preventScroll: true });
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [closing]);
+
   // Drag down on the grabber or the header: the sheet follows the finger, then closes or snaps back.
   const onDragStart = (e: PointerEvent<HTMLElement>) => {
     const dialog = ref.current;

@@ -110,7 +110,7 @@ button.day-action:active {
   mix-blend-mode: var(--grain-card-blend);
   pointer-events: none;
 }
-/* Not sent: the same quiet line as the hours card, a hairline chip with an amber dot. */
+/* Not sent: the same quiet line as the hours card, a hairline chip with the same amber "!" badge as the day marks. */
 .day-action-unsent {
   border: 1px solid rgba(17, 26, 27, 0.12);
   background: var(--card);
@@ -120,13 +120,22 @@ button.day-action:active {
 .day-action-unsent::before {
   inset: -7px 0;
 }
-.day-action-dot {
+/* The selected-day badge (.is-sel .mark-unsent), since the chip sits on white too. */
+.day-action-badge {
   flex: none;
-  width: 8px;
-  height: 8px;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
-  background: var(--amber-dark);
-  box-shadow: 0 0 0 3px rgba(244, 195, 90, 0.28);
+  background: #c98a00;
+  box-shadow: 0 0 0 1px #8a5f00;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
 }
 @media (prefers-reduced-motion: reduce) {
   button.day-action:active {

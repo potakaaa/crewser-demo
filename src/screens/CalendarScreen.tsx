@@ -232,13 +232,13 @@ export function CalendarScreen() {
                   // Only today can be logged in the Log sheet; earlier logged days just need sending.
                   onClick={() => (isToday ? openLog(true) : openSheet('hours', 'week'))}
                 >
-                  <span className="day-action-dot" aria-hidden="true" />
+                  <span className="day-action-badge" aria-hidden="true">!</span>
                   {isToday ? 'Hours not sent' : 'Hours not sent · Send'}
                 </button>
               )}
               {unsent && !isToday && !loggedDraft && (
                 <span className="day-action day-action-unsent" role="note">
-                  <span className="day-action-dot" aria-hidden="true" />
+                  <span className="day-action-badge" aria-hidden="true">!</span>
                   Hours not sent
                 </span>
               )}

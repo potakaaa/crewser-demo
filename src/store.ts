@@ -108,7 +108,7 @@ const DEFAULT_FONT: FontTheme = 'poster';
 const FONTS: { value: FontTheme; label: string; hint: string; sample: string }[] = [
   { value: 'inter', label: 'Inter', hint: 'Clean and neutral', sample: '08:40' },
   { value: 'screenplay', label: 'Screenplay', hint: 'Courier Prime, script page', sample: '08:40' },
-  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall capitals', sample: '08:40' },
+  { value: 'poster', label: 'Poster', hint: 'Bebas Neue caps', sample: '08:40' },
   { value: 'editorial', label: 'Editorial', hint: 'Fraunces, a warm serif', sample: '08:40' },
   { value: 'credits', label: 'Credits', hint: 'Syne, wide and rebellious', sample: '08:40' },
 ];
