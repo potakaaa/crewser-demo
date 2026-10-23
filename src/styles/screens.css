@@ -889,3 +889,39 @@
 .btn-sm {
   min-height: 40px;
 }
+
+/* ───────── "For Bianca · 2nd AC" chip: whose hours the app is entering ───────── */
+.for-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: #ffffff;
+}
+.for-chip-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--lime);
+}
+.for-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.for-chip-role {
+  flex: none;
+  font-weight: 500;
+  opacity: 0.75;
+}
+.for-chip-role::before {
+  content: '· ';
+}
+.gh-titlebar .for-chip {
+  align-self: center;
+}

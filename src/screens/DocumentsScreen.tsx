@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { docs, today, type Doc, type DocKind } from '../mock';
-import { ForColleague } from '../components/ForColleague';
+import { ForChip } from '../components/ForChip';
 import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
@@ -123,9 +123,9 @@ export function DocumentsScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={`${projectName} · ${docs.length} files`} title="Documents">
+          <ForChip tone="light" compact />
           <NotifButton tone="dark" />
         </ScreenTitle>
-        <ForColleague />
         <div className="fchips" role="group" aria-label="Filter documents">
           {FILTERS.map((f) => (
             <button type="button" key={f.value} className="fchip" aria-pressed={filter === f.value} onClick={() => setFilter(f.value)}>

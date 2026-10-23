@@ -2,7 +2,7 @@ import { useRef, type CSSProperties } from 'react';
 import '../styles/calendar.css';
 import { useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
-import { ForColleague } from '../components/ForColleague';
+import { ForChip } from '../components/ForChip';
 import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
@@ -134,8 +134,7 @@ export function CalendarScreen() {
           </button>
           <NotifButton tone="dark" />
         </div>
-
-        <ForColleague />
+        <ForChip tone="light" />
 
         <div className="cal-panel">
           <Collapse open={!monthOpen}>

@@ -8,11 +8,12 @@ import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { TodayBar } from '../components/TodayBar';
 import { NotifButton } from '../components/NotifButton';
+import { ForChip } from '../components/ForChip';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { Wordmark } from '../components/Brand';
 import { smartNotes } from '../lib/notes';
-import { firstNameOf, greeting } from '../lib/greeting';
+import { greeting } from '../lib/greeting';
 import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
 
@@ -48,13 +49,17 @@ export function DashboardScreen() {
               {link.initials}
             </span>
             <span className="home-greet">
-              <span className="home-hello">
-                {greeting()}, {link.isMe ? person.firstName : firstNameOf(link)}
-              </span>
+              {link.isMe ? (
+                <span className="home-hello">
+                  {greeting()}, {person.firstName}
+                </span>
+              ) : (
+                <ForChip tone="dark" />
+              )}
               <span className="home-project">
                 {link.projectName} · Shoot day {today.shootDay}
                 <Icon name="down" size={14} color="#C4CFD0" strokeWidth={2} />
-                <span className="sr-only">{link.isMe ? '' : `. Entering hours for ${link.personName}, ${link.position}`}. Switch project</span>
+                <span className="sr-only">. Switch project</span>
               </span>
             </span>
           </button>
