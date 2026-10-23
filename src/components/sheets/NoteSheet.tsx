@@ -14,7 +14,7 @@ export function noteSheetMeta(id?: string) {
   return { title: note ? TYPE_LABEL[note.type] : 'Note', subtitle: note ? whenLabel(note) : undefined };
 }
 
-/** A smart note in full: hero, facts, QR, text, attachments, who it is shared with. */
+/** A smart note in full: hero (title, call and wrap), facts, its own action, the note text, attachments, who it is shared with. */
 export function NoteSheet({ id }: { id?: string }) {
   const note = id ? noteById(id) : undefined;
   const a = useNoteActions();
@@ -22,13 +22,23 @@ export function NoteSheet({ id }: { id?: string }) {
   const isFlight = note.type === 'flight' && !!note.route;
   const pa = note.primaryAction;
   const flightNo = note.facts.find((f) => f.label === 'Flight no.')?.value;
+  // Call and wrap are read in the hero (a flight's number in the pair under it), so the facts list does not repeat them.
+  const wrap = note.facts.find((f) => f.label === 'Wrap');
+  const inHero = (label: string, value: string) =>
+    isFlight ? label === 'Flight no.' : (label === 'Call' && value === note.time) || (label === 'Wrap' && !!wrap);
+  const facts = note.facts.filter((f) => !inHero(f.label, f.value));
+  // With its own Directions button below, a place only needs Copy here.
+  const directionsBelow = !!pa && pa.kind !== 'boardingPass';
 
   return (
     <>
-      <div className="note-hero">
-        <span className="chip-icon chip-icon-glass">
-          <Icon name={note.type} size={18} color={TYPE_COLOR[note.type].dot} />
-        </span>
+      <div className="ns-hero">
+        <div className="ns-hero-head">
+          <span className="chip-icon chip-icon-glass">
+            <Icon name={note.type} size={18} color={TYPE_COLOR[note.type].dot} />
+          </span>
+          {!isFlight && <h3 className="ns-title">{note.title}</h3>}
+        </div>
         {isFlight ? (
           <div className="route route-dark">
             <div>
@@ -42,15 +52,21 @@ export function NoteSheet({ id }: { id?: string }) {
             </div>
           </div>
         ) : (
-          <div className={`detail-hero${note.day ? '' : ' detail-hero-solo'}`}>
-            {note.day && (
-              <div className="detail-hero-time">
-                <span className="detail-big">{timeText(note)}</span>
-                <span className="detail-sub">{timeSub(note)}</span>
-              </div>
-            )}
-            <h3 className="detail-title">{note.title}</h3>
-          </div>
+          note.day && (
+            <div className="ns-times">
+              <span className="ns-time">
+                <span className="ns-k">{wrap ? 'Call' : note.kind === 'time' ? 'Time' : 'When'}</span>
+                <span className="ns-big">{timeText(note)}</span>
+                {!wrap && timeSub(note) && <span className="ns-sub">{timeSub(note)}</span>}
+              </span>
+              {wrap && (
+                <span className="ns-time">
+                  <span className="ns-k">Wrap</span>
+                  <span className={wrap.unconfirmed ? 'ns-tbc' : 'ns-big'}>{wrap.value}</span>
+                </span>
+              )}
+            </div>
+          )
         )}
       </div>
 
@@ -67,20 +83,31 @@ export function NoteSheet({ id }: { id?: string }) {
         </div>
       )}
       {hasScanCode(note) && <QrPreview note={note} />}
-      {note.facts.length > 0 && (
+      {facts.length > 0 && (
         <div className="facts-card">
-          {note.facts.map((f) => (
+          {facts.map((f) => (
             <div className="fact-row" key={f.label}>
               <span className="fact-text">
                 <span className="tile-k">{f.label}</span>
                 <span className={`fact-v${f.unconfirmed ? ' muted' : ''}`}>{f.value}</span>
               </span>
-              <FactActions fact={f} />
+              <FactActions fact={directionsBelow && f.action === 'map' ? { ...f, action: 'copy' } : f} />
             </div>
           ))}
         </div>
       )}
-      {note.text && <p className="note-text">{note.text}</p>}
+      {pa && (
+        <button type="button" className="btn btn-primary btn-lg" onClick={() => a.primary(note)}>
+          <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={18} color="#FFFFFF" strokeWidth={1.8} />
+          {pa.label}
+        </button>
+      )}
+      {note.text && (
+        <div className="ns-callout">
+          <span className="ns-callout-k">Note</span>
+          <p>{note.text}</p>
+        </div>
+      )}
       {note.attachments.map((att) => (
         <button type="button" key={att.file} className="att-row" onClick={() => a.openPdf(att.file)}>
           <span className="todo-icon todo-icon-neutral">
@@ -102,12 +129,6 @@ export function NoteSheet({ id }: { id?: string }) {
           <Icon name="calendar" size={16} color="#54686C" />
           <span>From {note.source}</span>
         </div>
-      )}
-      {pa && (
-        <button type="button" className="btn btn-ink btn-lg" onClick={() => a.primary(note)}>
-          <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={18} color="#FFFFFF" strokeWidth={1.8} />
-          {pa.label}
-        </button>
       )}
     </>
   );

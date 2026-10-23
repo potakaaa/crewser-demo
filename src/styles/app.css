@@ -1421,35 +1421,107 @@
 .route-arrow {
   margin-bottom: 26px;
 }
-.detail-hero {
+/* ───────── Note sheet hero: icon and title, then call and wrap as a numeral pair ───────── */
+.ns-hero {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: 14px;
+  padding: 14px var(--sp-4) var(--sp-4);
+  border-radius: var(--r-card);
+  background: var(--brand-surface);
+  color: #ffffff;
 }
-/* No time block above it (a General info note): the title sits under the icon tile without the browser's h3 margins. */
-.detail-hero-solo .detail-title {
-  margin: 0;
+/* Static film grain, as on the header and the Documents call sheet card: below the text, never animated. */
+.ns-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--grain, none) 0 0 / 160px 160px;
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
-.detail-hero-time {
+.ns-hero-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--sp-3);
 }
-.detail-big {
-  font-size: var(--fs-5xl);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.03em;
+.ns-hero-head .chip-icon {
+  width: 36px;
+  height: 36px;
 }
-.detail-sub {
+.ns-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+/* Labels on one line, values on the next, bottoms aligned: "to be confirmed" sits level with 08:00. */
+.ns-times {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  justify-content: start;
+  align-items: end;
+  column-gap: var(--sp-6);
+  row-gap: 3px;
+}
+.ns-time {
+  display: contents;
+}
+/* Labels and muted values use on-dark-2: the grain lifts the lightest speck, and on-dark-3 would drop below 4.5:1. */
+.ns-k {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-dark-2);
+}
+.ns-big {
+  line-height: 1;
+  white-space: nowrap;
+}
+.ns-tbc {
+  padding-bottom: 2px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--on-dark-2);
+}
+/* "Check-in", "until 22:00": beside the time, on its baseline row. */
+.ns-sub {
+  grid-row: 2;
+  padding-bottom: 3px;
   font-size: var(--fs-md);
   color: var(--on-dark-2);
 }
-.detail-title {
-  font-size: var(--fs-xl);
+/* The note text as a callout: a soft fill, no border, so it reads as an aside to the facts above. */
+.ns-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px var(--sp-4) var(--sp-4);
+  border-radius: var(--r-card);
+  background: var(--chip);
+}
+.ns-callout-k {
+  font-size: var(--fs-xs);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.ns-callout p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-line;
+  color: var(--text-2);
 }
 .duo {
   display: grid;
@@ -1480,7 +1552,7 @@
   box-shadow: var(--shadow-card);
 }
 .fact-row {
-  min-height: 68px;
+  min-height: 60px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -2007,16 +2079,6 @@
 }
 .log-dialog-soft {
   background: var(--sheet);
-}
-.note-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-5) var(--sp-5);
-  border-radius: var(--r-card);
-  background: var(--brand-surface);
-  color: #ffffff;
 }
 .log-dialog {
   max-height: 88%;
@@ -2879,16 +2941,18 @@
 /* Big numbers and times. Use .num on anything new; these are the existing ones. */
 .num,
 .route-code,
-.detail-big,
+.ns-big,
 .duo-card strong,
 .tt-v {
   font-family: var(--font-numeral);
   font-weight: var(--numeral-weight);
   letter-spacing: var(--numeral-track);
 }
-.route-code,
-.detail-big {
+.route-code {
   font-size: calc(var(--fs-5xl) * var(--numeral-scale));
+}
+.ns-big {
+  font-size: calc(var(--fs-4xl) * var(--numeral-scale));
 }
 .route-code-md {
   font-size: calc(var(--fs-4xl) * var(--numeral-scale));
@@ -2904,14 +2968,14 @@
 }
 /* Headlines other than .display. Use .head on anything new. */
 .head,
-.detail-title,
+.ns-title,
 .section-titles h2,
 .log-titles h2 {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   letter-spacing: var(--display-track);
 }
-.detail-title {
+.ns-title {
   font-size: calc(var(--fs-xl) * var(--display-scale));
 }
 .section-titles h2 {
