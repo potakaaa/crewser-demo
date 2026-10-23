@@ -483,6 +483,16 @@
   font-weight: 500;
   color: var(--text-3);
 }
+/* The label inside the call sheet half: one unit, so it can fade as a whole when the preview changes day. */
+.today-sheet-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* The previewed day has no call sheet: muted, still tappable for a short explanation. */
+.today-sheet-none {
+  opacity: 0.6;
+}
 .today-sent {
   display: flex;
   min-width: 0;

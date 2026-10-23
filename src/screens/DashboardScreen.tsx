@@ -68,7 +68,7 @@ export function DashboardScreen() {
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
         <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />
-        {sn.hero && <TodayBar hero={sn.hero} />}
+        {sn.hero && <TodayBar hero={sn.hero} previewDay={preview ? scrub.stops[preview.index]?.note.day : undefined} />}
       </GradientHeader>
 
       <Sheet className="sheet-dash">
