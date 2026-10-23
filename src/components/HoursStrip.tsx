@@ -79,10 +79,10 @@ export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
 export function HoursStrip() {
   const openSheet = useDemo((s) => s.openSheet);
   const o = useHoursOverview();
-  const tile = (metric: HoursMetric, className = '') => {
+  const tile = (metric: HoursMetric) => {
     const c = metricCopy(o, metric);
     return (
-      <button type="button" className={`hs-tile ${className}`} data-after-master={metric === 'week' || undefined} onClick={() => openSheet('hours', metric)} aria-label={`${c.label}: ${[c.value, c.unit].filter(Boolean).join(' ')}. ${c.sentence} Open details`}>
+      <button type="button" className="hs-tile" data-after-master={metric === 'week' || undefined} onClick={() => openSheet('hours', metric)} aria-label={`${c.label}: ${[c.value, c.unit].filter(Boolean).join(' ')}. ${c.sentence} Open details`}>
         <span className="hs-k">{c.short}</span>
         <span className="hs-v num">
           {c.value}
@@ -96,7 +96,7 @@ export function HoursStrip() {
       <div className="hs-card">
         <div className="hs-grid">
           {tile('week')}
-          {tile('overtime', 'hs-ot')}
+          {tile('overtime')}
           {tile('days')}
         </div>
         <UnsentNudge o={o} />
