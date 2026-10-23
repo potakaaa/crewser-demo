@@ -11,6 +11,8 @@ const FLING_MS = 200;
 const STALE_MS = 80;
 /** The ruler counts as settled this long after its last scroll event (momentum included). */
 const IDLE_MS = 120;
+/** Markers of a cluster fan out this far apart (px) when the ruler is locked on one of them. */
+const FAN_PX = 15;
 /** Two taps this close in time (ms) and place (px) are a double tap. */
 const DOUBLE_TAP_MS = 350;
 const DOUBLE_TAP_PX = 30;
@@ -398,6 +400,7 @@ export function Timeline({
   const current = preview ? scrub.stops[preview.index] : undefined;
   const line = preview && current ? previewLine(scrub, preview) : 'Now. Nothing previewed.';
   const clusters = clusterOf(scrub.stops);
+  const fanLead = preview ? clusters[preview.index]?.lead : undefined;
   return (
     <section className="tl" aria-label="Preview what is coming up">
       <div
@@ -429,19 +432,26 @@ export function Timeline({
                 <span className="tl-label">{m.label}</span>
               </span>
             ))}
-            {scrub.stops.map((s, i) => (
-              <span
-                className="tl-pin"
-                key={s.note.id}
-                data-on={preview?.index === i}
-                data-n={clusters[i] ? true : undefined}
-                style={{ left: s.x, '--pin': TYPE_COLOR[s.note.type].dot, '--span': `${clusters[i]?.span ?? 0}px` } as CSSProperties}
-                aria-hidden="true"
-              >
-                <span className="tl-pin-dot" />
-                {clusters[i] && <span className="tl-pin-n">{clusters[i].n}</span>}
-              </span>
-            ))}
+            {scrub.stops.map((s, i) => {
+              const c = clusters[i];
+              // Locked on a member: the whole cluster fans out around the locked note, which stays under the playhead.
+              const fanned = !!c && fanLead === c.lead;
+              const offset = fanned ? (i - preview!.index) * FAN_PX : 0;
+              return (
+                <span
+                  className="tl-pin"
+                  key={s.note.id}
+                  data-on={preview?.index === i}
+                  data-n={c && c.lead === i ? true : undefined}
+                  data-fan={fanned ? true : undefined}
+                  style={{ left: s.x, '--pin': TYPE_COLOR[s.note.type].dot, '--span': `${c?.span ?? 0}px`, '--fan': `${offset}px` } as CSSProperties}
+                  aria-hidden="true"
+                >
+                  <span className="tl-pin-dot" />
+                  {c && c.lead === i && <span className="tl-pin-n">{c.n}</span>}
+                </span>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -452,7 +462,7 @@ export function Timeline({
         Left and right arrow keys move between notes. Home goes back to now.
       </p>
       <p className="sr-only" role="status">
-        {preview ? `${line}${current ? `: ${current.note.title}` : ''}` : ''}
+        {preview && current ? `${current.note.title}, ${line}` : ''}
       </p>
     </section>
   );

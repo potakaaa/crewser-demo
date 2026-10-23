@@ -1,7 +1,7 @@
 import { notes as allNotes, today } from '../mock';
 import type { Note } from '../mock';
 import { diffDays, fmtCountdown, toMinutes, weekday } from './dates';
-import { sortNotes } from './notes';
+import { sortNotes, TYPE_LABEL } from './notes';
 
 const HOUR = 60;
 const DAY = 24 * HOUR;
@@ -147,37 +147,42 @@ export function previewAt(s: Scrub, x: number): Preview | null {
 
 export const samePreview = (a: Preview | null, b: Preview | null) => a === b || (!!a && !!b && a.index === b.index);
 
-/** The caption under the card: "Preview · in 4 h · Tue 08:00". */
+/** The caption for the locked note: "2 of 3 · Flight · in 2 days · Wed 12:05", without the count when it stands alone. */
 export function previewLine(s: Scrub, p: Preview): string {
   const stop = s.stops[p.index];
   if (!stop) return ''; // a preview left over from an earlier ruler
-  return `Preview · ${stop.rel} · ${stop.when}`;
+  const c = clusters(s.stops)[p.index];
+  return [c && `${c.pos} of ${c.n}`, TYPE_LABEL[stop.note.type], stop.rel, stop.when].filter(Boolean).join(' · ');
 }
 
 /** Notes closer together than this (px) on the ruler overlap as dots (10 px wide), so they get one count badge. */
 export const CLUSTER_PX = 12;
 
-/** A cluster of tied notes, recorded on its leading stop. */
-export interface Cluster {
+/** One note's place in a cluster of tied notes. */
+export interface ClusterInfo {
+  /** Index of the first stop in the cluster. */
+  lead: number;
   /** Notes in the cluster. */
   n: number;
-  /** px from the lead's marker to the last one's. */
+  /** This note's place in it, 1-based. */
+  pos: number;
+  /** px from the first marker to the last one. */
   span: number;
 }
 
 /**
- * Per stop: the cluster it leads if two or more notes follow one another within CLUSTER_PX, else null.
- * The badge goes on the leading stop only; the others are drawn stacked behind it.
+ * Per stop: its cluster if it is one of two or more notes that follow one another within CLUSTER_PX, else null.
+ * The count badge sits on the lead; when the playhead locks on a member, the whole cluster fans out.
  */
-export function clusters(stops: ScrubStop[]): (Cluster | null)[] {
-  const out: (Cluster | null)[] = stops.map(() => null);
-  let lead = -1;
-  stops.forEach((s, i) => {
-    if (lead >= 0 && s.x - stops[i - 1].x < CLUSTER_PX) {
-      const c = out[lead] ?? { n: 1, span: 0 };
-      out[lead] = { n: c.n + 1, span: s.x - stops[lead].x };
-    } else lead = i;
-  });
+export function clusters(stops: ScrubStop[]): (ClusterInfo | null)[] {
+  const out: (ClusterInfo | null)[] = stops.map(() => null);
+  let from = 0;
+  for (let i = 1; i <= stops.length; i++) {
+    if (i < stops.length && stops[i].x - stops[i - 1].x < CLUSTER_PX) continue;
+    const n = i - from;
+    if (n > 1) for (let k = from; k < i; k++) out[k] = { lead: from, n, pos: k - from + 1, span: stops[i - 1].x - stops[from].x };
+    from = i;
+  }
   return out;
 }
 

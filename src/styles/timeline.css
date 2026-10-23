@@ -17,6 +17,9 @@
   width: 0;
   height: 14px;
   z-index: 1;
+  /* A cluster fans out around the locked note (visual only: the stop's scroll position does not change). */
+  transform: translateX(var(--fan, 0px));
+  transition: transform 150ms var(--ease-out);
 }
 .tl .tl-pin::before {
   content: '';
@@ -62,6 +65,12 @@
   text-align: center;
   box-shadow: 0 0 0 1.5px rgba(8, 20, 22, 0.7);
 }
+.tl .tl-pin[data-fan] .tl-pin-n {
+  opacity: 0;
+}
+.tl .tl-pin-n {
+  transition: opacity 150ms ease;
+}
 /* Locked under the playhead: bigger and ringed in white. Lime stays with Now and the playhead, the brightest things on the ruler. */
 .tl .tl-pin[data-on='true'] {
   z-index: 3;
@@ -85,6 +94,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .tl .tl-pin,
+  .tl .tl-pin-n,
   .tl .tl-pin-dot {
     transition: none;
   }
