@@ -60,7 +60,24 @@ export function ContentCard({ note }: { note: Note }) {
             <p className="ccard-facts">
               {tiles.map((t) => (
                 <span className="ccard-fact" key={t.key}>
-                  <span className="ccard-fact-k">{t.label}</span> <span className={`ccard-fact-v${t.unconfirmed ? ' muted' : ''}`}>{t.value}</span>
+                  <span className="ccard-fact-k">{t.label}</span>{' '}
+                  {t.action !== 'attachment' && isCopyable({ action: t.action, unconfirmed: t.unconfirmed }) ? (
+                    // The values worth copying (flight number, booking code, addresses) copy in one tap, without opening the note.
+                    <button
+                      type="button"
+                      className="ccard-fact-copy"
+                      aria-label={`Copy ${t.label.toLowerCase()} ${t.value}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        a.copy(t.value);
+                      }}
+                    >
+                      <span className="ccard-fact-v">{t.value}</span>
+                      <Icon name="copy" size={13} color="#54686C" strokeWidth={1.8} />
+                    </button>
+                  ) : (
+                    <span className={`ccard-fact-v${t.unconfirmed ? ' muted' : ''}`}>{t.value}</span>
+                  )}
                 </span>
               ))}
             </p>
