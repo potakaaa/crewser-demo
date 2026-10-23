@@ -117,11 +117,13 @@ function UrgentBody({ u }: { u: Urgent }) {
       </button>
       <NotePrimaryAction note={note} className="today-action" />
       {attachment && (
-        <button type="button" className="btn btn-outline today-action" onClick={() => a.quick(note)}>
-          <Icon name="clip" size={16} color="#111A1B" strokeWidth={1.8} />
+        <button type="button" className="btn btn-sky today-action" onClick={() => a.quick(note)}>
+          <Icon name="clip" size={16} color="#FFFFFF" strokeWidth={1.8} />
           Open
         </button>
       )}
+      {/* A note without an action keeps the slot, so the card is the same height whichever note the ruler is on. */}
+      {!note.primaryAction && !attachment && <div aria-hidden="true" style={{ height: 'calc(36px + var(--sp-2))' }} />}
     </div>
   );
 }
