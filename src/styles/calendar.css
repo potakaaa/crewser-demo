@@ -36,11 +36,12 @@
   font-family: var(--font);
   font-size: 9px;
   font-weight: 800;
-  font-style: normal;
   line-height: 1;
 }
+/* On the white selected day: a deeper amber with a dark ring (5.6:1 against white); the "!" stays ink (6:1). */
 .is-sel .mark-unsent {
-  box-shadow: 0 0 0 1px rgba(107, 74, 0, 0.35);
+  background: #c98a00;
+  box-shadow: 0 0 0 1px #8a5f00;
 }
 .mday .day-marks {
   top: 2px;
