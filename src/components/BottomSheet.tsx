@@ -91,8 +91,10 @@ function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, child
 
   // Reopened while it was still closing: the same content stays mounted, so the effect above does not run.
   // The closing sheet was inert and dropped focus, so take it back or Esc has nowhere to go.
+  const wasClosing = useRef(closing);
   useEffect(() => {
-    if (!closing) ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true });
+    if (wasClosing.current && !closing) ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true });
+    wasClosing.current = closing;
   }, [closing]);
 
   // Drag down on the grabber or the header: the sheet follows the finger, then closes or snaps back.

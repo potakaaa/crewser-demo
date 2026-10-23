@@ -102,17 +102,22 @@ const initialSheet = (): SheetState | null => hashToSheet(typeof location === 'u
 
 export type FontTheme = 'inter' | 'screenplay' | 'poster' | 'editorial' | 'credits';
 
-/** Headline and numeral typefaces to try out; body text stays Inter. Settings and the demo panel list these. */
-export const FONT_THEMES: { value: FontTheme; label: string; hint: string; sample: string }[] = [
-  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall capitals · default', sample: '08:40' },
+/** The font theme when nothing is saved, and the one Reset demo goes back to. */
+const DEFAULT_FONT: FontTheme = 'poster';
+
+const FONTS: { value: FontTheme; label: string; hint: string; sample: string }[] = [
   { value: 'inter', label: 'Inter', hint: 'Clean and neutral', sample: '08:40' },
   { value: 'screenplay', label: 'Screenplay', hint: 'Courier Prime, script page', sample: '08:40' },
+  { value: 'poster', label: 'Poster', hint: 'Bebas Neue, tall capitals', sample: '08:40' },
   { value: 'editorial', label: 'Editorial', hint: 'Fraunces, a warm serif', sample: '08:40' },
   { value: 'credits', label: 'Credits', hint: 'Syne, wide and rebellious', sample: '08:40' },
 ];
 
-/** The font theme when nothing is saved, and the one Reset demo goes back to. */
-const DEFAULT_FONT: FontTheme = 'poster';
+/** Headline and numeral typefaces to try out; body text stays Inter. The default comes first and says so. Settings and the demo panel list these. */
+export const FONT_THEMES = [
+  ...FONTS.filter((f) => f.value === DEFAULT_FONT).map((f) => ({ ...f, hint: `${f.hint} · default` })),
+  ...FONTS.filter((f) => f.value !== DEFAULT_FONT),
+];
 
 const FONT_KEY = 'crewser-font-theme';
 
