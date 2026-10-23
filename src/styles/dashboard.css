@@ -920,15 +920,31 @@
   -webkit-line-clamp: 1;
   overflow: hidden;
 }
+/* Room to breathe: the facts are one quiet line, not a row of boxes, and the CTA has air above it. */
 .sheet-dash .ccard-compact .ccard-body {
-  gap: 6px;
-  padding: 4px 12px 12px;
+  gap: 10px;
+  padding: 10px 14px 14px;
 }
-.sheet-dash .ccard-compact .tile {
-  min-height: 44px;
+/* Facts side by side, a gap instead of separators, so a wrapped line never starts with a dot. */
+.ccard-facts {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  font-size: var(--fs-md);
+  line-height: 1.4;
+  color: var(--text-3);
 }
-.sheet-dash .ccard-compact .tile-main {
-  padding: 5px 10px;
+.ccard-fact {
+  min-width: 0;
+}
+.ccard-fact-v {
+  font-weight: 600;
+  color: var(--ink);
+}
+.ccard-fact-v.muted {
+  font-weight: 500;
+  color: var(--text-2);
 }
 .sheet-dash .ccard-compact .btn {
   min-height: 44px;
