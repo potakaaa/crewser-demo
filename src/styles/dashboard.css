@@ -538,21 +538,19 @@
   inset: -5px -1px;
 }
 
-/* ───────── Sky: the primary button for a note's own action ─────────
-   The crewser.app hero sky (slate teal to sage) with film grain. Stops are darkened from the
-   photo so white text is 4.9:1 or better at the light (sage) end. Lime stays for the one CTA. */
+/* ───────── Primary button for a note's own action (.btn-sky, wired in NotePrimaryAction) ─────────
+   The brand surface: dark ink to deep green with a faint lime glow and film grain, white text
+   (8:1 or better). Lime stays for the one CTA (Submit after wrap, Log). */
 .btn.btn-sky {
   position: relative;
   isolation: isolate;
   border: 0;
-  background: linear-gradient(100deg, #3f6470 0%, #4f6f75 55%, #5e7668 100%);
+  background: var(--brand-surface);
   color: #ffffff;
   font-weight: 600;
-  text-shadow: 0 1px 1px rgba(17, 26, 27, 0.18);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(17, 26, 27, 0.12),
-    0 4px 12px rgba(31, 58, 61, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 12px rgba(17, 33, 35, 0.24);
   transition:
     transform 180ms var(--ease-out),
     box-shadow var(--t-fast) ease;
@@ -564,12 +562,12 @@
   z-index: -1;
   border-radius: inherit;
   background: var(--grain, none) 0 0 / 160px 160px;
-  opacity: 0.26;
+  opacity: 0.2;
   mix-blend-mode: overlay;
   pointer-events: none;
 }
 .btn.btn-sky:hover {
-  background: linear-gradient(100deg, #395b66 0%, #48676d 55%, #576e61 100%);
+  background: var(--brand-surface-hover);
 }
 .btn.btn-sky:active {
   transform: scale(0.98);
