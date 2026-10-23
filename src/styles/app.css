@@ -632,7 +632,7 @@
   font-size: var(--fs-md);
   font-weight: 500;
 }
-/* ───────── To-do / undated / attachment rows ───────── */
+/* ───────── To-do / attachment rows ───────── */
 .todo-row,
 .att-row {
   transition: transform 180ms var(--ease-out);
@@ -673,26 +673,6 @@
   font-weight: 600;
 }
 .todo-t2 {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-}
-.undated-row {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  min-height: 64px;
-  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
-  border: var(--dashed);
-  border-radius: var(--r-card);
-  background: none;
-  color: var(--ink);
-  text-align: left;
-}
-.undated-t1 {
-  font-size: var(--fs-md);
-  font-weight: 600;
-}
-.undated-t2 {
   font-size: var(--fs-sm);
   color: var(--text-2);
 }
@@ -827,8 +807,7 @@
 }
 .tile-main:active,
 .todo-row:active,
-.att-row:active,
-.undated-row:active {
+.att-row:active {
   transform: scale(0.985);
 }
 .tile {

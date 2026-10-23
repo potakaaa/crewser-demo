@@ -64,7 +64,7 @@
   font-size: var(--fs-md);
   font-weight: 600;
 }
-.notif-markall:disabled {
+.notif-markall[aria-disabled='true'] {
   color: var(--text-3);
   font-weight: 500;
   opacity: 0.7;
