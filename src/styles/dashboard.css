@@ -262,8 +262,21 @@
 }
 
 /* The swappable top part. Fixed height, so previewing never moves anything below it. */
+/* A note without an action makes the card shorter: the height eases over the crossfade's
+   180 ms, so the Today bar below glides instead of jumping. --xf-h is the incoming layer's
+   height, measured in TodayCard; the outgoing layer is clipped a little outside the box. */
 .xf {
   position: relative;
+  height: var(--xf-h, auto);
+  overflow: clip;
+  overflow-clip-margin: 6px;
+  transition: height 180ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .xf {
+    height: auto;
+    transition: none;
+  }
 }
 .xf-in {
   animation: xf-in 180ms ease both;
@@ -530,22 +543,13 @@
 }
 
 /* The note's own action inside the card (Directions, Show boarding pass, Open…), like .ccard-action. */
-/* Compact: 36 px to look at, 44 px to hit, only as wide as its label. */
+/* Full width, like the note cards: every top card has at most one action. */
 .today-action {
-  position: relative;
   flex: none;
-  align-self: flex-start;
-  min-height: 36px;
-  margin-top: var(--sp-2);
-  padding: 0 14px;
-  font-weight: 600;
+  width: 100%;
+  min-height: 44px;
+  margin-top: var(--sp-1);
 }
-.today-action::before {
-  content: '';
-  position: absolute;
-  inset: -5px -1px;
-}
-/* A note without an action keeps its room, so the card is the same height on every note. Same size as .today-action plus its margin. */
 
 /* ───────── Primary button for a note's own action (NotePrimaryAction) ─────────
    The brand surface: dark ink to deep green with a faint lime glow and film grain, white text
