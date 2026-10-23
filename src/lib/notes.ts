@@ -86,38 +86,26 @@ export interface CardTile {
   key: string;
   label: string;
   value: string;
-  action?: 'copy' | 'map' | 'attachment';
+  /** Copy and map facts are the ones the card lets you copy. */
+  action?: Fact['action'];
   unconfirmed?: boolean;
-  wide: boolean;
 }
 
 /**
- * The fact tiles on a content card: up to three, preferring facts you act on
- * (copy, map, not yet confirmed), filled up in data order. Map facts and the
- * attachment go last and span both columns.
+ * The facts on a content card, up to three: first the ones you act on (copy, map, not yet confirmed),
+ * then filled up in data order. Places go last. The card shows the first two as one line.
  */
 export function cardTiles(n: Note): CardTile[] {
   const actionable = (f: Fact) => !!f.action || !!f.unconfirmed;
-  // A ticket with a code gets its own QR preview instead of an attachment tile.
-  const att = hasScanCode(n) ? undefined : n.attachments[0];
-  const slots = att ? 2 : 3;
-  const chosen = n.facts.filter(actionable).slice(0, slots);
+  const chosen = n.facts.filter(actionable).slice(0, 3);
   for (const f of n.facts) {
-    if (chosen.length >= slots) break;
+    if (chosen.length >= 3) break;
     if (!chosen.includes(f)) chosen.push(f);
   }
-  const ordered = n.facts.filter((f) => chosen.includes(f));
-  const tiles: CardTile[] = ordered.map((f) => ({
-    key: f.label,
-    label: f.label,
-    value: f.value,
-    action: f.action,
-    unconfirmed: f.unconfirmed,
-    wide: f.action === 'map',
-  }));
-  tiles.sort((a, b) => Number(a.wide) - Number(b.wide));
-  if (att) tiles.push({ key: att.file, label: n.type === 'flight' ? 'Ticket' : 'Attachment', value: att.file, action: 'attachment', wide: true });
-  return tiles;
+  const tiles: CardTile[] = n.facts
+    .filter((f) => chosen.includes(f))
+    .map((f) => ({ key: f.label, label: f.label, value: f.value, action: f.action, unconfirmed: f.unconfirmed }));
+  return tiles.sort((a, b) => Number(a.action === 'map') - Number(b.action === 'map'));
 }
 
 export const dayStub = (n: Note) => (n.day ? fmtDayShort(n.day) : '');

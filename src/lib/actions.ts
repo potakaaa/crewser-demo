@@ -28,7 +28,6 @@ export function useNoteActions() {
     openNote: (id: string) => openSheet('note', id),
     map: (place: string) => toast(`Opens “${place}” in maps (demo)`),
     directions: () => toast('Directions open in your maps app (demo)'),
-    unconfirmed: (label: string) => toast(`${label} is not confirmed by production yet`),
     primary: (n: Note) => (n.primaryAction?.kind === 'boardingPass' ? openTicket() : toast('Directions open in your maps app (demo)')),
     quick: (n: Note) => {
       const q = quickAction(n);

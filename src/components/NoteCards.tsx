@@ -61,7 +61,7 @@ export function ContentCard({ note }: { note: Note }) {
               {tiles.map((t) => (
                 <span className="ccard-fact" key={t.key}>
                   <span className="ccard-fact-k">{t.label}</span>{' '}
-                  {t.action !== 'attachment' && isCopyable({ action: t.action, unconfirmed: t.unconfirmed }) ? (
+                  {isCopyable(t) ? (
                     // The values worth copying (flight number, booking code, addresses) copy in one tap, without opening the note.
                     <button
                       type="button"
