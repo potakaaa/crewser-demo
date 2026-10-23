@@ -800,81 +800,13 @@
   color: var(--text-2);
   overflow-wrap: break-word;
 }
-.tiles {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.tile-main:active,
 .todo-row:active,
 .att-row:active {
   transform: scale(0.985);
 }
-.tile {
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-control);
-  background: var(--sheet);
-  transition: background 150ms ease;
-}
-.tile:hover {
-  background: #e9eeed;
-}
-.tile-main {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: 10px var(--sp-3);
-  border: 0;
-  border-radius: inherit;
-  background: none;
-  color: var(--ink);
-  text-align: left;
-  transition: transform 180ms var(--ease-out);
-}
-.tile-extra {
-  width: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-left: 1px solid var(--hairline);
-  border-radius: 0 var(--r-control) var(--r-control) 0;
-  background: none;
-}
-.tile-main:focus-visible,
-.tile-extra:focus-visible {
-  outline-offset: -2px;
-}
-.tile-wide {
-  grid-column: 1 / span 2;
-}
-.tile-open {
-  border: 1.5px dashed rgba(17, 26, 27, 0.28);
-  background: transparent;
-}
-.tile-open .tile-v {
-  color: var(--text-3);
-}
-.tile-text {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
 .tile-k {
   font-size: var(--fs-xs);
   color: var(--text-3);
-}
-.tile-v {
-  font-size: var(--fs-md);
-  font-weight: 600;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
 }
 /* Home smart cards: tighter than the detail screen, so more of the day fits. */
 .ccard-head {
@@ -889,21 +821,6 @@
 .ccard-body {
   gap: 8px;
   padding: 2px 14px 14px;
-}
-.ccard .tiles {
-  gap: 8px;
-}
-.ccard .tile {
-  min-height: 48px;
-}
-.ccard .tile-main {
-  padding: 7px 12px;
-}
-.ccard .tile-text {
-  gap: 1px;
-}
-.ccard .tile-extra {
-  width: 44px;
 }
 .ccard-body .crew-toggle {
   min-height: 40px;
@@ -1580,6 +1497,12 @@
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #7a2a24;
+}
+.ns-sos-note {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
   color: #7a2a24;
 }
 .ns-block {

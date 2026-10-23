@@ -781,7 +781,7 @@
   color: var(--on-dark-2);
 }
 /* The one accent: overtime in lime (7:1 on the surface). */
-.hs-grid > .hs-tile:nth-child(2) .hs-v {
+.hs-tile[data-metric='overtime'] .hs-v {
   color: var(--lime);
 }
 
@@ -942,9 +942,11 @@
   font-weight: 600;
   color: var(--ink);
 }
+/* Not confirmed yet: lighter and in italics, so "to be confirmed" reads as a gap, not a value (5.9:1). */
 .ccard-fact-v.muted {
+  font-style: italic;
   font-weight: 500;
-  color: var(--text-2);
+  color: var(--text-3);
 }
 .sheet-dash .ccard-compact .btn {
   min-height: 44px;
