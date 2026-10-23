@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { docs, today, type Note } from '../mock';
+import { today, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
-import { addDays, fmtCountdown, fmtDayMonth, fmtDayShort, toMinutes } from '../lib/dates';
-import { dayStat, shiftLabel } from '../lib/stats';
+import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
 import { useSubmitted } from '../lib/useSubmitted';
-import { TYPE_LABEL } from '../lib/notes';
+import { quickAction, TYPE_LABEL } from '../lib/notes';
+import { phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
+import { NotePrimaryAction } from './NotePrimaryAction';
 import { previewLine, type Preview, type Scrub } from '../lib/timeline';
-
-const callSheetFor = (day: string) => docs.find((d) => d.kind === 'callsheet' && d.day === day);
-
-/** "Call sheet · Shoot day 7" without the repeated "Call sheet". */
-const shortTitle = (title: string) => title.replace(/^Call sheet · /, '');
 
 /** Fade time of the swap, in ms; matches `.xf-in` / `.xf-out` in dashboard.css. */
 const FADE_MS = 180;
@@ -59,30 +55,7 @@ interface Urgent {
   timeSmall?: boolean;
   title: string;
   sub?: string;
-  place?: string;
-  noteId?: string;
-}
-
-const placeOf = (n: Note) => n.facts.find((f) => f.action === 'map')?.value;
-
-/** Where today's shift stands, by the app's clock: before the call, on set, or after wrap. */
-type Phase = 'before' | 'during' | 'after';
-
-const wrapOf = (n: Note) => n.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
-
-/** Wrap as minutes since midnight; a wrap at or before the call is the next day (20:00–04:00 wraps at 28:00). */
-function wrapMinutes(n: Note): number | null {
-  const wrap = wrapOf(n);
-  if (!wrap) return null;
-  const m = toMinutes(wrap);
-  return n.time && m <= toMinutes(n.time) ? m + 24 * 60 : m;
-}
-
-function phaseOf(n: Note | undefined): Phase {
-  const now = toMinutes(today.time);
-  if (!n?.time || now < toMinutes(n.time)) return 'before';
-  const wrap = wrapMinutes(n);
-  return wrap !== null && now >= wrap ? 'after' : 'during';
+  note: Note;
 }
 
 function heroUrgent(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): Urgent {
@@ -109,8 +82,7 @@ function heroUrgent(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): Urgen
     time: n.time,
     title: n.title,
     sub: n.subtitle,
-    place: placeOf(n) ?? n.subtitle,
-    noteId: n.id,
+    note: n,
   };
 }
 
@@ -124,27 +96,22 @@ function stopUrgent(n: Note, index: number): Urgent {
     timeSmall: n.kind !== 'time',
     title: n.title,
     sub: n.subtitle,
-    place: placeOf(n),
-    noteId: n.id,
+    note: n,
   };
 }
 
 function UrgentBody({ u }: { u: Urgent }) {
   const a = useNoteActions();
-  const place = u.place;
+  const note = u.note;
+  // The note's own action, as on its card below; a note with only an attachment opens that.
+  const attachment = !note.primaryAction && quickAction(note);
   return (
     <div className="today-urgent">
       <div className="today-top">
         <span className="today-tag" data-tone={u.tone}>{u.tag}</span>
         <span className="today-meta">{u.meta}</span>
-        <span className="spacer" />
-        {place && u.tone === 'lime' && (
-          <button type="button" className="icon-btn today-ib" aria-label={`Directions to ${place}`} onClick={a.directions}>
-            <Icon name="nav" size={17} color="#111A1B" />
-          </button>
-        )}
       </div>
-      <button type="button" className="today-main" data-hero={u.tone === 'lime'} onClick={() => u.noteId && a.openNote(u.noteId)} aria-label={`${u.time ? `${u.time}, ` : ''}${u.title}. Open details`}>
+      <button type="button" className="today-main" data-hero={u.tone === 'lime'} onClick={() => a.openNote(note.id)} aria-label={`${u.time ? `${u.time}, ` : ''}${u.title}. Open details`}>
         {u.time && <span className={`today-time num${u.timeSmall ? ' today-time-sm' : ''}`}>{u.time}</span>}
         <span className="today-titles">
           <span className="today-t1">{u.title}</span>
@@ -152,6 +119,13 @@ function UrgentBody({ u }: { u: Urgent }) {
         </span>
         <Icon name="right" size={18} color="#54686C" />
       </button>
+      <NotePrimaryAction note={note} className="today-action" />
+      {attachment && (
+        <button type="button" className="btn btn-outline today-action" onClick={() => a.quick(note)}>
+          <Icon name="clip" size={16} color="#111A1B" strokeWidth={1.8} />
+          Open
+        </button>
+      )}
     </div>
   );
 }
@@ -190,23 +164,13 @@ function NothingToday() {
 }
 
 /**
- * The one card for the day: when to be where, today's call sheet, and Submit hours.
- * The top part is the note the ruler's playhead is on (today's call at rest). The call sheet and
- * Submit hours row below never changes, so the end of the day is one tap away while you look ahead.
+ * The top card: the smart note the ruler's playhead is on (today's call at rest), with that note's own action.
+ * Call sheet and Submit hours live in the TodayBar below, which never changes while you scrub.
  */
 export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undefined; scrub: Scrub; preview: Preview | null; onBack: () => void }) {
-  const a = useNoteActions();
-  const setLogOpen = useDemo((s) => s.setLogOpen);
   const submitted = useSubmitted().includes(today.date);
   const offline = useDemo((s) => s.offline);
-  const start = useDemo((s) => s.logStart);
-  const end = useDemo((s) => s.logEnd);
-  const breakMin = useDemo((s) => s.breakMin);
   const phase = phaseOf(hero);
-  // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
-  const sent = submitted && end ? dayStat(today.date, { date: today.date, kind: 'shoot', start, end, breakMin, status: 'submitted' }) : null;
-  const sheet = callSheetFor(today.date);
-  const tomorrow = callSheetFor(addDays(today.date, 1));
 
   let key: string;
   let body: ReactNode;
@@ -234,50 +198,8 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
               Back to now
             </button>
           </>
-        ) : tomorrow ? (
-          <button type="button" className="today-tmrw" onClick={() => a.openPdf(tomorrow.file)}>
-            <span className="today-dot" aria-hidden="true" />
-            <span>Tomorrow's call sheet is out</span>
-            <strong>Open</strong>
-          </button>
         ) : (
           <span className="today-hint">Slide the ruler above to preview what is next.</span>
-        )}
-      </div>
-
-      {/* Always in the page, so a screen reader hears the change when it fills. */}
-      <p className="sr-only" role="status">
-        {submitted ? (offline ? "Saved on this phone, sends when you're online." : sent ? `Hours sent: ${shiftLabel(sent).replace(' · ', ', ')}.` : 'Hours sent.') : ''}
-      </p>
-
-      <div className="today-actions">
-        {sheet && (
-          <button type="button" className="btn today-seg today-sheet" onClick={() => a.openPdf(sheet.file)}>
-            <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
-            Call sheet
-            <span className="today-sheet-day">{shortTitle(sheet.title).replace('Shoot day ', 'Day ')}</span>
-          </button>
-        )}
-        {submitted ? (
-          <div className="today-sent">
-            <button
-              type="button"
-              className="btn today-seg today-sent-btn"
-              onClick={() => setLogOpen(true)}
-              aria-label={sent ? `${offline ? 'Saved on this phone' : 'Sent'}: ${fmtDayMonth(today.date)}, ${shiftLabel(sent).replace(' · ', ', ')}. Review` : 'Hours submitted. Review'}
-            >
-              <Icon name="check" size={18} color="#2B3300" strokeWidth={2.2} />
-              <span className="today-sent-text">
-                <strong>{offline ? 'Saved on phone' : 'Sent'}</strong>
-                {offline ? <span>Sends when online</span> : sent && <span>{shiftLabel(sent)}</span>}
-              </span>
-            </button>
-          </div>
-        ) : (
-          <button type="button" className={`btn today-seg today-submit${phase === 'after' ? ' btn-lime' : ''}`} onClick={() => setLogOpen(true)}>
-            <Icon name="logTime" size={18} color="#111A1B" strokeWidth={1.8} />
-            Submit hours
-          </button>
         )}
       </div>
     </div>

@@ -6,6 +6,7 @@ import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../
 import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
+import { TodayBar } from '../components/TodayBar';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { Wordmark } from '../components/Brand';
@@ -65,6 +66,7 @@ export function DashboardScreen() {
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
         <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />
+        {sn.hero && <TodayBar hero={sn.hero} />}
       </GradientHeader>
 
       <Sheet className="sheet-dash">
