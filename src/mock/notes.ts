@@ -153,7 +153,7 @@ export const notes: Note[] = [
         { label: 'Set medic', name: 'Medic Matthias', phone: '+43 664 555 10 01', note: 'First aid on set, shoot days' },
         { label: 'Location manager', name: 'Location Lukas', phone: '+43 664 555 09 01' },
         { label: 'Hospital in Vienna (A&E)', name: 'AKH Wien', phone: '+43 1 40400 0', note: 'Währinger Gürtel 18–20, 1090 Wien · open 24 h' },
-        { label: 'Hospital in Madeira (A&E)', name: 'Hospital Dr. Nélio Mendonça', phone: '+351 291 705 700', note: 'Funchal · open 24 h · for the Madeira days' },
+        { label: 'Hospital in Madeira (A&E)', name: 'Hospital Dr. Nélio Mendonça', phone: '+351 291 705 600', note: 'Av. Luís de Camões 6180, 9000-177 Funchal · open 24 h · for the Madeira days' },
       ],
       hours: [
         { days: 'Mon–Fri', time: '08:00–19:00' },
