@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { today, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
@@ -25,14 +25,28 @@ function Crossfade({ id, children }: { id: string; children: ReactNode }) {
   useEffect(() => {
     last.current = children;
   });
+  // Keep --xf-h at the height of the version fading in, so the card's height can ease between notes.
+  // Not under reduced motion: the height just follows the content.
+  const box = useRef<HTMLDivElement>(null);
+  const incoming = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const outer = box.current;
+    const inner = incoming.current;
+    if (!outer || !inner || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const measure = () => outer.style.setProperty('--xf-h', `${inner.offsetHeight}px`);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [id]);
   useEffect(() => {
     if (!leaving) return;
     const t = window.setTimeout(() => setLeaving(null), FADE_MS + 40);
     return () => window.clearTimeout(t);
   }, [leaving]);
   return (
-    <div className="xf">
-      <div className="xf-in" key={id}>
+    <div className="xf" ref={box}>
+      <div className="xf-in" key={id} ref={incoming}>
         {children}
       </div>
       {leaving && (
