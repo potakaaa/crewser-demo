@@ -15,6 +15,8 @@ export interface AppNotification {
   /** When it arrived, an ISO timestamp with offset. The demo clock is Mon 19 Oct 2026, 08:40 (UTC+2). */
   at: string;
   target: NotifTarget;
+  /** For an hours notification: the day (ISO) it is about. It disappears once that day has been sent. */
+  day?: string;
   /** Already read when the demo starts (or after Reset). */
   read: boolean;
 }
@@ -47,6 +49,7 @@ const byLink: Record<string, AppNotification[]> = {
     {
       id: 'ferry-me-hours-sun',
       kind: 'hours',
+      day: '2026-10-18',
       title: 'Sun 18 hours not sent',
       body: 'Still a draft. Send them so production can approve.',
       at: '2026-10-19T07:30:00+02:00',
@@ -89,6 +92,7 @@ const byLink: Record<string, AppNotification[]> = {
     {
       id: 'ferry-samir-hours-sun',
       kind: 'hours',
+      day: '2026-10-18',
       title: 'Sun 18 hours are still a draft',
       body: 'Check them with Samir and send.',
       at: '2026-10-19T07:30:00+02:00',

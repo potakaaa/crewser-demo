@@ -37,7 +37,7 @@
   background: none;
   font-weight: 600;
 }
-.notif-markall:disabled {
+.notif-markall[aria-disabled='true'] {
   opacity: 0.4;
 }
 

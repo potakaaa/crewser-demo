@@ -1,4 +1,4 @@
-import { today } from '../../mock';
+import { NOW } from '../../mock/projects';
 import type { NotifKind } from '../../mock/notifications';
 import { useDemo, useNotifications, useUnreadCount } from '../../store';
 import { Icon, type IconName } from '../Icon';
@@ -10,9 +10,6 @@ const KIND_ICON: Record<NotifKind, IconName> = {
   hours: 'logTime',
   link: 'link',
 };
-
-/** The demo clock, so "12 min ago" never depends on the real time. */
-const NOW = Date.parse(`${today.date}T${today.time}:00+02:00`);
 
 function ago(at: string): string {
   const min = Math.max(0, Math.round((NOW - Date.parse(at)) / 60_000));
@@ -49,7 +46,7 @@ export function NotificationsSheet() {
         <span className="notif-count" aria-live="polite">
           {unread > 0 ? `${unread} unread` : 'All read'}
         </span>
-        <button type="button" className="notif-markall" disabled={unread === 0} onClick={markAllRead}>
+        <button type="button" className="notif-markall" aria-disabled={unread === 0} onClick={() => unread > 0 && markAllRead()}>
           Mark all read
         </button>
       </div>

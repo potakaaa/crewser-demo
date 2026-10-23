@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { linkById, links, noteById, pdfs, today, type CrewLink } from './mock';
+import { linkById, links, noteById, pdfs, today, workdaysFor, type CrewLink } from './mock';
 import { initialRead, notificationsFor, type AppNotification, type NotifKind } from './mock/notifications';
-import { todayPlan } from './lib/stats';
+import { hoursOverview, todayPlan } from './lib/stats';
 import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { addDays, addMonths, firstOfMonth } from './lib/dates';
@@ -440,7 +440,13 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       const read = s.notifRead[s.activeLinkId] ?? [];
       return read.includes(id) ? {} : { notifRead: { ...s.notifRead, [s.activeLinkId]: [...read, id] } };
     }),
-  markAllRead: () => set((s) => ({ notifRead: { ...s.notifRead, [s.activeLinkId]: notificationsFor(s.activeLinkId).map((n) => n.id) } })),
+  markAllRead: () =>
+    set((s) => {
+      // Only what the list shows: a kind switched off in Settings stays unread for when it comes back.
+      const shown = visibleNotifications(s.activeLinkId, s.submitted[s.activeLinkId] ?? NO_DAYS, usePrefs.getState()).map((n) => n.id);
+      const read = s.notifRead[s.activeLinkId] ?? [];
+      return { notifRead: { ...s.notifRead, [s.activeLinkId]: [...read, ...shown.filter((id) => !read.includes(id))] } };
+    }),
   openNotification: (id) => {
     const n = notificationsFor(get().activeLinkId).find((x) => x.id === id);
     if (!n) return;
@@ -467,24 +473,34 @@ export const useActiveLink = () => useDemo((s) => s.links.find((l) => l.id === s
 /** The Settings switch that turns a kind of notification off. Kinds not listed are always shown. */
 const KIND_PREF: Partial<Record<NotifKind, 'callSheetOut' | 'hoursReminder'>> = { callsheet: 'callSheetOut', hours: 'hoursReminder' };
 
+const NO_DAYS: string[] = [];
+
+/** A link's notifications that are still relevant: Settings allows the kind, and an hours one only while its day is unsent. */
+function visibleNotifications(linkId: string, submitted: string[], prefs: { callSheetOut: boolean; hoursReminder: boolean }): AppNotification[] {
+  const unsent = hoursOverview(submitted, null, workdaysFor(linkId)).unsent.map((d) => d.date);
+  return notificationsFor(linkId).filter((n) => {
+    const key = KIND_PREF[n.kind];
+    if (key && !prefs[key]) return false;
+    return n.kind !== 'hours' || !n.day || unsent.includes(n.day);
+  });
+}
+
 export type NotificationItem = AppNotification & { unread: boolean };
 
-/** The active link's notifications that Settings allows, unread first, newest first within each group. */
+/** The active link's notifications to show, unread first, newest first within each group. */
 export function useNotifications(): NotificationItem[] {
   const linkId = useDemo((s) => s.activeLinkId);
   const read = useDemo((s) => s.notifRead[s.activeLinkId]);
+  const submitted = useDemo((s) => s.submitted[s.activeLinkId] ?? NO_DAYS);
   const callSheetOut = usePrefs((p) => p.callSheetOut);
   const hoursReminder = usePrefs((p) => p.hoursReminder);
-  return useMemo(() => {
-    const prefs = { callSheetOut, hoursReminder };
-    return notificationsFor(linkId)
-      .filter((n) => {
-        const key = KIND_PREF[n.kind];
-        return !key || prefs[key];
-      })
-      .map((n) => ({ ...n, unread: !read?.includes(n.id) }))
-      .sort((a, b) => Number(b.unread) - Number(a.unread) || Date.parse(b.at) - Date.parse(a.at));
-  }, [linkId, read, callSheetOut, hoursReminder]);
+  return useMemo(
+    () =>
+      visibleNotifications(linkId, submitted, { callSheetOut, hoursReminder })
+        .map((n) => ({ ...n, unread: !read?.includes(n.id) }))
+        .sort((a, b) => Number(b.unread) - Number(a.unread) || Date.parse(b.at) - Date.parse(a.at)),
+    [linkId, read, submitted, callSheetOut, hoursReminder],
+  );
 }
 
 /** Unread notifications of the active link, for the bell's badge. */

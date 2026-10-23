@@ -91,7 +91,7 @@ const rawLinks: Omit<CrewLink, 'status'>[] = [
 ];
 
 /** The demo clock: Mon 19 Oct 2026, 08:40 in Vienna (CEST, UTC+2). */
-const NOW = Date.parse(`${today.date}T${today.time}:00+02:00`);
+export const NOW = Date.parse(`${today.date}T${today.time}:00+02:00`);
 const DAY_MS = 86_400_000;
 /** A link counts as "expiring" this many days before it ends. */
 const EXPIRING_DAYS = 7;
