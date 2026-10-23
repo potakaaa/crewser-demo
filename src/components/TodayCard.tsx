@@ -123,7 +123,7 @@ function UrgentBody({ u }: { u: Urgent }) {
         </button>
       )}
       {/* A note without an action keeps the slot, so the card is the same height whichever note the ruler is on. */}
-      {!note.primaryAction && !attachment && <div aria-hidden="true" style={{ height: 'calc(36px + var(--sp-2))' }} />}
+      {!note.primaryAction && !attachment && <div className="today-action-slot" aria-hidden="true" />}
     </div>
   );
 }

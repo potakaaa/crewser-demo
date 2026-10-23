@@ -537,6 +537,11 @@
   position: absolute;
   inset: -5px -1px;
 }
+/* A note without an action keeps its room, so the card is the same height on every note. Same size as .today-action plus its margin. */
+.today-action-slot {
+  flex: none;
+  height: calc(36px + var(--sp-2));
+}
 
 /* ───────── Primary button for a note's own action (.btn-sky, wired in NotePrimaryAction) ─────────
    The brand surface: dark ink to deep green with a faint lime glow and film grain, white text
