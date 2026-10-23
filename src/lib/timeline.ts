@@ -17,8 +17,6 @@ export const REST_PX = 4;
 export const STOP_GAP = 3;
 /** Arrow keys step to the next note further than this (px) from the playhead. Smaller than STOP_GAP, so ties never trap them. */
 export const NAV_EPS = STOP_GAP / 2;
-/** A note further than this past the playhead is "nothing else until …". */
-const QUIET = 3 * HOUR;
 
 export interface RulerMark {
   key: string;
@@ -54,14 +52,11 @@ export interface Scrub {
   stops: ScrubStop[];
   /** Ruler length in px, Now to the end. */
   length: number;
-  minAt: (x: number) => number;
 }
 
 /** Which note the playhead is on: the nearest one, ahead or behind. Null (no Preview) means Now is nearest. */
 export interface Preview {
   index: number;
-  /** The note is a long way ahead of the playhead. */
-  quiet: boolean;
 }
 
 /** "in 20 min" · "in 4 h" · "in 2 days": short enough for a one-line caption. */
@@ -99,14 +94,6 @@ export function buildScrub(list: Note[] = allNotes): Scrub {
     }
     return last.x + ((min - last.min) / DAY) * MARK_GAP;
   };
-  const minAt = (x: number) => {
-    if (x <= 0) return 0;
-    for (let i = 1; i < marks.length; i++) {
-      if (x <= marks[i].x) return marks[i - 1].min + ((x - marks[i - 1].x) / MARK_GAP) * (marks[i].min - marks[i - 1].min);
-    }
-    return last.min + ((x - last.x) / MARK_GAP) * DAY;
-  };
-
   // Notes at the same time, or just after Now, would share a spot or sit under the "back at Now" zone
   // and never be reachable: each is nudged right of the one before it.
   let prevX = REST_PX - STOP_GAP + 1;
@@ -131,7 +118,7 @@ export function buildScrub(list: Note[] = allNotes): Scrub {
     .map<PastDot>((n) => ({ note: n, x: -(nowMin - at(n)) * pxPerMin }));
 
   const end = Math.max(last.min, (stops[stops.length - 1]?.min ?? 0) + TAIL);
-  return { marks, past, stops, length: Math.ceil(Math.max(xAt(end), prevX + STOP_GAP * 4)), minAt };
+  return { marks, past, stops, length: Math.ceil(Math.max(xAt(end), prevX + STOP_GAP * 4)) };
 }
 
 /**
@@ -155,19 +142,15 @@ function nearestStop(s: Scrub, x: number): number {
 export function previewAt(s: Scrub, x: number): Preview | null {
   const index = nearestStop(s, x);
   if (index < 0) return null;
-  return { index, quiet: s.stops[index].min - s.minAt(x) > QUIET };
+  return { index };
 }
 
-export const samePreview = (a: Preview | null, b: Preview | null) => a === b || (!!a && !!b && a.index === b.index && a.quiet === b.quiet);
+export const samePreview = (a: Preview | null, b: Preview | null) => a === b || (!!a && !!b && a.index === b.index);
 
-/** The caption under the card: "Preview · in 4 h · Tue 08:00" or "Nothing else until Tue 08:00". */
+/** The caption under the card: "Preview · in 4 h · Tue 08:00". */
 export function previewLine(s: Scrub, p: Preview): string {
   const stop = s.stops[p.index];
-  if (!stop) {
-    const lastStop = s.stops[s.stops.length - 1];
-    return lastStop ? `Nothing else after ${lastStop.when}` : 'Nothing else coming up';
-  }
-  return p.quiet ? `Nothing else until ${stop.when}` : `Preview · ${stop.rel} · ${stop.when}`;
+  return `Preview · ${stop.rel} · ${stop.when}`;
 }
 
 /** Notes closer together than this (px) on the ruler overlap as dots (10 px wide), so they get one count badge. */
@@ -201,4 +184,13 @@ export function clusters(stops: ScrubStop[]): (Cluster | null)[] {
 export function snapTarget(s: Scrub, x: number): number {
   const i = nearestStop(s, x);
   return i < 0 ? 0 : s.stops[i].x;
+}
+
+/**
+ * One stop on from `x`, like an arrow key or a wheel notch: the next note further than NAV_EPS ahead,
+ * or the previous note behind (Now when there is none). Null when going forward from the last note.
+ */
+export function stepTarget(s: Scrub, x: number, dir: 1 | -1): number | null {
+  if (dir > 0) return s.stops.find((st) => st.x > x + NAV_EPS)?.x ?? null;
+  return [...s.stops].reverse().find((st) => st.x < x - NAV_EPS)?.x ?? 0;
 }

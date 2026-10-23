@@ -130,22 +130,6 @@ function UrgentBody({ u }: { u: Urgent }) {
   );
 }
 
-function NothingLeft() {
-  return (
-    <div className="today-urgent">
-      <div className="today-top">
-        <span className="today-tag">ALL CLEAR</span>
-      </div>
-      <div className="today-main today-main-empty">
-        <span className="today-titles">
-          <span className="today-t1">Nothing else scheduled</span>
-          <span className="today-t2">Production has not sent anything after this.</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
 function NothingToday() {
   return (
     <div className="today-urgent">
@@ -174,10 +158,11 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
 
   let key: string;
   let body: ReactNode;
-  if (preview) {
-    const stop = scrub.stops[preview.index];
-    key = stop ? `stop-${preview.index}` : 'none';
-    body = stop ? <UrgentBody u={stopUrgent(stop.note, preview.index)} /> : <NothingLeft />;
+  // A preview from the ruler before this one (Empty was toggled) can point past the stops for one render.
+  const stop = preview ? scrub.stops[preview.index] : undefined;
+  if (preview && stop) {
+    key = `stop-${preview.index}`;
+    body = <UrgentBody u={stopUrgent(stop.note, preview.index)} />;
   } else if (hero) {
     const u = heroUrgent(hero, phase, submitted ? (offline ? 'saved' : 'sent') : null);
     key = u.key;
@@ -191,7 +176,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
     <div className="today-card">
       <Crossfade id={key}>{body}</Crossfade>
       <div className="today-line">
-        {preview ? (
+        {preview && stop ? (
           <>
             <span className="today-preview">{previewLine(scrub, preview)}</span>
             <button type="button" className="pill-btn" onClick={onBack}>

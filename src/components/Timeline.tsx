@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref, type RefObject } from 'react';
 import { TYPE_COLOR } from '../lib/noteStyle';
-import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewLine, samePreview, snapTarget, type Preview, type Scrub } from '../lib/timeline';
+import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewLine, samePreview, snapTarget, stepTarget, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
 /** Fastest fling that still counts, px per ms. */
@@ -37,21 +37,24 @@ interface Glider {
  * Everything that moves the ruler. Touch and trackpads scroll it natively; this adds mouse drag
  * (with a short fling), the mouse wheel, and tells `onScrub` the scroll position once per frame.
  * Once the ruler has been still for a moment, with no finger or button down, it glides to the
- * position `snapTo` names (the next note, or Now). A double tap or double click calls `onDoubleTap`.
+ * position `snapTo` names (the nearest note, or Now). A wheel notch steps one stop, like an arrow key. A double tap or double click calls `onDoubleTap`.
  * It works on the DOM node, so React never re-renders while the ruler moves.
  */
 function useScrubber(
   el: HTMLDivElement | null,
   onScrub: (x: number) => void,
   snapTo: (x: number) => number,
+  stepTo: (x: number, dir: 1 | -1) => number | null,
   onDoubleTap: () => void,
 ): RefObject<Glider> {
   const onScrubRef = useRef(onScrub);
   const snapRef = useRef(snapTo);
+  const stepRef = useRef(stepTo);
   const doubleTapRef = useRef(onDoubleTap);
   useEffect(() => {
     onScrubRef.current = onScrub;
     snapRef.current = snapTo;
+    stepRef.current = stepTo;
     doubleTapRef.current = onDoubleTap;
   });
   const glider = useRef<Glider>({ glideTo: () => {}, target: () => null });
@@ -238,6 +241,7 @@ function useScrubber(
     // swipes and Shift+wheel arrive as deltaX and scroll the ruler natively.
     let lastOther = -Infinity;
     const onWheel = (e: WheelEvent) => {
+      const heading = glideEnd; // where a glide in progress was going: notches in a row step on from there
       stopGlide();
       settleSoon(); // a wheel turn the page takes sends the ruler no scroll event
       const legacy = (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY ?? 0;
@@ -247,11 +251,13 @@ function useScrubber(
         return;
       }
       if (!e.cancelable || e.timeStamp - lastOther < 150) return;
-      const atStart = el.scrollLeft <= 0 && e.deltaY < 0;
-      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1 && e.deltaY > 0;
-      if (atStart || atEnd) return;
+      // One notch, one stop: a notch is shorter than half a gap, so a plain scroll would only snap back.
+      // At either end the notch goes to the page instead.
+      const base = heading ?? el.scrollLeft;
+      const to = stepRef.current(base, e.deltaY > 0 ? 1 : -1);
+      if (to === null || Math.abs(to - base) < NAV_EPS) return;
       e.preventDefault();
-      el.scrollBy({ left: e.deltaY * (e.deltaMode === 1 ? 16 : 1) * 0.6, behavior: 'auto' });
+      glideTo(to);
     };
 
     const onClickCapture = (e: MouseEvent) => {
@@ -352,6 +358,7 @@ export function Timeline({
     el,
     onScrub,
     (x) => snapTarget(scrub, x),
+    (x, dir) => stepTarget(scrub, x, dir),
     () => backToNowRef.current(true),
   );
 
@@ -378,8 +385,8 @@ export function Timeline({
     // Repeated presses step on from where the glide is heading, not from where it happens to be.
     const x = glider.current.target() ?? el.scrollLeft;
     let to: number | null = null;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = scrub.stops.find((s) => s.x > x + NAV_EPS)?.x ?? x;
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = [...scrub.stops].reverse().find((s) => s.x < x - NAV_EPS)?.x ?? 0;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = stepTarget(scrub, x, 1) ?? x;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = stepTarget(scrub, x, -1);
     else if (e.key === 'Home') to = 0;
     else if (e.key === 'End') to = scrub.stops[scrub.stops.length - 1]?.x ?? 0;
     if (to === null) return;
@@ -388,8 +395,8 @@ export function Timeline({
   };
 
   if (!scrub.stops.length) return null;
-  const line = preview ? previewLine(scrub, preview) : 'Now. Nothing previewed.';
-  const current = preview && scrub.stops[preview.index];
+  const current = preview ? scrub.stops[preview.index] : undefined;
+  const line = preview && current ? previewLine(scrub, preview) : 'Now. Nothing previewed.';
   const clusters = clusterOf(scrub.stops);
   return (
     <section className="tl" aria-label="Preview what is coming up">
