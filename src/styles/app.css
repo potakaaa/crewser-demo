@@ -1426,6 +1426,10 @@
   flex-direction: column;
   gap: var(--sp-2);
 }
+/* No time block above it (a General info note): the title sits under the icon tile without the browser's h3 margins. */
+.detail-hero-solo .detail-title {
+  margin: 0;
+}
 .detail-hero-time {
   display: flex;
   align-items: baseline;

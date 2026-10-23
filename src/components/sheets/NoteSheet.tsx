@@ -7,9 +7,10 @@ import { QrPreview } from '../QrPreview';
 import { CrewSection } from '../CrewStack';
 import { hasScanCode, timeSub, timeText, TYPE_LABEL, whenLabel } from '../../lib/notes';
 
-/** Sheet title and subtitle for a note, used by SheetHost. */
+/** Sheet title and subtitle for a note, used by SheetHost. A note without a date is General info and says nothing about dates. */
 export function noteSheetMeta(id?: string) {
   const note = id ? noteById(id) : undefined;
+  if (note && !note.day) return { title: 'General info', subtitle: undefined };
   return { title: note ? TYPE_LABEL[note.type] : 'Note', subtitle: note ? whenLabel(note) : undefined };
 }
 
@@ -41,11 +42,13 @@ export function NoteSheet({ id }: { id?: string }) {
             </div>
           </div>
         ) : (
-          <div className="detail-hero">
-            <div className="detail-hero-time">
-              <span className="detail-big">{timeText(note)}</span>
-              <span className="detail-sub">{timeSub(note)}</span>
-            </div>
+          <div className={`detail-hero${note.day ? '' : ' detail-hero-solo'}`}>
+            {note.day && (
+              <div className="detail-hero-time">
+                <span className="detail-big">{timeText(note)}</span>
+                <span className="detail-sub">{timeSub(note)}</span>
+              </div>
+            )}
             <h3 className="detail-title">{note.title}</h3>
           </div>
         )}
