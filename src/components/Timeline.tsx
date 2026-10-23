@@ -355,6 +355,14 @@ export function Timeline({
     shown.current = preview;
   }, [preview]);
 
+  // When the preview ends (Home, a double tap, Back to now, scrolling back), say so; never on first mount.
+  const [backAtNow, setBackAtNow] = useState(false);
+  const hadPreview = useRef(false);
+  useEffect(() => {
+    setBackAtNow(hadPreview.current && !preview);
+    hadPreview.current = !!preview;
+  }, [preview]);
+
   const backToNowRef = useRef<(focus?: boolean) => void>(() => {});
   const glider = useScrubber(
     el,
@@ -462,7 +470,7 @@ export function Timeline({
         Left and right arrow keys move between notes. Home goes back to now.
       </p>
       <p className="sr-only" role="status">
-        {preview && current ? `${current.note.title}, ${line}` : ''}
+        {preview && current ? `${current.note.title}, ${line}` : backAtNow ? 'Back at now' : ''}
       </p>
     </section>
   );

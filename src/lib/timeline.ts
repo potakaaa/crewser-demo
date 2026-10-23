@@ -163,12 +163,12 @@ export function previewLine(s: Scrub, p: Preview): string {
   return [clusterTag(s, p.index), TYPE_LABEL[stop.note.type], stop.when].filter(Boolean).join(' · ');
 }
 
-/** The same for a screen reader, with the count spelled out and how far away the note is: "2 of 3, Hotel, in 2 days, Wed 15:00". */
+/** The same for a screen reader, with the count spelled out and how far away the note is: "note 2 of 3, Hotel, in 2 days, Wed 15:00". */
 export function previewSpoken(s: Scrub, p: Preview): string {
   const stop = s.stops[p.index];
   if (!stop) return '';
   const c = clusters(s.stops)[p.index];
-  return [c && `${c.pos} of ${c.n}`, TYPE_LABEL[stop.note.type], stop.rel, stop.when].filter(Boolean).join(', ');
+  return [c && `note ${c.pos} of ${c.n}`, TYPE_LABEL[stop.note.type], stop.rel, stop.when].filter(Boolean).join(', ');
 }
 
 /** Notes closer together than this (px) on the ruler overlap as dots (10 px wide), so they get one count badge. */
