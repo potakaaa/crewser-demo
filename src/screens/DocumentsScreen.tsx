@@ -123,7 +123,7 @@ export function DocumentsScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={`${projectName} · ${docs.length} files`} title="Documents">
-          <ForChip tone="light" compact />
+          <ForChip tone="dark" compact />
           <NotifButton tone="dark" />
         </ScreenTitle>
         <div className="fchips" role="group" aria-label="Filter documents">

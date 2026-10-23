@@ -8,8 +8,8 @@ import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
 import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
-import { sortNotes, TYPE_LABEL, undatedNotes } from '../lib/notes';
-import { chipStyle, TYPE_COLOR } from '../lib/noteStyle';
+import { sortNotes, TYPE_LABEL } from '../lib/notes';
+import { TYPE_COLOR } from '../lib/noteStyle';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
 
@@ -93,7 +93,6 @@ export function CalendarScreen() {
   const grid = monthGrid(calMonth);
 
   const dayNotes = notesOn(calDate);
-  const undated = undatedNotes(notes);
   const rel = relativeDay(calDate, today.date);
   const dayLabel = rel === 'today' ? `Today · ${fmtDayMonth(calDate)}` : rel === 'tomorrow' ? `Tomorrow · ${fmtDayMonth(calDate)}` : fmtDayMonth(calDate);
   const unit = monthOpen ? 'month' : 'week';
@@ -125,7 +124,7 @@ export function CalendarScreen() {
                 {link.isMe ? label : label.replace(/^([A-Z][a-z]{2})[a-z]+(?= \d)/, '$1')}
                 {link.isMe ? !monthOpen && ` · CW ${isoWeek(monday)}` : ' · '}
               </span>
-              <ForChip tone="light" compact bare />
+              <ForChip tone="dark" compact bare />
               <span className="chev" data-open={monthOpen}>
                 <Icon name="down" size={16} color="#C4CFD0" strokeWidth={1.8} />
               </span>
@@ -212,18 +211,6 @@ export function CalendarScreen() {
 
       <Sheet className="sheet-cal">
         {offline && <OfflineBanner tone="light" />}
-        {undated.length > 0 && (
-          <button type="button" className="undated-row" onClick={() => openSheet('note', undated[0].id)}>
-            <span className="chip-icon" style={chipStyle(undated[0].type)}>
-              <Icon name={undated[0].type} size={18} />
-            </span>
-            <span className="todo-titles">
-              <span className="undated-t1">{undated.length === 1 ? '1 note without a date' : `${undated.length} notes without a date`}</span>
-              <span className="undated-t2">{undated[0].title}</span>
-            </span>
-            <Icon name="right" size={18} color="#54686C" />
-          </button>
-        )}
         <div key={calDate} className="day-list">
           <div className="day-heading">
             <h2>{dayLabel}</h2>

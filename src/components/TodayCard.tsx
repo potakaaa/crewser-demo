@@ -117,7 +117,7 @@ function UrgentBody({ u }: { u: Urgent }) {
       </button>
       <NotePrimaryAction note={note} className="today-action" />
       {attachment && (
-        <button type="button" className="btn btn-sky today-action" onClick={() => a.quick(note)}>
+        <button type="button" className="btn btn-primary today-action" onClick={() => a.quick(note)}>
           <Icon name="clip" size={16} color="#FFFFFF" strokeWidth={1.8} />
           Open
         </button>
