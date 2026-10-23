@@ -1488,7 +1488,7 @@
 }
 .ns-tbc {
   padding-bottom: 2px;
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-weight: 500;
   line-height: 1.2;
   color: var(--on-dark-2);
@@ -1518,7 +1518,7 @@
 }
 .ns-callout p {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-base);
   line-height: 1.5;
   white-space: pre-line;
   color: var(--text-2);

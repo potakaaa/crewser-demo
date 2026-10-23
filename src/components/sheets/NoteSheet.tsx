@@ -24,12 +24,14 @@ export function NoteSheet({ id }: { id?: string }) {
   const flightNo = note.facts.find((f) => f.label === 'Flight no.')?.value;
   // The hero shows call and wrap, or the time with its note ("15:00 Check-in"); a flight's number is in the pair under it.
   // The facts list does not repeat any of those (the sheet's subtitle already gives the date).
-  const wrap = note.facts.find((f) => f.label === 'Wrap');
+  // Only a dated note has the time block; an undated one keeps all its facts.
+  const call = note.day ? note.facts.find((f) => f.label === 'Call') : undefined;
+  const wrap = note.day ? note.facts.find((f) => f.label === 'Wrap') : undefined;
   const atTime = (value: string) => !!note.time && value.endsWith(note.time);
   const inHero = (label: string, value: string) =>
     isFlight
       ? label === 'Flight no.'
-      : (label === 'Call' && value === note.time) || (label === 'Wrap' && !!wrap) || (!wrap && label === timeSub(note) && atTime(value));
+      : (label === 'Call' && !!call) || (label === 'Wrap' && !!wrap) || (!wrap && !!note.day && label === timeSub(note) && atTime(value));
   const facts = note.facts.filter((f) => !inHero(f.label, f.value));
   // With its own Directions button below, a place only needs Copy here.
   const directionsBelow = !!pa && pa.kind !== 'boardingPass';
@@ -59,8 +61,8 @@ export function NoteSheet({ id }: { id?: string }) {
           note.day && (
             <div className="ns-times">
               <span className="ns-time">
-                <span className="ns-k">{wrap ? 'Call' : note.kind === 'time' ? 'Time' : 'When'}</span>
-                <span className="ns-big">{timeText(note)}</span>
+                <span className="ns-k">{call || wrap ? 'Call' : note.kind === 'time' ? 'Time' : 'When'}</span>
+                <span className="ns-big">{call?.value ?? timeText(note)}</span>
                 {!wrap && timeSub(note) && <span className="ns-sub">{timeSub(note)}</span>}
               </span>
               {wrap && (
