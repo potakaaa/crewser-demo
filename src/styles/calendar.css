@@ -164,3 +164,8 @@ button.day-action:active {
 .sheet-cal .undated-row {
   min-height: 52px;
 }
+
+/* Week arrows ride level with the bell in the top-right corner, as on every other screen. */
+.gh-titlebar:has(.month-toggle) > .icon-btn {
+  align-self: flex-start;
+}
