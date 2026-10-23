@@ -98,8 +98,8 @@ export function ContentCard({ note }: { note: Note }) {
             </div>
           )}
           {pa && (
-            <button type="button" className="btn btn-ink" onClick={() => a.primary(note)}>
-              <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+            <button type="button" className="btn btn-outline ccard-action" onClick={() => a.primary(note)}>
+              <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#111A1B" strokeWidth={1.8} />
               {pa.label}
             </button>
           )}

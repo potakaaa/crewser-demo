@@ -10,7 +10,7 @@ export function InfoPocket({ notes }: { notes: Note[] }) {
   return (
     <button type="button" className="pocket" onClick={() => openSheet('info')} aria-label={`General info, ${notes.length} ${notes.length === 1 ? 'note' : 'notes'}: ${preview}. Open`}>
       <span className="pocket-icon">
-        <Icon name="plain" size={18} color="#2A3B3F" />
+        <Icon name="plain" size={18} color="#111A1B" />
       </span>
       <span className="pocket-text">
         <span className="pocket-t1">

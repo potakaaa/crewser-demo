@@ -135,11 +135,11 @@ function UrgentBody({ u }: { u: Urgent }) {
   return (
     <div className="today-urgent">
       <div className="today-top">
-        <span className={u.tone === 'lime' ? 'chip-lime' : 'chip-quiet'}>{u.tag}</span>
+        <span className="today-tag" data-tone={u.tone}>{u.tag}</span>
         <span className="today-meta">{u.meta}</span>
         <span className="spacer" />
         {place && u.tone === 'lime' && (
-          <button type="button" className="icon-btn icon-btn-chip today-ib" aria-label={`Directions to ${place}`} onClick={a.directions}>
+          <button type="button" className="icon-btn today-ib" aria-label={`Directions to ${place}`} onClick={a.directions}>
             <Icon name="nav" size={17} color="#111A1B" />
           </button>
         )}
@@ -160,7 +160,7 @@ function NothingLeft() {
   return (
     <div className="today-urgent">
       <div className="today-top">
-        <span className="chip-quiet">ALL CLEAR</span>
+        <span className="today-tag">ALL CLEAR</span>
       </div>
       <div className="today-main today-main-empty">
         <span className="today-titles">
@@ -176,7 +176,7 @@ function NothingToday() {
   return (
     <div className="today-urgent">
       <div className="today-top">
-        <span className="chip-quiet">TODAY</span>
+        <span className="today-tag">TODAY</span>
         <span className="today-meta">Shoot day {today.shootDay}</span>
       </div>
       <div className="today-main today-main-empty">
@@ -252,7 +252,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
 
       <div className="today-actions">
         {sheet && (
-          <button type="button" className="btn btn-soft btn-md today-sheet" onClick={() => a.openPdf(sheet.file)}>
+          <button type="button" className="btn today-seg today-sheet" onClick={() => a.openPdf(sheet.file)}>
             <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
             Call sheet
             <span className="today-sheet-day">{shortTitle(sheet.title).replace('Shoot day ', 'Day ')}</span>
@@ -262,7 +262,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
           <div className="today-sent">
             <button
               type="button"
-              className="btn btn-md today-sent-btn"
+              className="btn today-seg today-sent-btn"
               onClick={() => setLogOpen(true)}
               aria-label={sent ? `${offline ? 'Saved on this phone' : 'Sent'}: ${fmtDayMonth(today.date)}, ${shiftLabel(sent).replace(' · ', ', ')}. Review` : 'Hours submitted. Review'}
             >
@@ -274,7 +274,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
             </button>
           </div>
         ) : (
-          <button type="button" className={`btn btn-md today-submit ${phase === 'after' ? 'btn-lime' : 'btn-outline'}`} onClick={() => setLogOpen(true)}>
+          <button type="button" className={`btn today-seg today-submit${phase === 'after' ? ' btn-lime' : ''}`} onClick={() => setLogOpen(true)}>
             <Icon name="logTime" size={18} color="#111A1B" strokeWidth={1.8} />
             Submit hours
           </button>
