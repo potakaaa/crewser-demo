@@ -256,20 +256,19 @@
   background: #ffffff;
   color: var(--ink);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 10px 28px rgba(8, 14, 15, 0.2);
+  overflow: clip;
 }
 .today-card > * {
   flex: none;
 }
 
-/* The swappable top part. Fixed height, so previewing never moves anything below it. */
-/* A note without an action makes the card shorter: the height eases over the crossfade's
-   180 ms, so the Today bar below glides instead of jumping. --xf-h is the incoming layer's
-   height, measured in TodayCard; the outgoing layer is clipped a little outside the box. */
+/* The swappable top part. A note without an action makes the card shorter: the height eases
+   over the crossfade's 180 ms, so the Today bar below glides instead of jumping. --xf-h is the
+   incoming layer's height, measured in TodayCard. Only the outgoing layer is clipped; the card's
+   own edge keeps a growing note off the Today bar. */
 .xf {
   position: relative;
   height: var(--xf-h, auto);
-  overflow: clip;
-  overflow-clip-margin: 6px;
   transition: height 180ms var(--ease-out);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -284,6 +283,7 @@
 .xf-out {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   pointer-events: none;
   animation: xf-out 180ms ease both;
 }
@@ -549,6 +549,16 @@
   width: 100%;
   min-height: 44px;
   margin-top: var(--sp-1);
+}
+/* Inside the card: the focus ring sits on the button (lime, to show on the dark fill), and the lift stays within the card's 12 px padding. */
+.btn.btn-primary.today-action:focus-visible {
+  outline-color: var(--lime);
+  outline-offset: -3px;
+}
+.btn.btn-primary.today-action {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 6px rgba(17, 33, 35, 0.2);
 }
 
 /* ───────── Primary button for a note's own action (NotePrimaryAction) ─────────
