@@ -74,7 +74,7 @@
 button.day-action:active {
   transform: scale(0.97);
 }
-/* The day's primary: the note primary button (.btn-sky in dashboard.css), scaled down. */
+/* The day's primary: the note primary button (.btn-primary in dashboard.css), scaled down. */
 .day-action-sheet {
   background: var(--brand-surface);
   color: #ffffff;
@@ -168,4 +168,20 @@ button.day-action:active {
 /* Week arrows ride level with the bell in the top-right corner, as on every other screen. */
 .gh-titlebar:has(.month-toggle) > .icon-btn {
   align-self: flex-start;
+}
+
+/* On a colleague's link the chip sits in the month label ("Oct 2026 · ● Bianca"): plain text, no pill. */
+.month-toggle .for-chip {
+  height: auto;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #ffffff;
+  font-size: inherit;
+  font-weight: 600;
+}
+.month-toggle .for-chip-dot {
+  box-shadow: none;
 }
