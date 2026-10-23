@@ -150,6 +150,7 @@ export const samePreview = (a: Preview | null, b: Preview | null) => a === b || 
 /** The caption under the card: "Preview · in 4 h · Tue 08:00". */
 export function previewLine(s: Scrub, p: Preview): string {
   const stop = s.stops[p.index];
+  if (!stop) return ''; // a preview left over from an earlier ruler
   return `Preview · ${stop.rel} · ${stop.when}`;
 }
 
@@ -188,7 +189,8 @@ export function snapTarget(s: Scrub, x: number): number {
 
 /**
  * One stop on from `x`, like an arrow key or a wheel notch: the next note further than NAV_EPS ahead,
- * or the previous note behind (Now when there is none). Null when going forward from the last note.
+ * or the previous note behind (Now when there is none). Not symmetric on purpose: going forward from the last
+ * note gives null (nowhere to go), going back from the first gives 0 (Now is always a place to go).
  */
 export function stepTarget(s: Scrub, x: number, dir: 1 | -1): number | null {
   if (dir > 0) return s.stops.find((st) => st.x > x + NAV_EPS)?.x ?? null;
