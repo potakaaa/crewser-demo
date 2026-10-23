@@ -599,9 +599,9 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: var(--grain, none) 0 0 / 160px 160px;
-  opacity: 0.2;
-  mix-blend-mode: overlay;
+  background: var(--grain, none) 0 0 / var(--grain-card-size) var(--grain-card-size);
+  opacity: var(--grain-card-opacity);
+  mix-blend-mode: var(--grain-card-blend);
   pointer-events: none;
 }
 .btn.btn-primary:hover {
@@ -727,9 +727,9 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--grain, none) 0 0 / 160px 160px;
-  opacity: 0.15;
-  mix-blend-mode: overlay;
+  background: var(--grain, none) 0 0 / var(--grain-card-size) var(--grain-card-size);
+  opacity: var(--grain-card-opacity);
+  mix-blend-mode: var(--grain-card-blend);
   pointer-events: none;
 }
 .hs-grid {
@@ -922,7 +922,7 @@
 }
 /* Room to breathe: the facts are one quiet line, not a row of boxes, and the CTA has air above it. */
 .sheet-dash .ccard-compact .ccard-body {
-  gap: 12px; /* also keeps a copy value's 44 px band clear of the CTA */
+  gap: 13px; /* also keeps a copy value's 44 px band clear of the CTA */
   padding: 10px 14px 14px;
 }
 /* Facts side by side, a gap instead of separators, so a wrapped line never starts with a dot. */
@@ -949,7 +949,7 @@
   color: var(--text-3);
 }
 /* A copyable value (flight no., booking code): the value at its own weight with a small copy
-   icon after it. 24 px to look at, 44 px to hit; a soft pill only while pressed. */
+   icon after it. 22 px to look at, 44 px to hit; a soft pill only while pressed. */
 .ccard-fact-copy {
   --focus: #2c6b72;
   position: relative;
