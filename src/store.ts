@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { linkById, links, noteById, pdfs, today, type CrewLink } from './mock';
+import { initialRead, notificationsFor, type AppNotification, type NotifKind } from './mock/notifications';
 import { todayPlan } from './lib/stats';
-import { resetPrefs } from './components/settings/prefs';
+import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { addDays, addMonths, firstOfMonth } from './lib/dates';
 
@@ -10,7 +12,7 @@ export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'set
 export type Route = { name: TabName } | { name: 'ticket' } | { name: 'pdf'; file: string };
 
 /** Things that open in a bottom sheet over the current tab. `id` picks the note, contact, project... */
-export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact';
+export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications';
 export interface SheetState {
   kind: SheetKind;
   id?: string;
@@ -167,6 +169,8 @@ interface DemoState {
   statusDark: boolean;
   toast: Toast | null;
   noteAccent: NoteAccent;
+  /** Ids of the notifications already read, per crew link. Read it with useNotifications(). */
+  notifRead: Record<string, string[]>;
 }
 
 interface Actions {
@@ -195,6 +199,11 @@ interface Actions {
   setStatusDark: (v: boolean) => void;
   showToast: (message: string) => void;
   setNoteAccent: (a: NoteAccent) => void;
+  /** Notification actions work on the active link's notifications. */
+  markRead: (id: string) => void;
+  markAllRead: () => void;
+  /** Mark one read and go where it points: a PDF, or a sheet. */
+  openNotification: (id: string) => void;
   reset: () => void;
 }
 
@@ -248,6 +257,7 @@ const initialState = (): DemoState => ({
   statusDark: false,
   toast: null,
   noteAccent: 'stub',
+  notifRead: initialRead(),
 });
 
 let toastSeq = 0;
@@ -412,6 +422,20 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   setStatusDark: (v) => set({ statusDark: v }),
   showToast: (message) => set({ toast: { id: ++toastSeq, message } }),
   setNoteAccent: (a) => set({ noteAccent: a }),
+  markRead: (id) =>
+    set((s) => {
+      const read = s.notifRead[s.activeLinkId] ?? [];
+      return read.includes(id) ? {} : { notifRead: { ...s.notifRead, [s.activeLinkId]: [...read, id] } };
+    }),
+  markAllRead: () => set((s) => ({ notifRead: { ...s.notifRead, [s.activeLinkId]: notificationsFor(s.activeLinkId).map((n) => n.id) } })),
+  openNotification: (id) => {
+    const n = notificationsFor(get().activeLinkId).find((x) => x.id === id);
+    if (!n) return;
+    get().markRead(id);
+    // Navigating to the PDF keeps the notifications sheet to come back to; opening a sheet swaps it.
+    if ('pdf' in n.target) get().navigate({ name: 'pdf', file: n.target.pdf });
+    else get().openSheet(n.target.sheet, n.target.id);
+  },
 
   reset: () => {
     clearScrollPositions();
@@ -426,3 +450,29 @@ export const useRoute = () => useDemo((s) => s.stack[s.stack.length - 1].route);
 
 /** The crew link the app is showing right now. */
 export const useActiveLink = () => useDemo((s) => s.links.find((l) => l.id === s.activeLinkId)!);
+
+/** The Settings switch that turns a kind of notification off. Kinds not listed are always shown. */
+const KIND_PREF: Partial<Record<NotifKind, 'callSheetOut' | 'hoursReminder'>> = { callsheet: 'callSheetOut', hours: 'hoursReminder' };
+
+export type NotificationItem = AppNotification & { unread: boolean };
+
+/** The active link's notifications that Settings allows, unread first, newest first within each group. */
+export function useNotifications(): NotificationItem[] {
+  const linkId = useDemo((s) => s.activeLinkId);
+  const read = useDemo((s) => s.notifRead[s.activeLinkId]);
+  const callSheetOut = usePrefs((p) => p.callSheetOut);
+  const hoursReminder = usePrefs((p) => p.hoursReminder);
+  return useMemo(() => {
+    const prefs = { callSheetOut, hoursReminder };
+    return notificationsFor(linkId)
+      .filter((n) => {
+        const key = KIND_PREF[n.kind];
+        return !key || prefs[key];
+      })
+      .map((n) => ({ ...n, unread: !read?.includes(n.id) }))
+      .sort((a, b) => Number(b.unread) - Number(a.unread) || Date.parse(b.at) - Date.parse(a.at));
+  }, [linkId, read, callSheetOut, hoursReminder]);
+}
+
+/** Unread notifications of the active link, for the bell's badge. */
+export const useUnreadCount = () => useNotifications().filter((n) => n.unread).length;

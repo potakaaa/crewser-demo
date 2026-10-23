@@ -1,0 +1,106 @@
+/* Notifications: bell badge and sheet. Structure only; the designer owns the look. */
+.notif-btn {
+  position: relative;
+}
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #dbf227;
+  color: #2b3300;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+}
+.notif-count {
+  font-size: var(--fs-sm, 13px);
+  color: #54686c;
+}
+.notif-markall {
+  min-height: 44px;
+  padding: 0 var(--sp-2);
+  border: 0;
+  background: none;
+  font-weight: 600;
+}
+.notif-markall:disabled {
+  opacity: 0.4;
+}
+
+.notif-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.notif-item {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 0;
+  border-radius: var(--r-control);
+  background: #ffffff;
+  text-align: left;
+}
+.notif-icon {
+  flex: none;
+  display: flex;
+}
+.notif-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.notif-title {
+  font-weight: 600;
+}
+.notif-item[data-unread='false'] .notif-title {
+  font-weight: 500;
+}
+.notif-body,
+.notif-time {
+  font-size: 13px;
+  color: #54686c;
+}
+.notif-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #0e7c86;
+}
+
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6, 32px) var(--sp-4);
+  text-align: center;
+}
+.notif-empty p {
+  margin: 0;
+  color: #54686c;
+}

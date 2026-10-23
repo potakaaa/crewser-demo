@@ -6,6 +6,7 @@ import { NoteSheet, noteSheetMeta } from './sheets/NoteSheet';
 import { HoursSheet, hoursSheetMeta } from './sheets/HoursSheet';
 import { InfoSheet, infoSheetMeta } from './sheets/InfoSheet';
 import { ContactSheet } from './sheets/ContactSheet';
+import { NotificationsSheet, notificationsSheetMeta } from './sheets/NotificationsSheet';
 import { ProjectSwitcher } from './ProjectSwitcher';
 
 interface Meta {
@@ -21,6 +22,7 @@ const META: Record<SheetKind, (id?: string) => Meta> = {
   hours: (id) => ({ ...hoursSheetMeta(id), tone: 'soft' }),
   info: (id) => ({ ...infoSheetMeta(id), tone: 'soft' }),
   project: () => ({ title: 'Your projects', subtitle: `${links.length} crew links on this phone`, tone: 'soft' }),
+  notifications: () => ({ ...notificationsSheetMeta(), tone: 'soft' }),
   contact: (id) => {
     const c = contacts.find((x) => x.id === id);
     return { title: c?.name ?? 'Contact', subtitle: c?.position };
@@ -39,6 +41,8 @@ function Body({ sheet }: { sheet: SheetState }) {
       return <ProjectSwitcher />;
     case 'contact':
       return <ContactSheet id={sheet.id} />;
+    case 'notifications':
+      return <NotificationsSheet />;
   }
 }
 
