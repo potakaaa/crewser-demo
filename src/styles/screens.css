@@ -890,38 +890,61 @@
   min-height: 40px;
 }
 
-/* ───────── "For Bianca · 2nd AC" chip: whose hours the app is entering ───────── */
+/* ───────── "For Bianca · 2nd AC" chip: whose hours the app is entering ─────────
+   A 22 px pill that never wraps, so it never adds a row. The tap target is the row it sits in. */
 .for-chip {
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   max-width: 100%;
   min-width: 0;
+  height: 22px;
+  padding: 0 9px 0 8px;
+  border-radius: 11px;
   font-size: var(--fs-sm);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1;
   white-space: nowrap;
+}
+/* On the dark headers: glass, white text (over 9:1). */
+.for-chip[data-tone='dark'] {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
+}
+/* On a light surface: soft fill, ink text (13:1). */
+.for-chip[data-tone='light'] {
+  border: 1px solid var(--hairline);
+  background: var(--soft);
+  color: var(--ink);
 }
 .for-chip-dot {
   flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: var(--lime);
 }
+.for-chip[data-tone='light'] .for-chip-dot {
+  box-shadow: 0 0 0 1.5px var(--ink);
+}
 .for-chip-name {
+  min-width: 0;
+  max-width: 170px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .for-chip-role {
   flex: none;
   font-weight: 500;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 .for-chip-role::before {
-  content: '· ';
+  content: '· ' / '';
 }
-.gh-titlebar .for-chip {
-  align-self: center;
+/* In a title row: level with the bell's centre. */
+.gh-titlebar > .for-chip {
+  align-self: flex-start;
+  margin-top: 11px;
 }

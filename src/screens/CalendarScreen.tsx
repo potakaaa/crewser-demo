@@ -1,6 +1,6 @@
 import { useRef, type CSSProperties } from 'react';
 import '../styles/calendar.css';
-import { useDemo } from '../store';
+import { useActiveLink, useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
 import { ForChip } from '../components/ForChip';
 import { NotifButton } from '../components/NotifButton';
@@ -66,6 +66,7 @@ function useSlideDir(key: string) {
 export function CalendarScreen() {
   const ref = useScrollRestore<HTMLDivElement>('calendar', useDemo((s) => s.setStatusDark));
   const offline = useDemo((s) => s.offline);
+  const link = useActiveLink();
   const empty = useDemo((s) => s.empty);
   const calDate = useDemo((s) => s.calDate);
   const calMonth = useDemo((s) => s.calMonth);
@@ -110,6 +111,7 @@ export function CalendarScreen() {
   const isToday = calDate === today.date;
   // The Hours sheet only offers Send for logged drafts; a past shoot day nobody logged has nothing to send.
   const loggedDraft = workdays.some((w) => w.date === calDate && w.status === 'draft');
+  const label = monthOpen ? fmtMonthYear(calMonth) : monthLabel(days[0], days[6]);
 
   return (
     <div className="screen" ref={ref}>
@@ -118,7 +120,12 @@ export function CalendarScreen() {
         <div className="gh-titlebar">
           <div className="gh-titles">
             <button type="button" className="month-toggle" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
-              <span>{monthOpen ? fmtMonthYear(calMonth) : `${monthLabel(days[0], days[6])} · CW ${isoWeek(monday)}`}</span>
+              {/* On a colleague's link the chip takes the place of the week number, and the month is short ("Oct 2026"), so the label fits beside the arrows. */}
+              <span>
+                {link.isMe ? label : label.replace(/^([A-Z][a-z]{2})[a-z]+(?= \d)/, '$1')}
+                {link.isMe ? !monthOpen && ` · CW ${isoWeek(monday)}` : ' · '}
+              </span>
+              <ForChip tone="light" compact bare />
               <span className="chev" data-open={monthOpen}>
                 <Icon name="down" size={16} color="#C4CFD0" strokeWidth={1.8} />
               </span>
@@ -134,7 +141,6 @@ export function CalendarScreen() {
           </button>
           <NotifButton tone="dark" />
         </div>
-        <ForChip tone="light" />
 
         <div className="cal-panel">
           <Collapse open={!monthOpen}>
