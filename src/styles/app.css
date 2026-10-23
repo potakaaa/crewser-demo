@@ -1500,21 +1500,37 @@
   font-size: var(--fs-md);
   color: var(--on-dark-2);
 }
-/* The note text as a callout: a soft fill, no border, so it reads as an aside to the facts above. */
+/* The note text as a callout: a light lime-sage tint and a short olive bar on the left,
+   so it reads as production's own word rather than another fact. Text 7:1, label 6:1. */
 .ns-callout {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 14px var(--sp-4) var(--sp-4);
+  padding: 14px var(--sp-4) var(--sp-4) 20px;
+  border: 1px solid rgba(91, 107, 18, 0.14);
   border-radius: var(--r-card);
-  background: var(--chip);
+  background: #f3f7dd;
+}
+.ns-callout::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 2px;
+  background: #b9cc2c;
 }
 .ns-callout-k {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--fs-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: #4f5e0f;
 }
 .ns-callout p {
   margin: 0;

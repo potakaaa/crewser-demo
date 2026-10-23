@@ -112,7 +112,10 @@ export function NoteSheet({ id }: { id?: string }) {
       )}
       {note.text && (
         <div className="ns-callout">
-          <span className="ns-callout-k">Note</span>
+          <span className="ns-callout-k">
+            <Icon name="plain" size={14} color="#4F5E0F" strokeWidth={1.8} />
+            Note
+          </span>
           <p>{note.text}</p>
         </div>
       )}
