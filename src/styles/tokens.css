@@ -50,6 +50,10 @@
   --numeral-weight: 600;
   --numeral-track: -0.03em;
   --numeral-scale: 1;
+  /* Static film grain on the dark brand-surface cards: one look everywhere (the shared rule is in screens.css). */
+  --grain-card-opacity: 0.15;
+  --grain-card-size: 160px;
+  --grain-card-blend: overlay;
 
   /* Type: small, calm, medium-weight. Big numbers get tight tracking. */
   --fs-xs: 11px; /* labels, chips, chart ticks */
