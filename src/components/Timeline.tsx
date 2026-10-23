@@ -80,7 +80,7 @@ function useScrubber(
         done?.();
         return;
       }
-      const dur = Math.min(320, 140 + Math.abs(dist) * 0.5);
+      const dur = Math.min(240, 120 + Math.abs(dist) * 0.25); // about 160 ms for a short snap, to match the card's crossfade
       const t0 = performance.now();
       glideEnd = x;
       const step = (now: number) => {

@@ -62,7 +62,7 @@
   text-align: center;
   box-shadow: 0 0 0 1.5px rgba(8, 20, 22, 0.7);
 }
-/* Locked under the playhead: bigger, ringed in lime, glowing. */
+/* Locked under the playhead: bigger and ringed in white. Lime stays with Now and the playhead, the brightest things on the ruler. */
 .tl .tl-pin[data-on='true'] {
   z-index: 3;
 }
@@ -75,8 +75,8 @@
   transform: scale(1.35);
   /* No blur: the ruler clips at its top edge, and a glow would show a flat cut there. */
   box-shadow:
-    0 0 0 2px var(--lime),
-    0 0 0 3px rgba(219, 242, 39, 0.3);
+    0 0 0 2px #ffffff,
+    0 0 0 3px rgba(8, 20, 22, 0.5);
 }
 
 /* Double tap resets the ruler: never zoom the page for it, and never select text. */
