@@ -1,12 +1,12 @@
 import type { Fact, Note } from '../mock';
-import { Icon, type IconName } from './Icon';
+import { Icon } from './Icon';
 import { Collapse } from './Layout';
 import { QrPreview } from './QrPreview';
 import { CrewSection } from './CrewStack';
 import { NotePrimaryAction } from './NotePrimaryAction';
 import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
-import { cardSubtitle, cardTiles, dayStub, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
+import { cardSubtitle, cardTiles, dayStub, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL } from '../lib/notes';
 
 /** Codes and addresses are worth copying; "to be confirmed" is not. */
 export const isCopyable = (f: Pick<Fact, 'action' | 'unconfirmed'>) => !f.unconfirmed && (f.action === 'copy' || f.action === 'map');
@@ -28,40 +28,6 @@ export function FactActions({ fact, size = 'md' }: { fact: Fact; size?: 'sm' | '
         </button>
       )}
     </span>
-  );
-}
-
-function FactTile({ tile }: { tile: CardTile }) {
-  const a = useNoteActions();
-  const icon: IconName | null = tile.action === 'map' ? 'nav' : tile.action === 'copy' ? 'copy' : tile.action === 'attachment' ? 'clip' : null;
-  const onClick = () => {
-    if (tile.unconfirmed) a.unconfirmed(tile.label);
-    else if (tile.action === 'map') a.map(tile.value);
-    else if (tile.action === 'attachment') a.openPdf(tile.value);
-    else a.copy(tile.value);
-  };
-  const aria = tile.unconfirmed
-    ? `${tile.label}: not confirmed yet`
-    : tile.action === 'map'
-      ? `Open in maps: ${tile.value}`
-      : tile.action === 'attachment'
-        ? `Open: ${tile.value}`
-        : `Copy ${tile.label}: ${tile.value}`;
-  return (
-    <div className={`tile${tile.unconfirmed ? ' tile-open' : ''}${tile.wide ? ' tile-wide' : ''}`}>
-      <button type="button" className="tile-main" aria-label={aria} onClick={onClick}>
-        <span className="tile-text">
-          <span className="tile-k">{tile.label}</span>
-          <span className="tile-v">{tile.value}</span>
-        </span>
-        {icon && <Icon name={icon} size={18} color="#2A3B3F" />}
-      </button>
-      {tile.action === 'map' && (
-        <button type="button" className="tile-extra" aria-label={`Copy ${tile.label}: ${tile.value}`} onClick={() => a.copy(tile.value)}>
-          <Icon name="copy" size={17} color="#2A3B3F" />
-        </button>
-      )}
-    </div>
   );
 }
 
@@ -91,11 +57,13 @@ export function ContentCard({ note }: { note: Note }) {
       {(tiles.length > 0 || note.primaryAction) && (
         <div className="ccard-body">
           {tiles.length > 0 && (
-            <div className="tiles">
+            <p className="ccard-facts">
               {tiles.map((t) => (
-                <FactTile key={t.key} tile={{ ...t, wide: tiles.length === 1 }} />
+                <span className="ccard-fact" key={t.key}>
+                  <span className="ccard-fact-k">{t.label}</span> <span className={`ccard-fact-v${t.unconfirmed ? ' muted' : ''}`}>{t.value}</span>
+                </span>
               ))}
-            </div>
+            </p>
           )}
           <NotePrimaryAction note={note} />
         </div>
