@@ -1,6 +1,6 @@
 # Switching between projects in the Crewser crew app
 
-Status: proposal for the production app. The clickable prototype (mock data, no backend) shows only: the project switcher, drafts and logged hours kept per link, the expired and revoked states, the "Acting as" banner and the confirm step before sending hours for a colleague. Everything else here (the wallet, adding and validating links, status checks, "Request a new link", "Remove from this phone", delegation grants and the security measures) is proposed and not built.
+Status: proposal for the production app. The clickable prototype (mock data, no backend) shows only: the project switcher, drafts and logged hours kept per link, the expired and revoked states, the "For Bianca" chip and the other cues for a colleague's link (listed below), the confirm step before sending hours for a colleague, and a notifications list per link (the bell in every header). Everything else here (the wallet, adding and validating links, status checks, "Request a new link", "Remove from this phone", delegation grants and the security measures) is proposed and not built.
 
 ## Summary
 
@@ -26,7 +26,7 @@ Crew members often work on two productions at the same time, and a department me
 - A project switcher at the top of the app lists every link on the phone: project, production, whose hours the link is for, and when it ends.
 - Links that end soon show a warning ("ends in 3 days"). Expired links are greyed out. A link that production revoked is shown differently from one that simply ran out, so the user knows whether to wait or to ask.
 - Choosing a link switches the app to that project and person. In the production app that means dashboard, calendar, documents and contacts. In the prototype only the project name, the logged hours and the Log sheet draft change; documents and contacts are shared mock data. Anything half-typed for the previous person stays saved as a draft with that person (see "Drafts").
-- Links that belong to a colleague carry the colleague's name wherever hours are shown, so it is always clear whose hours are being entered. The prototype does this with the "Acting as" banner and the "Hours for …" title of the Log sheet.
+- Links that belong to a colleague carry the colleague's name wherever hours are shown, so it is always clear whose hours are being entered. The prototype does this with a "For Bianca" chip (on the Dashboard it replaces the greeting; on Calendar it sits in the month label; on Documents and Contacts it sits in the header), the Settings banner "Entering hours for Slate Bianca", and the "Hours for …" title of the Log sheet.
 
 ## The local wallet
 
@@ -90,7 +90,7 @@ The delegate then holds a token of their own with that restricted scope, and the
 ### Rules the app follows in both phases
 
 - Hours are only ever sent with the token of the person they are for. Every screen that edits hours works on one selected entry.
-- When the person is not the user, the app confirms before sending. In the prototype the first tap on Submit shows "You are sending hours for Slate Bianca, not for yourself." and changes the button to "Submit for Slate Bianca"; the second tap sends.
+- When the person is not the user, the app confirms before sending. In the prototype the first tap on Submit shows "You are sending hours for Slate Bianca, not for yourself." and changes the button to "Submit for Slate Bianca"; the second tap sends. The "not sent" Send asks once more in the same way for a colleague, on the Dashboard and in the Hours sheet: the line changes to "Sending hours for Mag Samir, not for you" and the button to "Send for Samir".
 - The app never mixes tokens in one request and never sends a token to any origin other than the allowlisted Crewser one.
 
 ## Drafts and sending
