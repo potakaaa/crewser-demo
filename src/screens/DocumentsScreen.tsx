@@ -22,6 +22,19 @@ const FILTERS: { value: Filter; label: string }[] = [
 /** Call sheets shown before the rest fold into "Earlier days". */
 const RECENT = 3;
 
+/** The version always shows: the rest of the line gives way (ellipsis) before it does. */
+function VersionMeta({ text, version }: { text: string; version: number }) {
+  return (
+    <>
+      <span className="drow-meta-text">{text}</span>
+      <span className="drow-ver" aria-hidden="true">
+        {' · '}v{version}
+      </span>
+      <span className="sr-only">, version {version}</span>
+    </>
+  );
+}
+
 function DocRow({ doc }: { doc: Doc }) {
   const navigate = useDemo((s) => s.navigate);
   const day = doc.kind === 'callsheet' ? doc.day : undefined;
@@ -43,7 +56,9 @@ function DocRow({ doc }: { doc: Doc }) {
           )}
           {day === today.date && <span className="drow-today">Today</span>}
         </span>
-        <span className="drow-meta">{meta}</span>
+        <span className="drow-meta">
+          <VersionMeta text={meta} version={doc.version} />
+        </span>
       </span>
       <Icon name="right" size={18} color="#54686C" />
     </button>
@@ -65,6 +80,8 @@ function PinnedCallSheet({ doc }: { doc: CallSheet }) {
       <span className="dpin-title">{fmtDayMonth(doc.day)} · call sheet</span>
       <span className="dpin-meta">
         {projectName} · updated {updatedLabel(doc.updated)} · {doc.size}
+        <span aria-hidden="true"> · v{doc.version}</span>
+        <span className="sr-only">, version {doc.version}</span>
       </span>
       <span className="dpin-cta">
         Open call sheet

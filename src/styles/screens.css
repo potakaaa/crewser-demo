@@ -166,11 +166,19 @@
   font-weight: 600;
 }
 .drow-meta {
+  display: flex;
+  min-width: 0;
   font-size: var(--fs-sm);
   color: var(--text-2);
-  white-space: nowrap;
+  white-space: pre;
+}
+.drow-meta-text {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.drow-ver {
+  flex: none;
 }
 .drow-today {
   padding: 2px 7px;

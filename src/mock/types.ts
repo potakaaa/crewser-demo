@@ -192,6 +192,8 @@ export interface Doc {
   updated: string;
   /** "184 KB" */
   size: string;
+  /** Which revision production has published: shown as "v4". */
+  version: number;
   isNew?: boolean;
 }
 
