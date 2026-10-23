@@ -489,9 +489,14 @@
   align-items: center;
   gap: 6px;
 }
-/* The previewed day has no call sheet: muted, still tappable for a short explanation. */
+/* The previewed day has no call sheet: muted, still tappable for a short explanation.
+   Only the icon fades; the words stay at 4.5:1 or better (label --text-2, date --text-3). */
 .today-sheet-none {
-  opacity: 0.6;
+  color: var(--text-2);
+  font-weight: 500;
+}
+.today-sheet-none svg {
+  opacity: 0.45;
 }
 .today-sent {
   display: flex;
