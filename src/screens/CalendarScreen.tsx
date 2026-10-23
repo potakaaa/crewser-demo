@@ -3,6 +3,7 @@ import '../styles/calendar.css';
 import { useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
 import { ForColleague } from '../components/ForColleague';
+import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
@@ -131,6 +132,7 @@ export function CalendarScreen() {
           <button type="button" className="icon-btn glass-btn" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
             <Icon name="right" size={18} color="#FFFFFF" />
           </button>
+          <NotifButton tone="dark" />
         </div>
 
         <ForColleague />

@@ -7,6 +7,7 @@ import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { TodayBar } from '../components/TodayBar';
+import { NotifButton } from '../components/NotifButton';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { Wordmark } from '../components/Brand';
@@ -57,9 +58,7 @@ export function DashboardScreen() {
               </span>
             </span>
           </button>
-          <button type="button" className="icon-btn glass-btn" aria-label="Search notes" onClick={() => toast('Search is not part of this demo')}>
-            <Icon name="search" size={20} color="#FFFFFF" />
-          </button>
+          <NotifButton tone="dark" />
         </div>
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />

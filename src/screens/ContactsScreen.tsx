@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { CONTACT_DEPARTMENTS, contacts, person, type Contact } from '../mock';
 import { ForColleague } from '../components/ForColleague';
+import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
@@ -106,7 +107,9 @@ export function ContactsScreen() {
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <ScreenTitle eyebrow={`${projectName} · ${contacts.length - 1} people`} title="Contacts" />
+        <ScreenTitle eyebrow={`${projectName} · ${contacts.length - 1} people`} title="Contacts">
+          <NotifButton tone="dark" />
+        </ScreenTitle>
         <ForColleague />
         <div className="searchbox">
           <Icon name="search" size={18} color="#C4CFD0" />

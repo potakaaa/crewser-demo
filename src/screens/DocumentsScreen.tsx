@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { docs, today, type Doc, type DocKind } from '../mock';
 import { ForColleague } from '../components/ForColleague';
+import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { callSheets, dayWord, KIND_TITLE, updatedLabel, type CallSheet } from '../components/docs/docs';
@@ -121,7 +122,9 @@ export function DocumentsScreen() {
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <ScreenTitle eyebrow={`${projectName} · ${docs.length} files`} title="Documents" />
+        <ScreenTitle eyebrow={`${projectName} · ${docs.length} files`} title="Documents">
+          <NotifButton tone="dark" />
+        </ScreenTitle>
         <ForColleague />
         <div className="fchips" role="group" aria-label="Filter documents">
           {FILTERS.map((f) => (
