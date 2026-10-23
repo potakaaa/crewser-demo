@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref, type RefObject } from 'react';
-import '../styles/timeline.css';
 import { TYPE_COLOR } from '../lib/noteStyle';
 import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewLine, samePreview, snapTarget, type Preview, type Scrub } from '../lib/timeline';
 
@@ -135,7 +134,7 @@ function useScrubber(
       pointer = null;
       dragging = false;
       delete el.dataset.drag;
-      if (!wasDragging) return;
+      if (!wasDragging) return settleSoon(); // a plain click may have cancelled a snap
       // A finger that stopped before lifting must not fling with the speed it had earlier.
       const fresh = e ? e.timeStamp - lastT < STALE_MS : false;
       // Where the flick would have come to rest; the nearest note to that point is where the ruler lands.
@@ -162,7 +161,7 @@ function useScrubber(
         tapT = e.timeStamp;
         return;
       }
-      if (e.button !== 0) return;
+      if (e.button !== 0) return settleSoon();
       pointer = e.pointerId;
       startX = lastX = e.clientX;
       startLeft = el.scrollLeft;
@@ -199,6 +198,7 @@ function useScrubber(
       if (e.pointerId === pointer) endDrag(e);
       if (e.pointerId !== tapId) return;
       tapId = null;
+      settleSoon(); // a pen has no touch events to do this
       // A swipe cancels the pointer, so a pointerup that stayed put and was quick is a tap.
       if (Math.hypot(e.clientX - tapX, e.clientY - tapY) > TAP_PX || e.timeStamp - tapT > TAP_MS) return;
       if (e.timeStamp - lastTapT < DOUBLE_TAP_MS && Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < DOUBLE_TAP_PX) {
@@ -239,6 +239,7 @@ function useScrubber(
     let lastOther = -Infinity;
     const onWheel = (e: WheelEvent) => {
       stopGlide();
+      settleSoon(); // a wheel turn the page takes sends the ruler no scroll event
       const legacy = (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY ?? 0;
       const notched = e.deltaX === 0 && e.deltaY !== 0 && !e.ctrlKey && (e.deltaMode === 1 || (e.deltaMode === 0 && Math.abs(legacy) === 120 && legacy !== -3 * e.deltaY));
       if (!notched) {

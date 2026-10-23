@@ -13,6 +13,7 @@ import './styles/base.css';
 import './styles/device.css';
 import './styles/app.css';
 import './styles/dashboard.css';
+import './styles/timeline.css';
 import './styles/screens.css';
 import App from './App';
 import { installGrain } from './lib/grain';

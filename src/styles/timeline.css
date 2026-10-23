@@ -79,9 +79,8 @@
     0 0 0 3px rgba(8, 20, 22, 0.5);
 }
 
-/* Double tap resets the ruler: never zoom the page for it, and never select text. */
+/* Double tap resets the ruler: no highlight flash on the tap. (touch-action is set in dashboard.css.) */
 .tl .tl-scroll {
-  touch-action: pan-x pan-y;
   -webkit-tap-highlight-color: transparent;
 }
 
