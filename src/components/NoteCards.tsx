@@ -37,7 +37,7 @@ export function FactActions({ fact, size = 'md' }: { fact: Fact; size?: 'sm' | '
  */
 export function ContentCard({ note }: { note: Note }) {
   const a = useNoteActions();
-  const tiles = cardTiles(note).slice(0, 2);
+  const tiles = cardTiles(note);
   return (
     <article className="ccard ccard-compact">
       <button type="button" className="ccard-head" onClick={() => a.openNote(note.id)} aria-label={`${note.title}, ${cardSubtitle(note)}, ${dayStub(note)} ${timeText(note)}. Open details`}>

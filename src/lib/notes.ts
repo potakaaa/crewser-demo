@@ -92,8 +92,8 @@ export interface CardTile {
 }
 
 /**
- * The facts on a content card, up to three: first the ones you act on (copy, map, not yet confirmed),
- * then filled up in data order. Places go last. The card shows the first two as one line.
+ * The two facts a content card shows. Of the first three candidates (the ones you act on, then data
+ * order), places sort last, so a place only shows when there is no other fact to fill the line.
  */
 export function cardTiles(n: Note): CardTile[] {
   const actionable = (f: Fact) => !!f.action || !!f.unconfirmed;
@@ -105,7 +105,7 @@ export function cardTiles(n: Note): CardTile[] {
   const tiles: CardTile[] = n.facts
     .filter((f) => chosen.includes(f))
     .map((f) => ({ key: f.label, label: f.label, value: f.value, action: f.action, unconfirmed: f.unconfirmed }));
-  return tiles.sort((a, b) => Number(a.action === 'map') - Number(b.action === 'map'));
+  return tiles.sort((a, b) => Number(a.action === 'map') - Number(b.action === 'map')).slice(0, 2);
 }
 
 export const dayStub = (n: Note) => (n.day ? fmtDayShort(n.day) : '');
