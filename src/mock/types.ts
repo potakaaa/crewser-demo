@@ -37,6 +37,24 @@ export interface Airport {
   city: string;
 }
 
+/** One line of a note's contact list. `phone` is dialable as written ("+43 1 555 01 00", "112"). */
+export interface InfoContact {
+  /** What the number is for: "Emergency", "Production office"... */
+  label: string;
+  /** Who answers, when it is a person. */
+  name?: string;
+  phone: string;
+  note?: string;
+}
+
+/** Structured content of a General info note: who to call, when the office is open, where it is. */
+export interface NoteInfo {
+  contacts?: InfoContact[];
+  /** Office hours, one row per day range, e.g. { days: 'Mon–Fri', time: '08:00–19:00' }. */
+  hours?: { days: string; time: string }[];
+  address?: string;
+}
+
 export interface Note {
   id: string;
   type: NoteType;
@@ -58,6 +76,8 @@ export interface Note {
   crew: 'all' | string[];
   source?: string;
   primaryAction?: PrimaryAction;
+  /** Contacts, office hours and address for notes like "Emergency contacts & office hours". */
+  info?: NoteInfo;
 }
 
 export type DayKind = 'prep' | 'shoot';
