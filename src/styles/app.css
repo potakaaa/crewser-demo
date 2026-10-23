@@ -1455,7 +1455,8 @@
   color: var(--text-2);
 }
 /* ───────── General info: emergency numbers, contacts, office hours, address ───────── */
-/* 112 · 144 · 133: three call tiles in a soft red, distinct without shouting. Numbers 7:1, labels 8:1. */
+/* 112 · 144 · 133: three call tiles in a soft red, distinct without shouting. Each tile stacks the
+   number, the service and a small reach tag, with room to breathe. Numbers 7:1, labels 8:1, tag 7:1. */
 .ns-sos {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1464,12 +1465,13 @@
 .ns-sos-btn {
   --focus: #8f2a23;
   min-width: 0;
-  min-height: 64px;
+  min-height: 88px;
+  padding: var(--sp-2) var(--sp-1);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: var(--sp-1);
   border: 1px solid rgba(143, 42, 35, 0.16);
   border-radius: var(--r-card);
   background: #fbeeec;
@@ -1483,7 +1485,7 @@
 .ns-sos-num {
   font-family: var(--font-numeral);
   font-weight: var(--numeral-weight);
-  font-size: calc(var(--fs-2xl) * var(--numeral-scale));
+  font-size: calc(var(--fs-3xl) * var(--numeral-scale));
   letter-spacing: var(--numeral-track);
   line-height: 1;
   color: #8f2a23;
@@ -1491,16 +1493,25 @@
 .ns-sos-k {
   max-width: 100%;
   overflow: hidden;
-  font-size: var(--fs-sm);
-  font-weight: 500;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #7a2a24;
 }
+/* "EU-wide" / "AT only": a small tag under the service, so where it works reads at a glance. */
 .ns-sos-note {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--sp-2);
+  border-radius: 10px;
+  background: #f3d7d3;
   font-size: var(--fs-xs);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
   color: #7a2a24;
 }
 .ns-block {
