@@ -14,7 +14,7 @@ const MASTER_DATA = ['Personal details', 'Address', 'Tax and social security num
 
 /** Sheet title and subtitle, used by SheetHost. */
 export function infoSheetMeta(id?: string) {
-  return id === 'master' ? { title: 'Master data', subtitle: `${person.displayName} · ${person.position}` } : { title: 'General info', subtitle: 'Notes without a date' };
+  return id === 'master' ? { title: 'Master data', subtitle: `${person.displayName} · ${person.position}` } : { title: 'General info', subtitle: 'Important info for the whole project' };
 }
 
 function MasterData() {
@@ -58,13 +58,13 @@ function MasterData() {
   );
 }
 
-/** Notes without a date, or the master data form when `id` is "master". */
+/** General info (notes with no date), or the master data form when `id` is "master". */
 export function InfoSheet({ id }: { id?: string }) {
   const openSheet = useDemo((s) => s.openSheet);
   const empty = useDemo((s) => s.empty);
   if (id === 'master') return <MasterData />;
   const undated = undatedNotes(empty ? [] : notes);
-  if (!undated.length) return <p className="sheet-empty">No general info yet. Notes without a date from production land here.</p>;
+  if (!undated.length) return <p className="sheet-empty">No general info yet. Important project info from production lands here.</p>;
   return (
     <ul className="info-list">
       {undated.map((n) => (
