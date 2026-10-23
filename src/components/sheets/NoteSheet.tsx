@@ -22,10 +22,14 @@ export function NoteSheet({ id }: { id?: string }) {
   const isFlight = note.type === 'flight' && !!note.route;
   const pa = note.primaryAction;
   const flightNo = note.facts.find((f) => f.label === 'Flight no.')?.value;
-  // Call and wrap are read in the hero (a flight's number in the pair under it), so the facts list does not repeat them.
+  // The hero shows call and wrap, or the time with its note ("15:00 Check-in"); a flight's number is in the pair under it.
+  // The facts list does not repeat any of those (the sheet's subtitle already gives the date).
   const wrap = note.facts.find((f) => f.label === 'Wrap');
+  const atTime = (value: string) => !!note.time && value.endsWith(note.time);
   const inHero = (label: string, value: string) =>
-    isFlight ? label === 'Flight no.' : (label === 'Call' && value === note.time) || (label === 'Wrap' && !!wrap);
+    isFlight
+      ? label === 'Flight no.'
+      : (label === 'Call' && value === note.time) || (label === 'Wrap' && !!wrap) || (!wrap && label === timeSub(note) && atTime(value));
   const facts = note.facts.filter((f) => !inHero(f.label, f.value));
   // With its own Directions button below, a place only needs Copy here.
   const directionsBelow = !!pa && pa.kind !== 'boardingPass';
