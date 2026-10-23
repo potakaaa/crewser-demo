@@ -107,10 +107,6 @@ function UrgentBody({ u }: { u: Urgent }) {
   const attachment = !note.primaryAction && quickAction(note);
   return (
     <div className="today-urgent">
-      <div className="today-top">
-        <span className="today-tag" data-tone={u.tone}>{u.tag}</span>
-        <span className="today-meta">{u.meta}</span>
-      </div>
       <button type="button" className="today-main" data-hero={u.tone === 'lime'} onClick={() => a.openNote(note.id)} aria-label={`${u.time ? `${u.time}, ` : ''}${u.title}. Open details`}>
         {u.time && <span className={`today-time num${u.timeSmall ? ' today-time-sm' : ''}`}>{u.time}</span>}
         <span className="today-titles">
@@ -133,10 +129,6 @@ function UrgentBody({ u }: { u: Urgent }) {
 function NothingToday() {
   return (
     <div className="today-urgent">
-      <div className="today-top">
-        <span className="today-tag">TODAY</span>
-        <span className="today-meta">Shoot day {today.shootDay}</span>
-      </div>
       <div className="today-main today-main-empty">
         <span className="today-titles">
           <span className="today-t1">Nothing on your sheet yet</span>
@@ -158,6 +150,10 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
 
   let key: string;
   let body: ReactNode;
+  // The tag and meta of what the card shows at rest; while previewing, the Preview line takes their place.
+  let tag = 'TODAY';
+  let tone: Urgent['tone'] | undefined;
+  let meta = `Shoot day ${today.shootDay}`;
   // A preview from the ruler before this one (Empty was toggled) can point past the stops for one render.
   const stop = preview ? scrub.stops[preview.index] : undefined;
   if (preview && stop) {
@@ -166,6 +162,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
   } else if (hero) {
     const u = heroUrgent(hero, phase, submitted ? (offline ? 'saved' : 'sent') : null);
     key = u.key;
+    ({ tag, tone, meta } = u);
     body = <UrgentBody u={u} />;
   } else {
     key = 'empty';
@@ -174,8 +171,7 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
 
   return (
     <div className="today-card">
-      <Crossfade id={key}>{body}</Crossfade>
-      <div className="today-line">
+      <div className="today-top">
         {preview && stop ? (
           <>
             <span className="today-preview">{previewLine(scrub, preview)}</span>
@@ -184,9 +180,13 @@ export function TodayCard({ hero, scrub, preview, onBack }: { hero: Note | undef
             </button>
           </>
         ) : (
-          <span className="today-hint">Slide the ruler above to preview what is next.</span>
+          <>
+            <span className="today-tag" data-tone={tone}>{tag}</span>
+            <span className="today-meta">{meta}</span>
+          </>
         )}
       </div>
+      <Crossfade id={key}>{body}</Crossfade>
     </div>
   );
 }
