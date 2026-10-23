@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { project, today, workdaysFor } from '../mock';
-import { useDemo } from '../store';
+import { useActiveLink, useDemo } from '../store';
 import { useSubmitted } from '../lib/useSubmitted';
 import { fmtH, hoursOverview, type HoursOverview } from '../lib/stats';
+import { firstNameOf } from '../lib/greeting';
 
 export type HoursMetric = 'week' | 'overtime' | 'days';
 
@@ -46,30 +47,43 @@ export function metricCopy(o: HoursOverview, metric: HoursMetric) {
   }
 }
 
-/** Sends every logged-but-unsent day to production. */
-export function useSubmitUnsent(o: HoursOverview) {
+/**
+ * A quiet line (amber dot, "Sun 18 not sent", Send) when logged days have not been sent yet.
+ * On a colleague's link it names them, and Send asks once more, like the Log sheet does.
+ */
+export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
   const submitDay = useDemo((s) => s.submitDay);
   const toast = useDemo((s) => s.showToast);
-  return () => {
-    o.unsent.forEach((d) => submitDay(d.date));
-    toast(o.unsent.length === 1 ? `${o.unsent[0].short} sent to production` : `${o.unsent.length} days sent to production`);
-  };
-}
-
-/** A quiet line (amber dot, "Sun 18 not sent", Send) when logged days have not been sent yet. */
-export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
-  const submit = useSubmitUnsent(o);
+  const link = useActiveLink();
+  const [confirming, setConfirming] = useState(false);
+  const days = o.unsent.map((d) => d.date).join();
+  // Another person or another set of days withdraws a pending confirmation.
+  useEffect(() => {
+    setConfirming(false);
+  }, [link.id, days]);
   if (!o.unsent.length) return null;
+
+  const first = firstNameOf(link);
+  const forName = link.isMe ? '' : ` for ${first}`;
   const one = o.unsent.length === 1;
+  const what = one ? o.unsent[0].short : `${o.unsent.length} days`;
+  const send = () => {
+    if (!link.isMe && !confirming) {
+      setConfirming(true);
+      return;
+    }
+    o.unsent.forEach((d) => submitDay(d.date));
+    toast(link.isMe ? `${what} sent to production` : `${what} sent${forName}`);
+  };
   return (
     <div className={`hs-nudge${solo ? ' hs-nudge-solo' : ''}`}>
       <span className="hs-nudge-dot" aria-hidden="true" />
-      <span className="hs-nudge-text">
-        {one ? `${o.unsent[0].short} not sent` : `${o.unsent.length} days not sent`}
-        <span className="sr-only"> to production yet</span>
+      <span className="hs-nudge-text" role={confirming ? 'status' : undefined}>
+        {confirming ? `Sending hours for ${link.personName}, not for you` : `${what}${forName} not sent`}
+        {!confirming && <span className="sr-only"> to production yet</span>}
       </span>
-      <button type="button" className="hs-send" onClick={submit}>
-        Send
+      <button type="button" className="hs-send" onClick={send}>
+        {confirming ? `Send for ${first}` : 'Send'}
       </button>
     </div>
   );
