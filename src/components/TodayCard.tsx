@@ -122,8 +122,6 @@ function UrgentBody({ u }: { u: Urgent }) {
           Open
         </button>
       )}
-      {/* A note without an action keeps the slot, so the card is the same height whichever note the ruler is on. */}
-      {!note.primaryAction && !attachment && <div className="today-action-slot" aria-hidden="true" />}
     </div>
   );
 }
