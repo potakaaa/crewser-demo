@@ -76,6 +76,17 @@ function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, child
     const scroll = root.querySelector<HTMLElement>('.sheet-scroll');
     if (scroll) scroll.scrollTop = 0;
     root.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true });
+    // A sheet dragged down to close that swaps to its parent sheet (SheetState.from) instead of unmounting is still
+    // where the finger left it: ease it back into place, like a drag that did not pass the threshold.
+    if (!root.style.translate) return;
+    root.style.transition = 'translate 240ms var(--ease-ios)';
+    root.style.translate = '0 0';
+    if (scrimRef.current) scrimRef.current.style.background = '';
+    const t = window.setTimeout(() => {
+      root.style.transition = '';
+      root.style.translate = '';
+    }, 260);
+    return () => window.clearTimeout(t);
   }, [contentKey]);
 
   // Drag down on the grabber or the header: the sheet follows the finger, then closes or snaps back.

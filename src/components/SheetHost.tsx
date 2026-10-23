@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useDemo, type SheetKind, type SheetState } from '../store';
 import { contacts, links } from '../mock';
 import { BottomSheet } from './BottomSheet';
@@ -54,30 +54,12 @@ export function SheetHost() {
   const last = useRef<SheetState | null>(null);
   if (sheet) last.current = sheet;
   const shown = sheet ?? last.current;
-  const contentKey = shown ? `${shown.kind}:${shown.id ?? ''}` : '';
-  const host = useRef<HTMLDivElement>(null);
-  // A sheet dragged down to close returns to the sheet it came from instead of closing, so the
-  // dialog is still where the finger left it: ease it back into place.
-  useEffect(() => {
-    const dialog = host.current?.closest<HTMLElement>('.log-dialog');
-    const scrim = dialog?.closest<HTMLElement>('.scrim');
-    if (!dialog || !dialog.style.translate) return;
-    dialog.style.transition = 'translate 240ms var(--ease-ios)';
-    dialog.style.translate = '0 0';
-    if (scrim) scrim.style.background = '';
-    const t = window.setTimeout(() => {
-      dialog.style.transition = '';
-      dialog.style.translate = '';
-    }, 260);
-    return () => window.clearTimeout(t);
-  }, [contentKey]);
   if (!shown) return null;
   const meta = META[shown.kind](shown.id);
+  const contentKey = `${shown.kind}:${shown.id ?? ''}`;
   return (
     <BottomSheet open={sheet !== null} onClose={close} title={meta.title} subtitle={meta.subtitle} tone={meta.tone} contentKey={contentKey}>
-      <div ref={host} style={{ display: 'contents' }}>
-        <Body key={contentKey} sheet={shown} />
-      </div>
+      <Body key={contentKey} sheet={shown} />
     </BottomSheet>
   );
 }
