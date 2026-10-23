@@ -705,19 +705,34 @@
   color: var(--text-3);
 }
 
-/* ───────── Hours: one card, three columns split by hairlines ───────── */
+/* ───────── Hours: your own numbers, on the dark brand surface with static grain ─────────
+   Three columns split by white hairlines; lime only on the overtime value. Labels in on-dark-2
+   (4.5:1 or better over the grain), numerals white. */
 .hs-card {
-  border: 1px solid var(--hairline);
+  position: relative;
+  isolation: isolate;
   border-radius: var(--r-card);
-  background: var(--card);
+  background: var(--brand-surface);
+  box-shadow: 0 8px 22px rgba(17, 33, 35, 0.22);
+  color: #ffffff;
   overflow: hidden;
+}
+.hs-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--grain, none) 0 0 / 160px 160px;
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 .hs-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .hs-tile {
-  --focus: #2c6b72;
+  --focus: #dbf227;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -726,15 +741,15 @@
   border: 0;
   border-radius: 0;
   background: none;
-  color: var(--ink);
+  color: #ffffff;
   text-align: left;
   transition: background var(--t-fast) ease;
 }
 .hs-tile + .hs-tile {
-  border-left: 1px solid var(--hairline);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
 .hs-tile:active {
-  background: var(--soft);
+  background: rgba(255, 255, 255, 0.08);
 }
 .hs-tile:focus-visible {
   outline-offset: -3px;
@@ -746,7 +761,7 @@
   font-size: var(--fs-sm);
   font-weight: 500;
   line-height: 1.3;
-  color: var(--text-3);
+  color: var(--on-dark-2);
 }
 .hs-v {
   font-size: calc(26px * var(--numeral-scale));
@@ -758,7 +773,11 @@
   font-size: var(--fs-sm);
   font-weight: 500;
   letter-spacing: 0;
-  color: var(--text-3);
+  color: var(--on-dark-2);
+}
+/* The one accent: overtime in lime (7:1 on the surface). */
+.hs-grid > .hs-tile:nth-child(2) .hs-v {
+  color: var(--lime);
 }
 
 /* Not sent yet: a line under the numbers, not a box. */
@@ -769,6 +788,21 @@
   min-height: 44px;
   padding: 0 6px 0 14px;
   border-top: 1px solid var(--hairline);
+}
+.hs-card .hs-nudge {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+.hs-card .hs-nudge-text {
+  color: #dfe6e6;
+}
+.hs-card .hs-send {
+  --focus: #dbf227;
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.hs-card .hs-send:active {
+  background: rgba(255, 255, 255, 0.18);
 }
 .hs-nudge-dot {
   flex: none;
