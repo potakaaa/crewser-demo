@@ -146,6 +146,8 @@ export interface PdfDoc {
   kicker: string;
   title: string;
   line: string;
+  /** Documents from production carry the revision they show: "v2". */
+  version?: number;
 }
 
 /** revoked = production removed the access; expired = the end date passed. The server decides, the clock only warns. */

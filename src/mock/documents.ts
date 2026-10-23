@@ -54,7 +54,8 @@ export const docPdfs: Record<string, PdfDoc> = Object.fromEntries(
       file: d.file,
       kicker: KICKER[d.kind],
       title: d.title,
-      line: `${d.day ? `${fmtDayMonth(d.day)} 2026` : `Updated ${d.updated.slice(0, 10)}`} · The Last Ferry · v${d.version}`,
+      line: `${d.day ? `${fmtDayMonth(d.day)} 2026` : `Updated ${d.updated.slice(0, 10)}`} · The Last Ferry`,
+      version: d.version,
     },
   ]),
 );
