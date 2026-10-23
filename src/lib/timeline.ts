@@ -11,12 +11,10 @@ const TONIGHT = 18 * HOUR;
 export const MARK_GAP = 84;
 /** The ruler runs on this long after the last note, so the playhead can pass it. */
 const TAIL = 12 * HOUR;
-/** Closer to Now than this (px) counts as "back at Now". */
+/** The first note sits at least this far (px) from Now, so it is never mistaken for Now. */
 export const REST_PX = 4;
 /** Notes keep at least this much room (px) on the ruler, so each one has a spot the playhead can stop on. */
 export const STOP_GAP = 3;
-/** How close (px) the playhead must be to a note to count as on it: scrollLeft sits on the screen's pixel grid. */
-const PICK_EPS = 1;
 /** Arrow keys step to the next note further than this (px) from the playhead. Smaller than STOP_GAP, so ties never trap them. */
 export const NAV_EPS = STOP_GAP / 2;
 /** A note further than this past the playhead is "nothing else until …". */
@@ -59,10 +57,10 @@ export interface Scrub {
   minAt: (x: number) => number;
 }
 
-/** Which note the playhead is on. index === stops.length means nothing is left. */
+/** Which note the playhead is on: the nearest one, ahead or behind. Null (no Preview) means Now is nearest. */
 export interface Preview {
   index: number;
-  /** The note is a long way past the playhead. */
+  /** The note is a long way ahead of the playhead. */
   quiet: boolean;
 }
 
@@ -136,12 +134,28 @@ export function buildScrub(list: Note[] = allNotes): Scrub {
   return { marks, past, stops, length: Math.ceil(Math.max(xAt(end), prevX + STOP_GAP * 4)), minAt };
 }
 
-/** The note at or after the playhead, or null while it rests on Now. */
+/**
+ * The stop nearest the playhead, with Now (x = 0) as a stop too: -1 for Now, else an index into `stops`.
+ * Equally near, the one ahead wins. The preview and the snap both use this, so what the card shows is what the ruler locks onto.
+ */
+function nearestStop(s: Scrub, x: number): number {
+  let best = -1;
+  let bestD = Math.abs(x);
+  s.stops.forEach((st, i) => {
+    const d = Math.abs(st.x - x);
+    if (d < bestD || (d === bestD && st.x >= x)) {
+      best = i;
+      bestD = d;
+    }
+  });
+  return best;
+}
+
+/** The note nearest the playhead, or null while Now is nearest. */
 export function previewAt(s: Scrub, x: number): Preview | null {
-  if (x < REST_PX) return null;
-  const index = s.stops.findIndex((st) => st.x >= x - PICK_EPS);
-  const i = index < 0 ? s.stops.length : index;
-  return { index: i, quiet: i < s.stops.length && s.stops[i].min - s.minAt(x) > QUIET };
+  const index = nearestStop(s, x);
+  if (index < 0) return null;
+  return { index, quiet: s.stops[index].min - s.minAt(x) > QUIET };
 }
 
 export const samePreview = (a: Preview | null, b: Preview | null) => a === b || (!!a && !!b && a.index === b.index && a.quiet === b.quiet);
@@ -183,13 +197,8 @@ export function clusters(stops: ScrubStop[]): (Cluster | null)[] {
   return out;
 }
 
-/**
- * Where the ruler should settle once it stops moving: the note at or after the playhead, so that
- * note's marker sits exactly under it, or Now when the playhead is back in the rest zone.
- * Null when nothing is left ahead (the playhead is past the last note): stay where it is.
- */
-export function snapTarget(s: Scrub, x: number): number | null {
-  const p = previewAt(s, x);
-  if (!p) return 0;
-  return s.stops[p.index]?.x ?? null;
+/** Where the ruler settles once it stops: the nearest note or Now, so that marker sits exactly under the playhead. */
+export function snapTarget(s: Scrub, x: number): number {
+  const i = nearestStop(s, x);
+  return i < 0 ? 0 : s.stops[i].x;
 }

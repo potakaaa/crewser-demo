@@ -6,6 +6,8 @@ import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewLine, sameP
 const DRAG_THRESHOLD = 5;
 /** Fastest fling that still counts, px per ms. */
 const MAX_FLING = 1.6;
+/** A fling is projected this far ahead (ms of release velocity) to find where it would have come to rest. */
+const FLING_MS = 200;
 /** A pause this long before release means the finger had stopped: no fling. */
 const STALE_MS = 80;
 /** The ruler counts as settled this long after its last scroll event (momentum included). */
@@ -27,7 +29,7 @@ export interface TimelineHandle {
 /** What the Timeline can ask of the scrubber: glide the ruler to a position, and where a glide is heading. */
 interface Glider {
   /** Animate scrollLeft to `x` (a jump with reduced motion); `done` runs when it arrives. */
-  glideTo: (x: number, done?: () => void) => void;
+  glideTo: (x: number, done?: () => void, fling?: boolean) => void;
   /** Where the glide in progress is heading, or null. */
   target: () => number | null;
 }
@@ -42,7 +44,7 @@ interface Glider {
 function useScrubber(
   el: HTMLDivElement | null,
   onScrub: (x: number) => void,
-  snapTo: (x: number) => number | null,
+  snapTo: (x: number) => number,
   onDoubleTap: () => void,
 ): RefObject<Glider> {
   const onScrubRef = useRef(onScrub);
@@ -71,7 +73,7 @@ function useScrubber(
       glide = 0;
       glideEnd = null;
     };
-    const glideTo = (x: number, done?: () => void) => {
+    const glideTo = (x: number, done?: () => void, fling = false) => {
       stopGlide();
       const from = el.scrollLeft;
       const dist = x - from;
@@ -80,7 +82,8 @@ function useScrubber(
         done?.();
         return;
       }
-      const dur = Math.min(240, 120 + Math.abs(dist) * 0.25); // about 160 ms for a short snap, to match the card's crossfade
+      // About 160 ms for a short snap, to match the card's crossfade; a fling travels on a little longer.
+      const dur = fling ? Math.min(420, 160 + Math.abs(dist) * 0.5) : Math.min(240, 120 + Math.abs(dist) * 0.25);
       const t0 = performance.now();
       glideEnd = x;
       const step = (now: number) => {
@@ -105,7 +108,7 @@ function useScrubber(
       idle = 0;
       if (pointer !== null || touches > 0 || glide) return;
       const to = snapRef.current(el.scrollLeft);
-      if (to !== null && Math.abs(to - el.scrollLeft) >= 0.5) glideTo(to);
+      if (Math.abs(to - el.scrollLeft) >= 0.5) glideTo(to);
     };
     const settleSoon = () => {
       window.clearTimeout(idle);
@@ -135,11 +138,10 @@ function useScrubber(
       if (!wasDragging) return;
       // A finger that stopped before lifting must not fling with the speed it had earlier.
       const fresh = e ? e.timeStamp - lastT < STALE_MS : false;
-      if (fresh && !reducedMotion()) {
-        const projected = el.scrollLeft + Math.max(-MAX_FLING, Math.min(MAX_FLING, velocity)) * 200;
-        el.scrollTo({ left: projected, behavior: 'smooth' });
-      }
-      settleSoon(); // a drag that stops dead sends no more scroll events
+      // Where the flick would have come to rest; the nearest note to that point is where the ruler lands.
+      const reach = fresh ? Math.max(-MAX_FLING, Math.min(MAX_FLING, velocity)) * FLING_MS : 0;
+      const rest = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, el.scrollLeft + reach));
+      glideTo(snapRef.current(rest), undefined, reach !== 0);
     };
 
     // Double tap: touch and pen only. A mouse double click arrives as its own event.
