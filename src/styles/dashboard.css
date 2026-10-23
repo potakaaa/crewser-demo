@@ -922,7 +922,7 @@
 }
 /* Room to breathe: the facts are one quiet line, not a row of boxes, and the CTA has air above it. */
 .sheet-dash .ccard-compact .ccard-body {
-  gap: 10px;
+  gap: 12px; /* also keeps a copy value's 44 px band clear of the CTA */
   padding: 10px 14px 14px;
 }
 /* Facts side by side, a gap instead of separators, so a wrapped line never starts with a dot. */

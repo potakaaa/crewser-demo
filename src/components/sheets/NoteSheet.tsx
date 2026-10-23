@@ -19,7 +19,7 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 /** 112, 144, 133: the short public emergency numbers, shown as three call tiles above the rest. */
 const isEmergency = (c: InfoContact) => /^\d{3}$/.test(c.phone);
 /** Where a tile's number works, in two words; the full note is in its label for screen readers. */
-const sosReach = (note?: string) => (!note ? undefined : /austria only/i.test(note) ? 'AT only' : /\bEU\b/.test(note) ? 'EU-wide' : undefined);
+const sosReach = (c: InfoContact) => (c.reach === 'eu' ? 'EU-wide' : c.reach === 'at' ? 'AT only' : undefined);
 const contactKey = (c: InfoContact) => `${c.label}:${c.phone}`;
 
 /** Contacts, office hours and address of a General info note: call or copy a number, copy or open the address. */
@@ -35,9 +35,9 @@ function InfoBlocks({ info }: { info: NoteInfo }) {
             <a key={contactKey(c)} className="ns-sos-btn" href={telHref(c.phone)} aria-label={`Call ${c.label}, ${c.phone}${c.note ? `, ${c.note}` : ''}`}>
               <span className="ns-sos-num">{c.phone}</span>
               <span className="ns-sos-k">{c.label}</span>
-              {sosReach(c.note) && (
+              {sosReach(c) && (
                 <span className="ns-sos-note" aria-hidden="true">
-                  {sosReach(c.note)}
+                  {sosReach(c)}
                 </span>
               )}
             </a>
