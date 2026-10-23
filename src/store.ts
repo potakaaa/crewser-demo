@@ -267,11 +267,31 @@ let toastSeq = 0;
 
 /**
  * Close the open sheet without going through Back. If it owns a history entry, step back over it
- * so Back does not later land on a sheet that is gone.
+ * so Back does not later land on a sheet that is gone. Callers clear `sheet` and `sheetPushed`
+ * themselves, in the same tick, so a second close finds nothing left to step back over.
  */
 function dropSheet(pushed: boolean) {
   if (pushed) history.back();
 }
+
+/**
+ * history.back() for a screen entry: the stack only changes when the popstate arrives, so a second
+ * Back before then would step out of the app. Ignored while one is on its way (the timer is only a
+ * safety net for a Back that never produces a popstate).
+ */
+let backPending = false;
+let backTimer = 0;
+function stepBack() {
+  if (backPending) return;
+  backPending = true;
+  window.clearTimeout(backTimer);
+  backTimer = window.setTimeout(() => (backPending = false), 1000);
+  history.back();
+}
+const backArrived = () => {
+  backPending = false;
+  window.clearTimeout(backTimer);
+};
 
 export const useDemo = create<DemoState & Actions>()((set, get) => ({
   ...initialState(),
@@ -302,7 +322,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       return;
     }
     if (top.pushed) {
-      history.back(); // popstate → syncFromLocation pops the stack
+      stepBack(); // popstate → syncFromLocation pops the stack
       return;
     }
     const next = stack.slice(0, -1);
@@ -311,6 +331,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
   },
 
   syncFromLocation: (src) => {
+    if (src !== 'hashchange') backArrived();
     const r = hashToRoute(location.hash);
     const deepSheet = hashToSheet(location.hash);
     const { stack, sheet, sheetPushed } = get();
@@ -364,7 +385,9 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       return;
     }
     if (sheetPushed) {
-      history.back(); // popstate → syncFromLocation closes the sheet
+      // Close now and step back over the sheet's history entry; the popstate that follows finds no sheet to close.
+      set({ sheet: null, sheetPushed: false });
+      dropSheet(true);
       return;
     }
     // A deep link (#/note/fl) leaves its hash behind; drop it so reload doesn't reopen the sheet.
