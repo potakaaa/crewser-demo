@@ -2,7 +2,7 @@ import { useRef, type CSSProperties } from 'react';
 import '../styles/calendar.css';
 import { useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
-import { ActingAs } from '../components/ActingAs';
+import { ForColleague } from '../components/ForColleague';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
@@ -133,7 +133,7 @@ export function CalendarScreen() {
           </button>
         </div>
 
-        <ActingAs />
+        <ForColleague />
 
         <div className="cal-panel">
           <Collapse open={!monthOpen}>

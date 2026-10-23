@@ -3,6 +3,7 @@ import { Icon, type IconName } from './Icon';
 import { Collapse } from './Layout';
 import { QrPreview } from './QrPreview';
 import { CrewSection } from './CrewStack';
+import { NotePrimaryAction } from './NotePrimaryAction';
 import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
 import { cardSubtitle, cardTiles, dayStub, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
@@ -71,7 +72,6 @@ function FactTile({ tile }: { tile: CardTile }) {
 export function ContentCard({ note }: { note: Note }) {
   const a = useNoteActions();
   const tiles = cardTiles(note).slice(0, 2);
-  const pa = note.primaryAction;
   return (
     <article className="ccard ccard-compact">
       <button type="button" className="ccard-head" onClick={() => a.openNote(note.id)} aria-label={`${note.title}, ${cardSubtitle(note)}, ${dayStub(note)} ${timeText(note)}. Open details`}>
@@ -88,7 +88,7 @@ export function ContentCard({ note }: { note: Note }) {
         </span>
         <Icon name="right" size={18} color="#54686C" />
       </button>
-      {(tiles.length > 0 || pa) && (
+      {(tiles.length > 0 || note.primaryAction) && (
         <div className="ccard-body">
           {tiles.length > 0 && (
             <div className="tiles">
@@ -97,12 +97,7 @@ export function ContentCard({ note }: { note: Note }) {
               ))}
             </div>
           )}
-          {pa && (
-            <button type="button" className="btn btn-outline ccard-action" onClick={() => a.primary(note)}>
-              <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#111A1B" strokeWidth={1.8} />
-              {pa.label}
-            </button>
-          )}
+          <NotePrimaryAction note={note} />
         </div>
       )}
     </article>

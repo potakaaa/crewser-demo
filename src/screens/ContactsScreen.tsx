@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { CONTACT_DEPARTMENTS, contacts, person, type Contact } from '../mock';
-import { ActingAs } from '../components/ActingAs';
+import { ForColleague } from '../components/ForColleague';
 import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
@@ -107,7 +107,7 @@ export function ContactsScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={`${projectName} · ${contacts.length - 1} people`} title="Contacts" />
-        <ActingAs />
+        <ForColleague />
         <div className="searchbox">
           <Icon name="search" size={18} color="#C4CFD0" />
           <input ref={input} type="search" aria-label="Search contacts" placeholder="Search name, role or number" value={query} onChange={(e) => setQuery(e.target.value)} />

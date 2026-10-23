@@ -10,7 +10,6 @@ import { TodayBar } from '../components/TodayBar';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { Wordmark } from '../components/Brand';
-import { ActingAs } from '../components/ActingAs';
 import { smartNotes } from '../lib/notes';
 import { firstNameOf, greeting } from '../lib/greeting';
 import { buildScrub, type Preview } from '../lib/timeline';
@@ -54,7 +53,7 @@ export function DashboardScreen() {
               <span className="home-project">
                 {link.projectName} · Shoot day {today.shootDay}
                 <Icon name="down" size={14} color="#C4CFD0" strokeWidth={2} />
-                <span className="sr-only">. Switch project</span>
+                <span className="sr-only">{link.isMe ? '' : `. Entering hours for ${link.personName}, ${link.position}`}. Switch project</span>
               </span>
             </span>
           </button>
@@ -62,7 +61,6 @@ export function DashboardScreen() {
             <Icon name="search" size={20} color="#FFFFFF" />
           </button>
         </div>
-        <ActingAs />
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
         <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />

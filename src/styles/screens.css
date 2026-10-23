@@ -837,44 +837,6 @@
   color: var(--text-2);
 }
 
-/* ───────── Acting as a colleague ───────── */
-.actingas {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-height: 44px;
-  padding: 0 var(--sp-3) 0 6px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 22px;
-  background: rgba(219, 242, 39, 0.16);
-  color: #ffffff;
-  font-size: var(--fs-sm);
-  text-align: left;
-  align-self: flex-start;
-  max-width: 100%;
-}
-.actingas-av {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  background: var(--lime);
-  color: var(--ink);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-}
-.actingas-text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.actingas-text strong {
-  font-weight: 600;
-}
 .setbanner {
   display: flex;
   align-items: center;
