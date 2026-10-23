@@ -54,7 +54,7 @@ export function DashboardScreen() {
                   {greeting()}, {person.firstName}
                 </span>
               ) : (
-                <ForChip tone="dark" />
+                <ForChip />
               )}
               <span className="home-project">
                 {link.projectName} · Shoot day {today.shootDay}

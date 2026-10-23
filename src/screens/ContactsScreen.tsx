@@ -108,7 +108,7 @@ export function ContactsScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={`${projectName} · ${contacts.length - 1} people`} title="Contacts">
-          <ForChip tone="dark" compact />
+          <ForChip compact />
           <NotifButton tone="dark" />
         </ScreenTitle>
         <div className="searchbox">

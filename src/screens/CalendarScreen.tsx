@@ -124,7 +124,7 @@ export function CalendarScreen() {
                 {link.isMe ? label : label.replace(/^([A-Z][a-z]{2})[a-z]+(?= \d)/, '$1')}
                 {link.isMe ? !monthOpen && ` · CW ${isoWeek(monday)}` : ' · '}
               </span>
-              <ForChip tone="dark" compact bare />
+              <ForChip compact bare />
               <span className="chev" data-open={monthOpen}>
                 <Icon name="down" size={16} color="#C4CFD0" strokeWidth={1.8} />
               </span>
