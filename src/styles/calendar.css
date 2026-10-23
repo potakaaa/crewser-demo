@@ -168,7 +168,7 @@ button.day-action:active {
 }
 
 /* On a colleague's link the chip sits in the month label ("Oct 2026 · ● Bianca"): plain text, no pill. */
-.month-toggle .for-chip {
+.month-toggle .for-chip[data-tone] {
   height: auto;
   gap: 5px;
   padding: 0;
@@ -178,7 +178,4 @@ button.day-action:active {
   color: #ffffff;
   font-size: inherit;
   font-weight: 600;
-}
-.month-toggle .for-chip-dot {
-  box-shadow: none;
 }

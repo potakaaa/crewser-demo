@@ -913,21 +913,12 @@
   background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
 }
-/* On a light surface: soft fill, ink text (13:1). */
-.for-chip[data-tone='light'] {
-  border: 1px solid var(--hairline);
-  background: var(--soft);
-  color: var(--ink);
-}
 .for-chip-dot {
   flex: none;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--lime);
-}
-.for-chip[data-tone='light'] .for-chip-dot {
-  box-shadow: 0 0 0 1.5px var(--ink);
 }
 .for-chip-name {
   min-width: 0;
