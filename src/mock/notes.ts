@@ -145,14 +145,15 @@ export const notes: Note[] = [
     crew: 'all',
     info: {
       contacts: [
-        { label: 'Emergency', phone: '112', note: 'EU emergency number' },
-        { label: 'Ambulance', phone: '144', note: 'Austria' },
-        { label: 'Police', phone: '133', note: 'Austria' },
+        { label: 'Emergency', phone: '112', note: 'Works everywhere in the EU, Madeira included' },
+        { label: 'Ambulance', phone: '144', note: 'In Austria only' },
+        { label: 'Police', phone: '133', note: 'In Austria only' },
         { label: 'Production office', phone: '+43 1 555 01 00', note: 'Call 24/7 on shoot days' },
         { label: 'Production coordinator', name: 'Coordinator Conny', phone: '+43 664 555 01 12' },
         { label: 'Set medic', name: 'Medic Matthias', phone: '+43 664 555 10 01', note: 'First aid on set, shoot days' },
         { label: 'Location manager', name: 'Location Lukas', phone: '+43 664 555 09 01' },
-        { label: 'Nearest hospital (A&E)', name: 'AKH Wien', phone: '+43 1 40400 0', note: 'Währinger Gürtel 18–20, 1090 Wien · open 24 h' },
+        { label: 'Hospital in Vienna (A&E)', name: 'AKH Wien', phone: '+43 1 40400 0', note: 'Währinger Gürtel 18–20, 1090 Wien · open 24 h' },
+        { label: 'Hospital in Madeira (A&E)', name: 'Hospital Dr. Nélio Mendonça', phone: '+351 291 705 700', note: 'Funchal · open 24 h · for the Madeira days' },
       ],
       hours: [
         { days: 'Mon–Fri', time: '08:00–19:00' },
