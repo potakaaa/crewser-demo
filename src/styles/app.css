@@ -1417,41 +1417,42 @@
   font-size: var(--fs-md);
   color: var(--on-dark-2);
 }
-/* The note text as a callout: a light lime-sage tint and a short olive bar on the left,
-   so it reads as production's own word rather than another fact. Text 7:1, label 6:1. */
-.ns-callout {
+/* Production's note, labelled the way crews label gear on set: a short strip of lime camera
+   tape over the card's top-left edge, torn ends, matte grain, marker capitals in ink (15:1).
+   The tape is the label itself, real text; the card stays the plain white of the rest. */
+.ns-note {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px var(--sp-4) var(--sp-4) 20px;
-  border: 1px solid rgba(91, 107, 18, 0.14);
+  margin-top: var(--sp-2);
+  padding: 28px var(--sp-5) var(--sp-5);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-card);
-  background: #f3f7dd;
+  background: var(--card);
+  box-shadow: var(--shadow-card);
 }
-.ns-callout::before {
-  content: '';
+.ns-tape {
   position: absolute;
-  left: 9px;
-  top: 14px;
-  bottom: 14px;
-  width: 3px;
-  border-radius: 2px;
-  background: #b9cc2c;
-}
-.ns-callout-k {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-xs);
-  font-weight: 600;
+  top: -11px;
+  left: 14px;
+  padding: 5px 16px 3px;
+  background: var(--grain-soft, none) 0 0 / 160px 160px, var(--lime);
+  background-blend-mode: multiply, normal;
+  clip-path: polygon(
+    3px 0, calc(100% - 3px) 0, 100% 22%, calc(100% - 4px) 45%, 100% 68%, calc(100% - 3px) 100%,
+    3px 100%, 0 76%, 4px 52%, 0 30%
+  );
+  transform: rotate(-2deg);
+  transform-origin: left center;
+  color: var(--ink);
+  font-family: var(--ff-poster);
+  font-size: 17px;
+  font-weight: 400;
   letter-spacing: 0.08em;
+  line-height: 1;
   text-transform: uppercase;
-  color: #4f5e0f;
 }
-.ns-callout p {
+.ns-note p {
   margin: 0;
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
   line-height: 1.5;
   white-space: pre-line;
   color: var(--text-2);

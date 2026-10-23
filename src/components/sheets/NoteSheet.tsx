@@ -194,10 +194,10 @@ export function NoteSheet({ id }: { id?: string }) {
         </button>
       )}
       {note.text && (
-        <div className="ns-callout">
-          <span className="ns-callout-k">
-            <Icon name="plain" size={14} color="#4F5E0F" strokeWidth={1.8} />
-            Note
+        // Production's note, labelled like gear on set: a strip of lime camera tape with marker writing.
+        <div className="ns-note">
+          <span className="ns-tape">
+            Production<span className="sr-only"> note:</span>
           </span>
           <p>{note.text}</p>
         </div>
