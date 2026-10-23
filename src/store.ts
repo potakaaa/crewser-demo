@@ -16,6 +16,8 @@ export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'not
 export interface SheetState {
   kind: SheetKind;
   id?: string;
+  /** The sheet this one was opened from; closing or going Back returns to it instead of leaving the page. */
+  from?: SheetState;
 }
 
 interface Entry {
@@ -180,7 +182,8 @@ interface Actions {
   syncFromLocation: (src?: 'popstate' | 'hashchange') => void;
   setFlag: (k: 'offline' | 'empty' | 'codeFound', v: boolean) => void;
   setLogOpen: (v: boolean) => void;
-  openSheet: (kind: SheetKind, id?: string) => void;
+  /** `from` is the sheet to come back to when this one is closed (see SheetState.from). */
+  openSheet: (kind: SheetKind, id?: string, from?: SheetState) => void;
   closeSheet: () => void;
   /** Switch to another crew link. Returns false when refused (unknown, expired or revoked link, with a toast for the last two); true when the link is now active. */
   setActiveLink: (id: string) => boolean;
@@ -313,6 +316,12 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const { stack, sheet, sheetPushed } = get();
     // Back with a sheet open that owns a history entry: close the sheet, stay on the page.
     if (sheet && sheetPushed && src !== 'hashchange') {
+      if (sheet.from) {
+        // Back from a sheet that was opened from another: show that one, with a fresh history entry for it.
+        history.pushState(null, '', location.hash);
+        set({ sheet: sheet.from });
+        return;
+      }
       set({ sheet: null, sheetPushed: false });
       return;
     }
@@ -341,15 +350,19 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     dropSheet(get().sheetPushed);
     set({ logOpen: true, sheet: null, sheetPushed: false });
   },
-  openSheet: (kind, id) => {
+  openSheet: (kind, id, from) => {
     const { sheet, sheetPushed } = get();
     // A sheet gets one history entry; switching to another sheet reuses it.
     if (!sheet && !sheetPushed) history.pushState(null, '', location.hash || routeToHash(get().stack[get().stack.length - 1].route));
-    set({ sheet: { kind, id }, sheetPushed: sheet ? sheetPushed : true, logOpen: false });
+    set({ sheet: { kind, id, from }, sheetPushed: sheet ? sheetPushed : true, logOpen: false });
   },
   closeSheet: () => {
     const { sheet, sheetPushed } = get();
     if (!sheet) return;
+    if (sheet.from) {
+      set({ sheet: sheet.from }); // keeps the history entry: it now belongs to the sheet we return to
+      return;
+    }
     if (sheetPushed) {
       history.back(); // popstate → syncFromLocation closes the sheet
       return;
@@ -432,9 +445,9 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const n = notificationsFor(get().activeLinkId).find((x) => x.id === id);
     if (!n) return;
     get().markRead(id);
-    // Navigating to the PDF keeps the notifications sheet to come back to; opening a sheet swaps it.
+    // Both ways keep the notifications sheet to come back to: the PDF screen reopens it on Back, a sheet returns to it on close or Back.
     if ('pdf' in n.target) get().navigate({ name: 'pdf', file: n.target.pdf });
-    else get().openSheet(n.target.sheet, n.target.id);
+    else get().openSheet(n.target.sheet, n.target.id, get().sheet ?? undefined);
   },
 
   reset: () => {
