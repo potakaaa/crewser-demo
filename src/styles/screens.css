@@ -75,7 +75,20 @@
   color: #ffffff;
   text-align: left;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  isolation: isolate;
   transition: transform 180ms var(--ease-out);
+}
+/* Static film grain, as on the grained buttons: below the text, never animated. */
+.dpin::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--grain, none) 0 0 / 160px 160px;
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 .dpin:active {
   transform: scale(0.985);
@@ -97,14 +110,17 @@
 .dpin-title {
   margin-top: 2px;
   font-family: var(--font-display);
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  letter-spacing: var(--track-tight);
-  line-height: 1.2;
+  /* Scaled per font like the other headlines: Poster is narrow and needs more, Courier is wide and needs less. */
+  font-size: calc(24px * var(--display-scale));
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-track);
+  line-height: 1.18;
+  text-wrap: balance;
 }
 .dpin-meta {
   font-size: var(--fs-sm);
-  color: var(--on-dark-3);
+  /* One step lighter than the other dark cards: the grain lifts the lightest speck behind the text, and on-dark-3 would drop below 4.5:1 there. */
+  color: var(--on-dark-2);
 }
 .dpin-cta {
   margin-top: var(--sp-2);
