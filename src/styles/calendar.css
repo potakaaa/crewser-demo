@@ -4,41 +4,57 @@
   position: relative;
 }
 
-/* Corner marks: a call sheet is out (file glyph), hours still open (amber dot). */
+/* Corner marks: a call sheet is out (file glyph), hours still open (an amber "!" badge, unlike the
+   round note dots under the date). The day's aria-label says both. */
 .day-marks {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  left: 5px;
+  top: 4px;
+  right: 4px;
+  left: 4px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   pointer-events: none;
   color: currentColor;
-  opacity: 0.8;
 }
 .day-marks svg {
   margin-left: auto;
+  opacity: 0.8;
 }
+/* Ink on amber, 11:1, on the dark strip and on the white selected day alike. */
 .mark-unsent {
-  width: 6px;
-  height: 6px;
-  border-radius: 3px;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   background: var(--amber-dark);
-  box-shadow: 0 0 0 1px rgba(20, 29, 30, 0.35);
+  box-shadow: 0 0 0 1.5px rgba(20, 29, 30, 0.35);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 9px;
+  font-weight: 800;
+  font-style: normal;
+  line-height: 1;
 }
 .is-sel .mark-unsent {
-  background: #c98a00;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px rgba(107, 74, 0, 0.35);
 }
 .mday .day-marks {
-  top: 3px;
-  right: 3px;
-  left: 3px;
+  top: 2px;
+  right: 2px;
+  left: 2px;
 }
 .mday .day-marks svg {
   width: 9px;
   height: 9px;
+}
+.mday .mark-unsent {
+  width: 10px;
+  height: 10px;
+  font-size: 8px;
 }
 .mday.is-out .day-marks {
   opacity: 0.4;
@@ -119,8 +135,8 @@ button.day-action:active {
 
 /* Room for the corner marks above the weekday. */
 .cal-panel .wday {
-  height: 66px;
-  padding-top: 8px;
+  height: 72px;
+  padding-top: 14px;
   gap: 4px;
 }
 .cal-panel .mday {

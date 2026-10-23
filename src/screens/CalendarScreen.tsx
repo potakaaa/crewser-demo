@@ -35,7 +35,7 @@ function DayMarks({ call, unsent }: { call: boolean; unsent: boolean }) {
   if (!call && !unsent) return null;
   return (
     <span className="day-marks" aria-hidden="true">
-      {unsent && <i className="mark-unsent" />}
+      {unsent && <span className="mark-unsent">!</span>}
       {call && <Icon name="file" size={11} strokeWidth={2} />}
     </span>
   );
