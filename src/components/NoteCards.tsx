@@ -66,7 +66,7 @@ export function ContentCard({ note }: { note: Note }) {
                     <button
                       type="button"
                       className="ccard-fact-copy"
-                      aria-label={`Copy ${t.label.toLowerCase()} ${t.value}`}
+                      aria-label={`Copy ${t.label}: ${t.value}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         a.copy(t.value);

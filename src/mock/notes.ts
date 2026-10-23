@@ -145,9 +145,9 @@ export const notes: Note[] = [
     crew: 'all',
     info: {
       contacts: [
-        { label: 'Emergency', phone: '112', note: 'Works everywhere in the EU, Madeira included' },
-        { label: 'Ambulance', phone: '144', note: 'In Austria only' },
-        { label: 'Police', phone: '133', note: 'In Austria only' },
+        { label: 'Emergency', phone: '112', reach: 'eu', note: 'Works everywhere in the EU, Madeira included' },
+        { label: 'Ambulance', phone: '144', reach: 'at', note: 'In Austria only' },
+        { label: 'Police', phone: '133', reach: 'at', note: 'In Austria only' },
         { label: 'Production office', phone: '+43 1 555 01 00', note: 'Call 24/7 on shoot days' },
         { label: 'Production coordinator', name: 'Coordinator Conny', phone: '+43 664 555 01 12' },
         { label: 'Set medic', name: 'Medic Matthias', phone: '+43 664 555 10 01', note: 'First aid on set, shoot days' },

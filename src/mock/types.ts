@@ -45,6 +45,8 @@ export interface InfoContact {
   name?: string;
   phone: string;
   note?: string;
+  /** Emergency numbers only: where it works. 'eu' is any EU country, 'at' is Austria only. */
+  reach?: 'eu' | 'at';
 }
 
 /** Structured content of a General info note: who to call, when the office is open, where it is. */
