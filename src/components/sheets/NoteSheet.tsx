@@ -2,6 +2,7 @@ import { noteById } from '../../mock';
 import { Icon } from '../Icon';
 import { TYPE_COLOR } from '../../lib/noteStyle';
 import { useNoteActions } from '../../lib/actions';
+import { fmtDayMonth } from '../../lib/dates';
 import { FactActions } from '../NoteCards';
 import { QrPreview } from '../QrPreview';
 import { CrewSection } from '../CrewStack';
@@ -27,11 +28,12 @@ export function NoteSheet({ id }: { id?: string }) {
   // Only a dated note has the time block; an undated one keeps all its facts.
   const call = note.day ? note.facts.find((f) => f.label === 'Call') : undefined;
   const wrap = note.day ? note.facts.find((f) => f.label === 'Wrap') : undefined;
-  const atTime = (value: string) => !!note.time && value.endsWith(note.time);
+  // "Wed 21 Oct, 15:00": the note's own day and time, nothing the hero and subtitle don't already say.
+  const atTime = (value: string) => !!note.day && !!note.time && value === `${fmtDayMonth(note.day)}, ${note.time}`;
   const inHero = (label: string, value: string) =>
     isFlight
       ? label === 'Flight no.'
-      : (label === 'Call' && !!call) || (label === 'Wrap' && !!wrap) || (!wrap && !!note.day && label === timeSub(note) && atTime(value));
+      : (label === 'Call' && !!call) || (label === 'Wrap' && !!wrap) || (!wrap && label === timeSub(note) && atTime(value));
   const facts = note.facts.filter((f) => !inHero(f.label, f.value));
   // With its own Directions button below, a place only needs Copy here.
   const directionsBelow = !!pa && pa.kind !== 'boardingPass';
