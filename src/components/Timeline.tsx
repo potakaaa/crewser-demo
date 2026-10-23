@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref, type RefObject } from 'react';
 import { TYPE_COLOR } from '../lib/noteStyle';
-import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewLine, samePreview, snapTarget, stepTarget, type Preview, type Scrub } from '../lib/timeline';
+import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewSpoken, samePreview, snapTarget, stepTarget, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
 /** Fastest fling that still counts, px per ms. */
@@ -398,7 +398,7 @@ export function Timeline({
 
   if (!scrub.stops.length) return null;
   const current = preview ? scrub.stops[preview.index] : undefined;
-  const line = preview && current ? previewLine(scrub, preview) : 'Now. Nothing previewed.';
+  const line = preview && current ? previewSpoken(scrub, preview) : 'Now. Nothing previewed.';
   const clusters = clusterOf(scrub.stops);
   const fanLead = preview ? clusters[preview.index]?.lead : undefined;
   return (

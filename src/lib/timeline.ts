@@ -147,12 +147,28 @@ export function previewAt(s: Scrub, x: number): Preview | null {
 
 export const samePreview = (a: Preview | null, b: Preview | null) => a === b || (!!a && !!b && a.index === b.index);
 
-/** The caption for the locked note: "2 of 3 · Flight · in 2 days · Wed 12:05", without the count when it stands alone. */
+/** "2/3" when the note is one of a cluster, else null. */
+const clusterTag = (s: Scrub, index: number) => {
+  const c = clusters(s.stops)[index];
+  return c && `${c.pos}/${c.n}`;
+};
+
+/**
+ * The caption next to "Back to now": "2/3 · Hotel · Wed 15:00", short enough to keep the day and time
+ * on one line at 360 px in every font. The count is left out when the note stands alone.
+ */
 export function previewLine(s: Scrub, p: Preview): string {
   const stop = s.stops[p.index];
   if (!stop) return ''; // a preview left over from an earlier ruler
+  return [clusterTag(s, p.index), TYPE_LABEL[stop.note.type], stop.when].filter(Boolean).join(' · ');
+}
+
+/** The same for a screen reader, with the count spelled out and how far away the note is: "2 of 3, Hotel, in 2 days, Wed 15:00". */
+export function previewSpoken(s: Scrub, p: Preview): string {
+  const stop = s.stops[p.index];
+  if (!stop) return '';
   const c = clusters(s.stops)[p.index];
-  return [c && `${c.pos} of ${c.n}`, TYPE_LABEL[stop.note.type], stop.rel, stop.when].filter(Boolean).join(' · ');
+  return [c && `${c.pos} of ${c.n}`, TYPE_LABEL[stop.note.type], stop.rel, stop.when].filter(Boolean).join(', ');
 }
 
 /** Notes closer together than this (px) on the ruler overlap as dots (10 px wide), so they get one count badge. */
