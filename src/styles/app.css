@@ -1539,6 +1539,167 @@
   white-space: pre-line;
   color: var(--text-2);
 }
+/* ───────── General info: emergency numbers, contacts, office hours, address ───────── */
+/* 112 · 144 · 133: three call tiles in a soft red, distinct without shouting. Numbers 7:1, labels 8:1. */
+.ns-sos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+.ns-sos-btn {
+  --focus: #8f2a23;
+  min-width: 0;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid rgba(143, 42, 35, 0.16);
+  border-radius: var(--r-card);
+  background: #fbeeec;
+  text-decoration: none;
+  transition: transform 180ms var(--ease-out);
+}
+.ns-sos-btn:active {
+  transform: scale(0.97);
+  background: #f8e4e1;
+}
+.ns-sos-num {
+  font-family: var(--font-numeral);
+  font-weight: var(--numeral-weight);
+  font-size: calc(var(--fs-2xl) * var(--numeral-scale));
+  letter-spacing: var(--numeral-track);
+  line-height: 1;
+  color: #8f2a23;
+}
+.ns-sos-k {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #7a2a24;
+}
+.ns-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.ns-h {
+  margin: 0;
+  padding: 0 2px;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text-2);
+}
+.ns-contacts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.ns-contact {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px 44px;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 10px var(--sp-3) 10px var(--sp-4);
+}
+.ns-contact + .ns-contact {
+  border-top: 1px solid var(--hairline);
+}
+.ns-contact-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.ns-contact-k {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.ns-contact-name {
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+.ns-contact-phone {
+  font-size: var(--fs-base);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.ns-contact-name + .ns-contact-phone {
+  font-size: var(--fs-md);
+  font-weight: 400;
+  color: var(--text-2);
+}
+.ns-contact-note {
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+  color: var(--text-3);
+}
+/* Copy is quiet; Call is the row's action, a small green primary. */
+.ns-copy {
+  background: none;
+}
+.ns-copy:active {
+  background: var(--soft);
+}
+.ns-call {
+  position: relative;
+  isolation: isolate;
+  background: var(--brand-surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.ns-call::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--grain, none) 0 0 / 160px 160px;
+  opacity: 0.2;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.ns-hours {
+  margin: 0;
+  padding: var(--sp-1) var(--sp-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.ns-hours-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: var(--sp-3);
+  padding: 10px 0;
+  font-size: var(--fs-base);
+}
+.ns-hours-row + .ns-hours-row {
+  border-top: 1px solid var(--hairline);
+}
+.ns-hours-row dt {
+  font-weight: 600;
+}
+.ns-hours-row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ns-sos-btn:active {
+    transform: none;
+  }
+}
 .duo {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

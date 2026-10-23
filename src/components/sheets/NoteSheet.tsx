@@ -1,4 +1,4 @@
-import { noteById } from '../../mock';
+import { noteById, type InfoContact, type NoteInfo } from '../../mock';
 import { Icon } from '../Icon';
 import { TYPE_COLOR } from '../../lib/noteStyle';
 import { useNoteActions } from '../../lib/actions';
@@ -13,6 +13,80 @@ export function noteSheetMeta(id?: string) {
   const note = id ? noteById(id) : undefined;
   if (note && !note.day) return { title: 'General info', subtitle: undefined };
   return { title: note ? TYPE_LABEL[note.type] : 'Note', subtitle: note ? whenLabel(note) : undefined };
+}
+
+const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
+/** 112, 144, 133: the short public emergency numbers, shown as three call tiles above the rest. */
+const isEmergency = (c: InfoContact) => /^\d{3}$/.test(c.phone);
+
+/** Contacts, office hours and address of a General info note: call or copy a number, copy or open the address. */
+function InfoBlocks({ info }: { info: NoteInfo }) {
+  const a = useNoteActions();
+  const sos = info.contacts?.filter(isEmergency) ?? [];
+  const contacts = info.contacts?.filter((c) => !isEmergency(c)) ?? [];
+  return (
+    <>
+      {sos.length > 0 && (
+        <div className="ns-sos" role="group" aria-label="Emergency numbers">
+          {sos.map((c) => (
+            <a key={c.phone} className="ns-sos-btn" href={telHref(c.phone)} aria-label={`Call ${c.label}, ${c.phone}${c.note ? `, ${c.note}` : ''}`}>
+              <span className="ns-sos-num">{c.phone}</span>
+              <span className="ns-sos-k">{c.label}</span>
+            </a>
+          ))}
+        </div>
+      )}
+      {contacts.length > 0 && (
+        <section className="ns-block" aria-label="Contacts">
+          <h4 className="ns-h">Contacts</h4>
+          <ul className="ns-contacts">
+            {contacts.map((c) => (
+              <li className="ns-contact" key={c.phone}>
+                <span className="ns-contact-text">
+                  <span className="ns-contact-k">{c.label}</span>
+                  {c.name && <span className="ns-contact-name">{c.name}</span>}
+                  <span className="ns-contact-phone">{c.phone}</span>
+                  {c.note && <span className="ns-contact-note">{c.note}</span>}
+                </span>
+                <button type="button" className="icon-btn ns-copy" aria-label={`Copy ${c.label} number: ${c.phone}`} onClick={() => a.copy(c.phone)}>
+                  <Icon name="copy" size={17} color="#2A3B3F" />
+                </button>
+                <a className="icon-btn ns-call" href={telHref(c.phone)} aria-label={`Call ${c.name ?? c.label}, ${c.phone}`}>
+                  <Icon name="call" size={18} color="#FFFFFF" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {info.hours && info.hours.length > 0 && (
+        <section className="ns-block" aria-label="Office hours">
+          <h4 className="ns-h">Office hours</h4>
+          <dl className="ns-hours">
+            {info.hours.map((h) => (
+              <div className="ns-hours-row" key={h.days}>
+                <dt>{h.days}</dt>
+                <dd>{h.time}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+      {info.address && (
+        <section className="ns-block" aria-label="Address">
+          <h4 className="ns-h">Address</h4>
+          <div className="facts-card">
+            <div className="fact-row">
+              <span className="fact-text">
+                <span className="fact-v">{info.address}</span>
+              </span>
+              <FactActions fact={{ label: 'Address', value: info.address, action: 'map' }} />
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
 }
 
 /** A smart note in full: hero (title, call and wrap), facts, its own action, the note text, attachments, who it is shared with. */
@@ -91,6 +165,7 @@ export function NoteSheet({ id }: { id?: string }) {
         </div>
       )}
       {hasScanCode(note) && <QrPreview note={note} />}
+      {note.info && <InfoBlocks info={note.info} />}
       {facts.length > 0 && (
         <div className="facts-card">
           {facts.map((f) => (
