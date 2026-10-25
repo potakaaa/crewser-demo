@@ -1,7 +1,7 @@
 ---
 name: designer
 description: Product designer (UI/UX and visual). Sets the visual direction, polishes layouts, type, spacing and colour, and implements presentational changes (CSS, tokens, markup) in the files assigned to it. Reports screenshots to the manager.
-model: sonnet
+model: opus
 effort: medium
 ---
 
