@@ -13,6 +13,9 @@ export const TYPE_LABEL: Record<NoteType, string> = {
 const sortKey = (n: Note) => (n.day ? n.day + ' ' + (n.kind === 'time' ? n.time : '00:00') : '9999');
 export const sortNotes = (list: Note[]) => [...list].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
 
+/** Notes without a date, oldest first: they live in the general info pocket, not in the lists. */
+export const undatedNotes = (list: Note[] = allNotes) => sortNotes(list).filter((n) => !n.day);
+
 export const minutesUntil = (n: Note) =>
   n.day === today.date && n.time ? toMinutes(n.time) - toMinutes(today.time) : Infinity;
 
@@ -42,30 +45,33 @@ export const hasScanCode = (n: Note) => quickAction(n) === 'ticket';
 const PRIORITY_TYPES: NoteType[] = ['appointment', 'flight', 'hotel'];
 
 export interface SmartNotes {
+  /** Today's call: the note the top card is about. */
   hero: Note | undefined;
   top: Note[];
   rest: { label: string; sub: string; notes: Note[] }[];
   restCount: number;
+  /** Notes without a date: they live in the info pocket, not in the list. */
+  undated: Note[];
 }
 
 export function smartNotes(list: Note[] = allNotes): SmartNotes {
   const sorted = sortNotes(list);
-  const hero = sorted.find((n) => n.type === 'appointment' && n.day === today.date && minutesUntil(n) > 0);
-  const upcoming = sorted.filter((n) => n !== hero && (!n.day || diffDays(n.day, today.date) >= 0));
+  const hero = sorted.find((n) => n.type === 'appointment' && n.kind === 'time' && n.day === today.date);
+  const undated = undatedNotes(list);
+  const upcoming = sorted.filter((n) => n !== hero && n.day && diffDays(n.day, today.date) >= 0);
   const top = upcoming.filter((n) => n.kind === 'time' && PRIORITY_TYPES.includes(n.type)).slice(0, 3);
   const restNotes = upcoming.filter((n) => !top.includes(n));
   const groups = new Map<string, Note[]>();
   restNotes.forEach((n) => {
-    const k = n.day ?? 'undated';
+    const k = n.day!;
     groups.set(k, [...(groups.get(k) ?? []), n]);
   });
   const rest = [...groups.entries()].map(([day, ns]) => {
-    if (day === 'undated') return { label: 'No date', sub: 'always valid', notes: ns };
     const rel = relativeDay(day, today.date);
     if (rel === 'tomorrow') return { label: 'Tomorrow', sub: fmtDayMonth(day), notes: ns };
     return { label: fmtDayMonth(day), sub: project.dayLabels[day] ?? rel, notes: ns };
   });
-  return { hero, top, rest, restCount: restNotes.length };
+  return { hero, top, rest, restCount: restNotes.length, undated };
 }
 
 /** Second line of a content card, e.g. "Appointment · tomorrow" or "Flight · OS487 · Vienna → Funchal". */
@@ -80,44 +86,26 @@ export interface CardTile {
   key: string;
   label: string;
   value: string;
-  action?: 'copy' | 'map' | 'attachment';
+  /** Copy and map facts are the ones the card lets you copy. */
+  action?: Fact['action'];
   unconfirmed?: boolean;
-  wide: boolean;
 }
 
 /**
- * The fact tiles on a content card: up to three, preferring facts you act on
- * (copy, map, not yet confirmed), filled up in data order. Map facts and the
- * attachment go last and span both columns.
+ * The two facts a content card shows. Of the first three candidates (the ones you act on, then data
+ * order), places sort last, so a place only shows when there is no other fact to fill the line.
  */
 export function cardTiles(n: Note): CardTile[] {
   const actionable = (f: Fact) => !!f.action || !!f.unconfirmed;
-  // A ticket with a code gets its own QR preview instead of an attachment tile.
-  const att = hasScanCode(n) ? undefined : n.attachments[0];
-  const slots = att ? 2 : 3;
-  const chosen = n.facts.filter(actionable).slice(0, slots);
+  const chosen = n.facts.filter(actionable).slice(0, 3);
   for (const f of n.facts) {
-    if (chosen.length >= slots) break;
+    if (chosen.length >= 3) break;
     if (!chosen.includes(f)) chosen.push(f);
   }
-  const ordered = n.facts.filter((f) => chosen.includes(f));
-  const tiles: CardTile[] = ordered.map((f) => ({
-    key: f.label,
-    label: f.label,
-    value: f.value,
-    action: f.action,
-    unconfirmed: f.unconfirmed,
-    wide: f.action === 'map',
-  }));
-  tiles.sort((a, b) => Number(a.wide) - Number(b.wide));
-  if (att) tiles.push({ key: att.file, label: n.type === 'flight' ? 'Ticket' : 'Attachment', value: att.file, action: 'attachment', wide: true });
-  return tiles;
+  const tiles: CardTile[] = n.facts
+    .filter((f) => chosen.includes(f))
+    .map((f) => ({ key: f.label, label: f.label, value: f.value, action: f.action, unconfirmed: f.unconfirmed }));
+  return tiles.sort((a, b) => Number(a.action === 'map') - Number(b.action === 'map')).slice(0, 2);
 }
-
-/** First sentence of the note text, for the one-line note on a card. */
-export const firstSentence = (text: string) => {
-  const m = text.match(/^[^.!?\n]*[.!?]?/);
-  return (m ? m[0] : text).trim();
-};
 
 export const dayStub = (n: Note) => (n.day ? fmtDayShort(n.day) : '');

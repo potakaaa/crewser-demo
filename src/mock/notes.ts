@@ -140,9 +140,28 @@ export const notes: Note[] = [
     title: 'Emergency contacts & office hours',
     subtitle: 'Production office',
     facts: [],
-    text: 'Phone numbers and opening hours of the production office.',
+    text: 'Phone numbers and opening hours of the production office. In an emergency call 112 first, then the production office.',
     attachments: [],
     crew: 'all',
+    info: {
+      contacts: [
+        { label: 'Emergency', phone: '112', reach: 'eu', note: 'Works everywhere in the EU, Madeira included' },
+        { label: 'Ambulance', phone: '144', reach: 'at', note: 'In Austria only' },
+        { label: 'Police', phone: '133', reach: 'at', note: 'In Austria only' },
+        { label: 'Production office', phone: '+43 1 555 01 00', note: 'Call 24/7 on shoot days' },
+        { label: 'Production coordinator', name: 'Coordinator Conny', phone: '+43 664 555 01 12' },
+        { label: 'Set medic', name: 'Medic Matthias', phone: '+43 664 555 10 01', note: 'First aid on set, shoot days' },
+        { label: 'Location manager', name: 'Location Lukas', phone: '+43 664 555 09 01' },
+        { label: 'Hospital in Vienna (A&E)', name: 'AKH Wien', phone: '+43 1 40400 0', note: 'Währinger Gürtel 18–20, 1090 Wien · open 24 h' },
+        { label: 'Hospital in Madeira (A&E)', name: 'Hospital Dr. Nélio Mendonça', phone: '+351 291 705 600', note: 'Av. Luís de Camões 6180, 9000-177 Funchal · open 24 h · for the Madeira days' },
+      ],
+      hours: [
+        { days: 'Mon–Fri', time: '08:00–19:00' },
+        { days: 'Sat', time: '09:00–14:00' },
+        { days: 'Sun', time: 'Closed, on call via the emergency line' },
+      ],
+      address: 'Nordlicht Film, Rossauer Lände 21, 1090 Wien',
+    },
   },
 ];
 

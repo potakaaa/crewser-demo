@@ -1,29 +1,30 @@
 import { useEffect, useState } from 'react';
-import { useDemo } from '../store';
+import { useActiveLink, useDemo } from '../store';
 import { Icon } from './Icon';
 import { BottomSheet } from './BottomSheet';
 import { Collapse } from './Layout';
 import { TimeWheel } from './TimeWheel';
-import { fmtDayMonth, toMinutes } from '../lib/dates';
-import { fmtH, todayPlan } from '../lib/stats';
+import { fmtDayMonth } from '../lib/dates';
+import { fmtH, netMinutes, todayPlan } from '../lib/stats';
 import { project, today } from '../mock';
 
 type Field = 'start' | 'end';
 
-/** Worked hours for start–end minus the break; an end before the start runs past midnight. */
+/** Worked hours for start–end minus the break (see `netMinutes`); `valid` is false when nothing is left to send. */
 function worked(start: string, end: string, breakMin: number) {
-  let mins = toMinutes(end) - toMinutes(start);
-  const overnight = mins <= 0;
-  if (overnight) mins += 24 * 60;
-  return { hours: (mins - breakMin) / 60, overnight };
+  const { minutes, overnight } = netMinutes(start, end, breakMin);
+  return { hours: minutes / 60, overnight, valid: minutes > 0 };
 }
+
+const BAD_SPAN = 'End must be after the start plus the break.';
 
 function summary(start: string, end: string | null, breakMin: number) {
   const target = project.dailyTargetHours;
-  const plan = todayPlan(breakMin);
+  const plan = todayPlan();
   const to = end ?? plan.wrap;
   if (!to) return `Starts at ${start}. Wrap is not confirmed yet.`;
-  const { hours, overnight } = worked(start, to, breakMin);
+  const { hours, overnight, valid } = worked(start, to, breakMin);
+  if (!valid) return `${end ? '' : 'Planned '}${start}–${to} leaves no hours after the break.`;
   const diff = hours - target;
   const tail = Math.abs(diff) < 0.001 ? `exactly your ${target} h target` : `${fmtH(Math.abs(diff))} h ${diff > 0 ? 'over' : 'under'} your ${target} h target`;
   const span = `${start}–${to}${overnight ? ' (next day)' : ''}`;
@@ -40,8 +41,13 @@ export function LogSheet() {
   const end = useDemo((s) => s.logEnd);
   const setTime = useDemo((s) => s.setLogTime);
   const toast = useDemo((s) => s.showToast);
+  const submitDay = useDemo((s) => s.submitDay);
+  const offline = useDemo((s) => s.offline);
+  const link = useActiveLink();
   const [editing, setEditing] = useState<Field | null>(null);
-  const plan = todayPlan(breakMin);
+  /** Entering hours for someone else: the first tap on Submit asks, the second sends. */
+  const [confirming, setConfirming] = useState(false);
+  const plan = todayPlan();
   const close = () => setOpen(false);
 
   // Each time the sheet opens, start with the pickers closed.
@@ -49,10 +55,14 @@ export function LogSheet() {
     if (open) setEditing(null);
   }, [open]);
 
-  const toggle = (f: Field) => {
-    if (f === 'end' && !end) setTime('logEnd', plan.wrap ?? '22:00');
-    setEditing((cur) => (cur === f ? null : f));
-  };
+  // Any change to the hours, or another person, withdraws a pending confirmation.
+  useEffect(() => {
+    setConfirming(false);
+  }, [open, start, end, breakMin, link.id]);
+
+  // Opening the End tile only previews the planned wrap on the wheel. The end counts as set
+  // once the user turns the wheel or taps a chip, so a plan is never sent by accident.
+  const toggle = (f: Field) => setEditing((cur) => (cur === f ? null : f));
 
   const quick: { label: string; value: string }[] =
     editing === 'start'
@@ -67,14 +77,36 @@ export function LogSheet() {
   const current = editing === 'start' ? start : (end ?? plan.wrap ?? '22:00');
   const endInfo = end ? worked(start, end, breakMin) : null;
 
+  const forName = link.isMe ? '' : ` for ${link.personName}`;
+  const sendLine =
+    end && endInfo ? `${fmtDayMonth(today.date)} · ${start}–${end}${endInfo.overnight ? ' (next day)' : ''} · ${fmtH(endInfo.hours)} h` : null;
+
+  const badSpan = !!endInfo && !endInfo.valid;
+
   const save = () => {
+    if (badSpan) return;
+    if (!end) {
+      close();
+      toast(link.isMe ? `Start time ${start} saved. Have a good shoot!` : `Start time${forName} saved`);
+      return;
+    }
+    if (!link.isMe && !confirming) {
+      setConfirming(true);
+      return;
+    }
     close();
-    if (end && endInfo) toast(`Workday saved: ${start}–${end}, ${fmtH(endInfo.hours)} h`);
-    else toast(`Start time ${start} saved. Have a good shoot!`);
+    // An end time the user set means the day is over: it goes to production and the dashboard shows it as done.
+    submitDay(today.date);
+    toast(offline ? `Saved on this phone${forName}, sends when you're online` : `Hours${forName} sent to production`);
   };
 
   return (
-    <BottomSheet open={open} onClose={close} title="Log today" subtitle={`${fmtDayMonth(today.date)} · Shoot day ${today.shootDay}`}>
+    <BottomSheet
+      open={open}
+      onClose={close}
+      title={link.isMe ? 'Log today' : `Hours for ${link.personName}`}
+      subtitle={`${fmtDayMonth(today.date)} · Shoot day ${today.shootDay}${link.isMe ? '' : ` · ${link.position}`}`}
+    >
       <div className="log-times">
         <button type="button" className="time-tile" data-active={editing === 'start'} aria-expanded={editing === 'start'} aria-controls="log-picker" onClick={() => toggle('start')}>
           <span className="tt-k">Start</span>
@@ -145,12 +177,23 @@ export function LogSheet() {
         </button>
       </div>
 
-      <p className="log-plan" aria-live="polite">
+      <p className="log-plan" aria-live={badSpan ? 'off' : 'polite'}>
         {summary(start, end, breakMin)}
       </p>
 
-      <button type="button" className="btn btn-lime btn-lg" onClick={save}>
-        {end ? 'Save workday' : 'Save start time'}
+      {sendLine && !badSpan && <p className="log-send">{sendLine}</p>}
+      {badSpan && (
+        <p className="log-confirm" id="log-bad-span" role="alert">
+          {BAD_SPAN}
+        </p>
+      )}
+      {confirming && (
+        <p className="log-confirm" role="status">
+          You are sending hours for {link.personName}, not for yourself.
+        </p>
+      )}
+      <button type="button" className="btn btn-lime btn-lg" aria-disabled={badSpan} aria-describedby={badSpan ? 'log-bad-span' : undefined} onClick={save}>
+        {!end ? 'Save start time' : confirming ? `Submit for ${link.personName}` : 'Submit hours'}
       </button>
       <button type="button" className="text-btn" onClick={() => toast('The full workday view is not part of this demo')}>
         Open full workday

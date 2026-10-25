@@ -1,0 +1,207 @@
+/* Calendar: marks on days and the day's quick actions. The week strip and month grid themselves are in app.css. */
+
+.cal-panel .mday {
+  position: relative;
+}
+
+/* Corner marks: a call sheet is out (file glyph), hours still open (an amber "!" badge, unlike the
+   round note dots under the date). The day's aria-label says both. */
+.day-marks {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  left: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  color: currentColor;
+}
+.day-marks svg {
+  margin-left: auto;
+  opacity: 0.8;
+}
+/* Ink on amber, 11:1, on the dark strip and on the white selected day alike. */
+.mark-unsent {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--amber-dark);
+  box-shadow: 0 0 0 1.5px rgba(20, 29, 30, 0.35);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+/* On the white selected day: a deeper amber with a dark ring (5.6:1 against white); the "!" stays ink (6:1). */
+.is-sel .mark-unsent {
+  background: #c98a00;
+  box-shadow: 0 0 0 1px #8a5f00;
+}
+.mday .day-marks {
+  top: 2px;
+  right: 2px;
+  left: 2px;
+}
+.mday .day-marks svg {
+  width: 9px;
+  height: 9px;
+}
+.mday .mark-unsent {
+  width: 10px;
+  height: 10px;
+  font-size: 8px;
+}
+.mday.is-out .day-marks {
+  opacity: 0.4;
+}
+
+/* Under the day heading: open the call sheet, or finish the hours. */
+.day-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+/* Compact day chips: 32 px to look at, 44 px to hit (an invisible band above and below). */
+.day-action {
+  position: relative;
+  isolation: isolate;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 10px;
+  border: 0;
+  border-radius: var(--r-control);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1;
+  transition: transform 180ms var(--ease-out);
+}
+.day-action::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+button.day-action:active {
+  transform: scale(0.97);
+}
+/* The day's primary: the note primary button (.btn-primary in dashboard.css), scaled down. */
+.day-action-sheet {
+  background: var(--brand-surface);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 3px 8px rgba(17, 33, 35, 0.2);
+}
+.day-action-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--grain, none) 0 0 / var(--grain-card-size) var(--grain-card-size);
+  opacity: var(--grain-card-opacity);
+  mix-blend-mode: var(--grain-card-blend);
+  pointer-events: none;
+}
+/* Not sent: the same quiet line as the hours card, a hairline chip with the same amber "!" badge as the day marks. */
+.day-action-unsent {
+  border: 1px solid rgba(17, 26, 27, 0.12);
+  background: var(--card);
+  color: var(--text-2);
+  font-weight: 500;
+}
+.day-action-unsent::before {
+  inset: -7px 0;
+}
+/* The selected-day badge (.is-sel .mark-unsent), since the chip sits on white too. */
+.day-action-badge {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #c98a00;
+  box-shadow: 0 0 0 1px #8a5f00;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  button.day-action:active {
+    transform: none;
+  }
+}
+
+/* Room for the corner marks above the weekday. */
+.cal-panel .wday {
+  height: 72px;
+  padding-top: 14px;
+  gap: 4px;
+}
+.cal-panel .mday {
+  height: 42px;
+}
+
+/* "October 2026 · CW 43" stays on one line, whatever the font. */
+.month-toggle > span:first-child {
+  white-space: nowrap;
+}
+
+/* Narrow phones (360 px): give the note titles the width the ticket stub was taking. */
+@media (max-width: 400px) {
+  .app[data-accent] .sheet-cal .nrow:not(.nrow-dashed) .nrow-toggle {
+    --stub-solid: 66px;
+    --stub-edge: 20px;
+    grid-template-columns: 74px 36px minmax(0, 1fr) 16px;
+    gap: var(--sp-2);
+    padding-left: var(--sp-3);
+    padding-right: var(--sp-2);
+  }
+  .sheet-cal .nrow-quick {
+    width: 52px;
+  }
+}
+
+/* Compact list: the day's notes sit close together and the page scrolls past quickly. */
+.sheet.sheet-cal {
+  gap: var(--sp-3);
+  padding-top: var(--sp-5);
+}
+.sheet-cal .day-list {
+  gap: var(--sp-2);
+}
+.sheet-cal .day-heading {
+  padding-top: 0;
+}
+.sheet-cal .empty-day {
+  padding: var(--sp-4);
+}
+
+/* Week arrows ride level with the bell in the top-right corner, as on every other screen. */
+.gh-titlebar:has(.month-toggle) > .icon-btn {
+  align-self: flex-start;
+}
+
+/* On a colleague's link the chip sits in the month label ("Oct 2026 · ● Bianca"): plain text, no pill. */
+.month-toggle .for-chip[data-tone] {
+  height: auto;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #ffffff;
+  font-size: inherit;
+  font-weight: 600;
+}

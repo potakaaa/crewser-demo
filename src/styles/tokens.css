@@ -1,4 +1,4 @@
-/* Crewser crew app v3 design tokens. Radii: 10 px controls, 18 px cards/bars/sheets. Nothing else. */
+/* Crewser crew app v4 design tokens. Radii: 10 px controls, 18 px cards/bars/sheets. Nothing else. */
 :root {
   --ink: #111a1b;
   --text-2: #3f5155;
@@ -11,7 +11,6 @@
   --soft: #edf2f1;
   --dark-tile: #1e282a;
   --lime: #dbf227;
-  --on-lime-2: #2b3300;
 
   --data-regular: #7fa1a8;
   --data-night-dark: #8a93e8;
@@ -37,6 +36,24 @@
   --focus: #2c6b72;
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   --font-display: var(--font);
+  --font-numeral: var(--font);
+  /* Each theme's own stack, for previews (the font picker) without switching the app. */
+  --ff-inter: var(--font);
+  --ff-screenplay: 'Courier Prime', 'Courier New', monospace;
+  --ff-poster: 'Bebas Neue', Impact, sans-serif;
+  --ff-editorial: 'Fraunces', Georgia, serif;
+  --ff-credits: 'Syne', sans-serif;
+  /* Per-font tuning, switched by .app[data-font]: weight, tracking and size scale for headlines and big numbers. */
+  --display-weight: 600;
+  --display-track: -0.02em;
+  --display-scale: 1;
+  --numeral-weight: 600;
+  --numeral-track: -0.03em;
+  --numeral-scale: 1;
+  /* Static film grain on the dark brand-surface cards: one look everywhere (the shared rule is in screens.css). */
+  --grain-card-opacity: 0.15;
+  --grain-card-size: 160px;
+  --grain-card-blend: overlay;
 
   /* Type: small, calm, medium-weight. Big numbers get tight tracking. */
   --fs-xs: 11px; /* labels, chips, chart ticks */

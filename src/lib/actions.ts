@@ -6,6 +6,7 @@ import { quickAction } from './notes';
 export function useNoteActions() {
   const navigate = useDemo((s) => s.navigate);
   const toast = useDemo((s) => s.showToast);
+  const openSheet = useDemo((s) => s.openSheet);
 
   const copy = (value: string) => {
     try {
@@ -24,10 +25,9 @@ export function useNoteActions() {
     toast,
     openPdf,
     openTicket,
-    openNote: (id: string) => navigate({ name: 'note', id }),
+    openNote: (id: string) => openSheet('note', id),
     map: (place: string) => toast(`Opens “${place}” in maps (demo)`),
     directions: () => toast('Directions open in your maps app (demo)'),
-    unconfirmed: (label: string) => toast(`${label} is not confirmed by production yet`),
     primary: (n: Note) => (n.primaryAction?.kind === 'boardingPass' ? openTicket() : toast('Directions open in your maps app (demo)')),
     quick: (n: Note) => {
       const q = quickAction(n);

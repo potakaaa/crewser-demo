@@ -37,6 +37,26 @@ export interface Airport {
   city: string;
 }
 
+/** One line of a note's contact list. `phone` is dialable as written ("+43 1 555 01 00", "112"). */
+export interface InfoContact {
+  /** What the number is for: "Emergency", "Production office"... */
+  label: string;
+  /** Who answers, when it is a person. */
+  name?: string;
+  phone: string;
+  note?: string;
+  /** Emergency numbers only: where it works. 'eu' is any EU country, 'at' is Austria only. */
+  reach?: 'eu' | 'at';
+}
+
+/** Structured content of a General info note: who to call, when the office is open, where it is. */
+export interface NoteInfo {
+  contacts?: InfoContact[];
+  /** Office hours, one row per day range, e.g. { days: 'Mon–Fri', time: '08:00–19:00' }. */
+  hours?: { days: string; time: string }[];
+  address?: string;
+}
+
 export interface Note {
   id: string;
   type: NoteType;
@@ -58,6 +78,8 @@ export interface Note {
   crew: 'all' | string[];
   source?: string;
   primaryAction?: PrimaryAction;
+  /** Contacts, office hours and address for notes like "Emergency contacts & office hours". */
+  info?: NoteInfo;
 }
 
 export type DayKind = 'prep' | 'shoot';
@@ -79,23 +101,6 @@ export interface WorkDay {
   end: string;
   breakMin: number;
   status: ApprovalStatus;
-}
-
-/** Deal-memo numbers used for the pay estimate. */
-export interface Contract {
-  currency: 'EUR';
-  /** Pay for one day at the daily target. */
-  dailyRate: number;
-  /** Multiplier on the hourly rate for hours past the daily target (1.5 = 150 %). */
-  overtimeRate: number;
-  /** Extra on the hourly rate for night hours, 22:00–06:00 (0.5 = +50 %). */
-  nightSurcharge: number;
-  /** Per diem per day away from home. */
-  perDiem: number;
-  /** First day per diem is paid (travel to Madeira). */
-  perDiemFrom: string;
-  /** Minimum rest between two shifts, in hours. */
-  minRestHours: number;
 }
 
 export interface CrewMember {
@@ -122,6 +127,8 @@ export interface Project {
   name: string;
   dailyTargetHours: number;
   totalShootDays: number;
+  /** Minimum rest between two shifts, in hours. */
+  minRestHours: number;
   /** Optional subtitles for day groups in the notes list. */
   dayLabels: Record<string, string>;
 }
@@ -141,4 +148,68 @@ export interface PdfDoc {
   kicker: string;
   title: string;
   line: string;
+  /** Documents from production carry the revision they show: "v2". */
+  version?: number;
+}
+
+/** revoked = production removed the access; expired = the end date passed. The server decides, the clock only warns. */
+export type LinkStatus = 'active' | 'expiring' | 'expired' | 'revoked';
+
+/**
+ * One crew link (SMS access link) to one project. A link belongs to one crew member;
+ * the gaffer may hold links for colleagues to enter their hours.
+ */
+export interface CrewLink {
+  id: string;
+  projectId: string;
+  projectName: string;
+  production: string;
+  personName: string;
+  /** What they are called by: personName is "<nickname> <first name>" in this mock, so the last word is not always safe to guess. */
+  firstName?: string;
+  initials: string;
+  department: string;
+  position: string;
+  /** True when the link is the app user's own. */
+  isMe: boolean;
+  /** Opaque access token from the link (mock value). */
+  token: string;
+  /** ISO date-time the link stops working. */
+  expiresAt: string;
+  /** ISO date-time production revoked the link, when it did. Wins over the end date. */
+  revokedAt?: string;
+  status: LinkStatus;
+}
+
+export type DocKind = 'callsheet' | 'schedule' | 'safety' | 'other';
+
+/** A file production shared with the crew. Every `file` is also a key in `pdfs`. */
+export interface Doc {
+  id: string;
+  file: string;
+  title: string;
+  kind: DocKind;
+  /** ISO date the document is for (call sheets). */
+  day?: string;
+  shootDay?: number;
+  /** ISO date-time of the last update. */
+  updated: string;
+  /** "184 KB" */
+  size: string;
+  /** Which revision production has published: shown as "v4". */
+  version: number;
+  isNew?: boolean;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  initials: string;
+  position: string;
+  department: string;
+  phone: string;
+  email: string;
+  /** Avatar background, a pale tint so the ink initials stay readable. */
+  tint: string;
+  pinned?: boolean;
 }

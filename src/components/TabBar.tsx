@@ -3,19 +3,27 @@ import { useDemo, useRoute, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
-  { name: 'home', label: 'Home', icon: 'home' },
+  { name: 'dashboard', label: 'Home', icon: 'dashboard' },
   { name: 'calendar', label: 'Calendar', icon: 'calendar' },
-  { name: 'stats', label: 'Stats', icon: 'stats' },
+  { name: 'documents', label: 'Docs', icon: 'documents' },
+  { name: 'contacts', label: 'Contacts', icon: 'contacts' },
+  { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
 
+// Five tabs plus the Log button have to fit a 375 px phone, so the active tab stays compact.
 const ICON = 22;
-const PAD_L = 14;
-const PAD_R = 16;
-const LABEL_GAP = 8;
+const PAD_L = 8;
+const PAD_R = 8;
+/** Matches `margin-left` on `.tab-label` in app.css; change them together. */
+const LABEL_GAP = 6;
+/** Inactive tabs never get narrower than this; if the label would squeeze them, the active tab goes icon-only. */
+const MIN_TAB = 40;
 
 interface Layout {
   w: number[];
   x: number[];
+  /** False on narrow phones: all five tabs are equal, icon-only. */
+  label: boolean;
 }
 
 /**
@@ -45,13 +53,20 @@ export function TabBar({ hidden }: { hidden: boolean }) {
       const padL = parseFloat(cs.paddingLeft);
       const inner = nav.clientWidth - padL - parseFloat(cs.paddingRight);
       const gap = parseFloat(cs.columnGap) || 0;
-      const labelW = labelRefs.current[active]?.scrollWidth ?? 60;
-      const activeW = PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
-      const otherW = (inner - activeW - gap * (TABS.length - 1)) / (TABS.length - 1);
+      const widths = labelRefs.current.map((el) => el?.scrollWidth ?? 0);
+      // Labels not laid out yet (fonts, first paint): a max of 0 would wrongly switch the label mode on. The font and resize hooks measure again.
+      if (Math.max(...widths) <= 0) return;
+      const room = inner - gap * (TABS.length - 1);
+      const pill = (labelW: number) => PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
+      // The label mode is decided by the longest label, so every tab behaves the same on a given phone.
+      const label = (room - pill(Math.max(...widths))) / (TABS.length - 1) >= MIN_TAB;
+      let activeW = pill(widths[active]);
+      let otherW = (room - activeW) / (TABS.length - 1);
+      if (!label) activeW = otherW = room / TABS.length;
       const w = TABS.map((_, i) => (i === active ? activeW : otherW));
       const x: number[] = [];
       w.reduce((acc, v) => (x.push(acc), acc + v + gap), padL);
-      setLayout({ w, x });
+      setLayout({ w, x, label });
     };
     measure();
     void document.fonts?.ready.then(measure);
@@ -75,7 +90,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
           {TABS.map((t, i) => {
             const on = i === active;
             const style: CSSProperties | undefined = layout
-              ? { width: layout.w[i], paddingLeft: on ? PAD_L : (layout.w[i] - ICON) / 2 }
+              ? { width: layout.w[i], paddingLeft: on && layout.label ? PAD_L : (layout.w[i] - ICON) / 2 }
               : undefined;
             return (
               <button
@@ -91,7 +106,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                 <span className="tab-icon">
                   <Icon name={t.icon} size={ICON} color={on ? '#111A1B' : '#3F5155'} strokeWidth={on ? 1.8 : 1.6} />
                 </span>
-                <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on}>
+                <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on && (layout?.label ?? true)}>
                   {t.label}
                 </span>
               </button>

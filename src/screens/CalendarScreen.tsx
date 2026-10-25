@@ -1,16 +1,45 @@
 import { useRef, type CSSProperties } from 'react';
-import { useDemo } from '../store';
-import { notes as allNotes, today, type Note, type NoteType } from '../mock';
+import '../styles/calendar.css';
+import { useActiveLink, useDemo } from '../store';
+import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
+import { ForChip } from '../components/ForChip';
+import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
 import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
 import { sortNotes, TYPE_LABEL } from '../lib/notes';
-import { chipStyle, TYPE_COLOR } from '../lib/noteStyle';
+import { TYPE_COLOR } from '../lib/noteStyle';
 import { useScrollRestore } from '../lib/scroll';
+import { useSubmitted } from '../lib/useSubmitted';
 
 const LEGEND: NoteType[] = ['appointment', 'flight', 'hotel', 'rental', 'plain'];
 const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
+
+/** The call sheet for each shoot day; a day with one is a shoot day. */
+const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
+
+/**
+ * Shoot days up to today whose hours have not gone to production: logged as a draft, or not logged yet.
+ * The draft part must agree with hoursOverview's `unsent` (lib/stats.ts); days nobody logged are extra, which `unsent` cannot know about.
+ */
+function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): boolean {
+  if (iso > today.date || !callSheetByDay.has(iso)) return false;
+  const logged = workdays.find((w) => w.date === iso);
+  if (logged && logged.status !== 'draft') return false;
+  return !submitted.includes(iso);
+}
+
+/** Small marks in the corner of a day: a call sheet is out, hours are still open. */
+function DayMarks({ call, unsent }: { call: boolean; unsent: boolean }) {
+  if (!call && !unsent) return null;
+  return (
+    <span className="day-marks" aria-hidden="true">
+      {unsent && <span className="mark-unsent">!</span>}
+      {call && <Icon name="file" size={11} strokeWidth={2} />}
+    </span>
+  );
+}
 
 /** Up to three dots per day, coloured by note type. */
 function Dots({ notes, onLight }: { notes: Note[]; onLight: boolean }) {
@@ -37,6 +66,7 @@ function useSlideDir(key: string) {
 export function CalendarScreen() {
   const ref = useScrollRestore<HTMLDivElement>('calendar', useDemo((s) => s.setStatusDark));
   const offline = useDemo((s) => s.offline);
+  const link = useActiveLink();
   const empty = useDemo((s) => s.empty);
   const calDate = useDemo((s) => s.calDate);
   const calMonth = useDemo((s) => s.calMonth);
@@ -46,7 +76,12 @@ export function CalendarScreen() {
   const toggleMonth = useDemo((s) => s.toggleCalMonth);
   const expanded = useDemo((s) => s.expanded.calendar);
   const toggleExpanded = useDemo((s) => s.toggleExpanded);
+  const openSheet = useDemo((s) => s.openSheet);
   const navigate = useDemo((s) => s.navigate);
+  const openLog = useDemo((s) => s.setLogOpen);
+  const submitted = useSubmitted();
+  // The logged days belong to the crew link in use, so a colleague's link shows their hours, not yours.
+  const workdays = workdaysFor(useDemo((s) => s.activeLinkId));
 
   const notes = empty ? [] : allNotes;
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
@@ -58,11 +93,24 @@ export function CalendarScreen() {
   const grid = monthGrid(calMonth);
 
   const dayNotes = notesOn(calDate);
-  const undated = notes.filter((n) => n.kind === 'undated');
   const rel = relativeDay(calDate, today.date);
   const dayLabel = rel === 'today' ? `Today · ${fmtDayMonth(calDate)}` : rel === 'tomorrow' ? `Tomorrow · ${fmtDayMonth(calDate)}` : fmtDayMonth(calDate);
   const unit = monthOpen ? 'month' : 'week';
-  const dayAria = (iso: string, n: number) => `${iso === today.date ? 'Today, ' : ''}${fmtDayMonth(iso)}, ${n ? count(n) : 'nothing planned'}`;
+  const dayAria = (iso: string, n: number) =>
+    [
+      `${iso === today.date ? 'Today, ' : ''}${fmtDayMonth(iso)}`,
+      n ? count(n) : 'nothing planned',
+      callSheetByDay.has(iso) && 'call sheet out',
+      hoursNotSent(iso, submitted, workdays) && 'hours not sent',
+    ]
+      .filter(Boolean)
+      .join(', ');
+  const callSheet = callSheetByDay.get(calDate);
+  const unsent = hoursNotSent(calDate, submitted, workdays);
+  const isToday = calDate === today.date;
+  // The Hours sheet only offers Send for logged drafts; a past shoot day nobody logged has nothing to send.
+  const loggedDraft = workdays.some((w) => w.date === calDate && w.status === 'draft');
+  const label = monthOpen ? fmtMonthYear(calMonth) : monthLabel(days[0], days[6]);
 
   return (
     <div className="screen" ref={ref}>
@@ -71,7 +119,12 @@ export function CalendarScreen() {
         <div className="gh-titlebar">
           <div className="gh-titles">
             <button type="button" className="month-toggle" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
-              <span>{monthOpen ? fmtMonthYear(calMonth) : `${monthLabel(days[0], days[6])} · CW ${isoWeek(monday)}`}</span>
+              {/* On a colleague's link the chip takes the place of the week number, and the month is short ("Oct 2026"), so the label fits beside the arrows. */}
+              <span>
+                {link.isMe ? label : label.replace(/^([A-Z][a-z]{2})[a-z]+(?= \d)/, '$1')}
+                {link.isMe ? !monthOpen && ` · CW ${isoWeek(monday)}` : ' · '}
+              </span>
+              <ForChip compact bare />
               <span className="chev" data-open={monthOpen}>
                 <Icon name="down" size={16} color="#C4CFD0" strokeWidth={1.8} />
               </span>
@@ -85,6 +138,7 @@ export function CalendarScreen() {
           <button type="button" className="icon-btn glass-btn" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
             <Icon name="right" size={18} color="#FFFFFF" />
           </button>
+          <NotifButton tone="dark" />
         </div>
 
         <div className="cal-panel">
@@ -107,6 +161,7 @@ export function CalendarScreen() {
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} onLight={isSel} />
+                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
@@ -136,6 +191,7 @@ export function CalendarScreen() {
                     >
                       <span className="mday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} onLight={isSel} />
+                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
@@ -155,23 +211,39 @@ export function CalendarScreen() {
 
       <Sheet className="sheet-cal">
         {offline && <OfflineBanner tone="light" />}
-        {undated.length > 0 && (
-          <button type="button" className="undated-row" onClick={() => navigate({ name: 'note', id: undated[0].id })}>
-            <span className="chip-icon" style={chipStyle(undated[0].type)}>
-              <Icon name={undated[0].type} size={18} />
-            </span>
-            <span className="todo-titles">
-              <span className="undated-t1">{undated.length === 1 ? '1 note without a date' : `${undated.length} notes without a date`}</span>
-              <span className="undated-t2">{undated[0].title}</span>
-            </span>
-            <Icon name="right" size={18} color="#54686C" />
-          </button>
-        )}
         <div key={calDate} className="day-list">
           <div className="day-heading">
             <h2>{dayLabel}</h2>
             {dayNotes.length > 0 && <span>{count(dayNotes.length)}</span>}
           </div>
+          {(callSheet || unsent) && (
+            <div className="day-actions">
+              {callSheet && (
+                <button type="button" className="day-action day-action-sheet" onClick={() => navigate({ name: 'pdf', file: callSheet.file })}>
+                  <Icon name="file" size={16} color="#FFFFFF" />
+                  Call sheet
+                  {callSheet.isNew && <span className="chip-lime chip-lime-sm">new</span>}
+                </button>
+              )}
+              {unsent && (isToday || loggedDraft) && (
+                <button
+                  type="button"
+                  className="day-action day-action-unsent"
+                  // Only today can be logged in the Log sheet; earlier logged days just need sending.
+                  onClick={() => (isToday ? openLog(true) : openSheet('hours', 'week'))}
+                >
+                  <span className="day-action-badge" aria-hidden="true">!</span>
+                  {isToday ? 'Hours not sent' : 'Hours not sent · Send'}
+                </button>
+              )}
+              {unsent && !isToday && !loggedDraft && (
+                <span className="day-action day-action-unsent" role="note">
+                  <span className="day-action-badge" aria-hidden="true">!</span>
+                  Hours not sent
+                </span>
+              )}
+            </div>
+          )}
           {dayNotes.length === 0 && <div className="empty-day">Nothing planned for this day</div>}
           {dayNotes.map((n) => (
             <NoteRow key={n.id} note={n} withPrimary open={expanded === n.id} onToggle={() => toggleExpanded('calendar', n.id)} />

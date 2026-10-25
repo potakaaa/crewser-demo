@@ -13,7 +13,7 @@ export function Toast({ raised, top = false }: { raised: boolean; top?: boolean 
   }, [toast]);
 
   return (
-    <div className={`toast-region${raised ? ' raised' : ''}${top ? ' top' : ''}`} aria-live="polite" aria-atomic="true">
+    <div className={`toast-region${raised ? ' raised' : ''}${top ? ' top' : ''}`} role="status" aria-live="polite" aria-atomic="true">
       {toast && (
         <div key={toast.id} className={`toast${visible ? ' show' : ''}`}>
           <svg className="toast-burst" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">

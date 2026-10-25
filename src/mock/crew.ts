@@ -9,7 +9,7 @@ export const crew: CrewMember[] = [
   { id: 'll', name: 'Lumen Leopold', initials: 'LL', position: 'Director of Photography', department: 'Camera', tint: '#CFE0E8' },
   { id: 'nn', name: 'Negative Nikolai', initials: 'NN', position: 'Loader', department: 'Camera', tint: '#D9E3CF' },
   { id: 'gg', name: 'Gaffer Greta', initials: 'GG', position: 'Gaffer', department: 'Lighting', tint: '#E5D7B0' },
-  { id: 'bi', name: 'Backlight Bianca', initials: 'BB', position: 'Electrician', department: 'Lighting', tint: '#E8D9CF' },
+  { id: 'bi', name: 'Slate Bianca', initials: 'SB', position: '2nd AC', department: 'Camera', tint: '#E8D9CF' },
   { id: 'kk', name: 'Key Karin', initials: 'KK', position: 'Key Grip', department: 'Grip', tint: '#E3E8C8' },
   { id: 'do', name: 'Dolly Dominik', initials: 'DD', position: 'Dolly Grip', department: 'Grip', tint: '#E0D6C8' },
   { id: 'br', name: 'Boom Brendan', initials: 'BB', position: 'Boom Operator', department: 'Sound', tint: '#D5DBDC' },

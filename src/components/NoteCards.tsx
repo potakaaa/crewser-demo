@@ -1,11 +1,12 @@
 import type { Fact, Note } from '../mock';
-import { Icon, type IconName } from './Icon';
+import { Icon } from './Icon';
 import { Collapse } from './Layout';
 import { QrPreview } from './QrPreview';
 import { CrewSection } from './CrewStack';
+import { NotePrimaryAction } from './NotePrimaryAction';
 import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
-import { cardSubtitle, cardTiles, dayStub, firstSentence, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL, type CardTile } from '../lib/notes';
+import { cardSubtitle, cardTiles, dayStub, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL } from '../lib/notes';
 
 /** Codes and addresses are worth copying; "to be confirmed" is not. */
 export const isCopyable = (f: Pick<Fact, 'action' | 'unconfirmed'>) => !f.unconfirmed && (f.action === 'copy' || f.action === 'map');
@@ -30,48 +31,15 @@ export function FactActions({ fact, size = 'md' }: { fact: Fact; size?: 'sm' | '
   );
 }
 
-function FactTile({ tile }: { tile: CardTile }) {
-  const a = useNoteActions();
-  const icon: IconName | null = tile.action === 'map' ? 'nav' : tile.action === 'copy' ? 'copy' : tile.action === 'attachment' ? 'clip' : null;
-  const onClick = () => {
-    if (tile.unconfirmed) a.unconfirmed(tile.label);
-    else if (tile.action === 'map') a.map(tile.value);
-    else if (tile.action === 'attachment') a.openPdf(tile.value);
-    else a.copy(tile.value);
-  };
-  const aria = tile.unconfirmed
-    ? `${tile.label}: not confirmed yet`
-    : tile.action === 'map'
-      ? `Open in maps: ${tile.value}`
-      : tile.action === 'attachment'
-        ? `Open: ${tile.value}`
-        : `Copy ${tile.label}: ${tile.value}`;
-  return (
-    <div className={`tile${tile.unconfirmed ? ' tile-open' : ''}${tile.wide ? ' tile-wide' : ''}`}>
-      <button type="button" className="tile-main" aria-label={aria} onClick={onClick}>
-        <span className="tile-text">
-          <span className="tile-k">{tile.label}</span>
-          <span className="tile-v">{tile.value}</span>
-        </span>
-        {icon && <Icon name={icon} size={18} color="#2A3B3F" />}
-      </button>
-      {tile.action === 'map' && (
-        <button type="button" className="tile-extra" aria-label={`Copy ${tile.label}: ${tile.value}`} onClick={() => a.copy(tile.value)}>
-          <Icon name="copy" size={17} color="#2A3B3F" />
-        </button>
-      )}
-    </div>
-  );
-}
-
-/** A top smart note: header row, fact tiles, one-line note and an action. */
+/**
+ * A top smart note, kept short so a few fit on a screen: the header row, the two facts you
+ * most often act on, and one action. The rest (QR code, note text, crew) is one tap away in the sheet.
+ */
 export function ContentCard({ note }: { note: Note }) {
   const a = useNoteActions();
-  const text = firstSentence(note.text);
   const tiles = cardTiles(note);
-  const pa = note.primaryAction;
   return (
-    <article className="ccard">
+    <article className="ccard ccard-compact">
       <button type="button" className="ccard-head" onClick={() => a.openNote(note.id)} aria-label={`${note.title}, ${cardSubtitle(note)}, ${dayStub(note)} ${timeText(note)}. Open details`}>
         <span className="stub">
           <span className="stub-time">{timeText(note)}</span>
@@ -86,22 +54,37 @@ export function ContentCard({ note }: { note: Note }) {
         </span>
         <Icon name="right" size={18} color="#54686C" />
       </button>
-      <div className="ccard-body">
-        <div className="tiles">
-          {tiles.map((t) => (
-            <FactTile key={t.key} tile={t} />
-          ))}
+      {(tiles.length > 0 || note.primaryAction) && (
+        <div className="ccard-body">
+          {tiles.length > 0 && (
+            <p className="ccard-facts">
+              {tiles.map((t) => (
+                <span className="ccard-fact" key={t.key}>
+                  <span className="ccard-fact-k">{t.label}</span>{' '}
+                  {isCopyable(t) ? (
+                    // The values worth copying (flight number, booking code, addresses) copy in one tap, without opening the note.
+                    <button
+                      type="button"
+                      className="ccard-fact-copy"
+                      aria-label={`Copy ${t.label}: ${t.value}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        a.copy(t.value);
+                      }}
+                    >
+                      <span className="ccard-fact-v">{t.value}</span>
+                      <Icon name="copy" size={13} color="#54686C" strokeWidth={1.8} />
+                    </button>
+                  ) : (
+                    <span className={`ccard-fact-v${t.unconfirmed ? ' muted' : ''}`}>{t.value}</span>
+                  )}
+                </span>
+              ))}
+            </p>
+          )}
+          <NotePrimaryAction note={note} />
         </div>
-        {hasScanCode(note) && <QrPreview note={note} />}
-        {text && <p className="ccard-note">{text}</p>}
-        <CrewSection note={note} />
-        {pa && (
-          <button type="button" className="btn btn-ink" onClick={() => a.primary(note)}>
-            <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
-            {pa.label}
-          </button>
-        )}
-      </div>
+      )}
     </article>
   );
 }

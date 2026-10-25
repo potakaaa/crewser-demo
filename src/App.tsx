@@ -1,17 +1,18 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { isTab, routeToHash, useDemo, useRoute, type Route } from './store';
+import { isTab, normalizeLocation, useDemo, useRoute, type Route } from './store';
 import { DeviceFrame } from './components/Device';
 import { DemoPanel } from './components/DemoPanel';
 import { TabBar } from './components/TabBar';
 import { LogSheet } from './components/LogSheet';
-import { StatSheets } from './components/StatSheets';
+import { SheetHost } from './components/SheetHost';
 import { Toast } from './components/Toast';
 import { ScreenStack } from './components/ScreenStack';
 import { Splash } from './components/Brand';
-import { HomeScreen } from './screens/HomeScreen';
-import { StatsScreen } from './screens/StatsScreen';
+import { DashboardScreen } from './screens/DashboardScreen';
 import { CalendarScreen } from './screens/CalendarScreen';
-import { NoteDetailScreen } from './screens/NoteDetailScreen';
+import { DocumentsScreen } from './screens/DocumentsScreen';
+import { ContactsScreen } from './screens/ContactsScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { BoardingPassScreen } from './screens/BoardingPassScreen';
 import { PdfViewerScreen } from './screens/PdfViewerScreen';
 
@@ -30,14 +31,16 @@ function useIsPhone() {
 
 function Screen({ route }: { route: Route }) {
   switch (route.name) {
-    case 'home':
-      return <HomeScreen />;
+    case 'dashboard':
+      return <DashboardScreen />;
     case 'calendar':
       return <CalendarScreen />;
-    case 'stats':
-      return <StatsScreen />;
-    case 'note':
-      return <NoteDetailScreen id={route.id} />;
+    case 'documents':
+      return <DocumentsScreen />;
+    case 'contacts':
+      return <ContactsScreen />;
+    case 'settings':
+      return <SettingsScreen />;
     case 'ticket':
       return <BoardingPassScreen />;
     case 'pdf':
@@ -49,18 +52,19 @@ function AppShell() {
   const route = useRoute();
   const logOpen = useDemo((s) => s.logOpen);
   const splash = useDemo((s) => s.splash);
-  const sheet = useDemo((s) => s.statsSheet);
+  const sheet = useDemo((s) => s.sheet);
   const accent = useDemo((s) => s.noteAccent);
+  const font = useDemo((s) => s.fontTheme);
   const tabs = isTab(route);
   return (
-    <div className="app" data-accent={accent}>
+    <div className="app" data-accent={accent} data-font={font}>
       <div className="app-content" inert={logOpen || splash || sheet !== null}>
         <ScreenStack render={(r) => <Screen route={r} />} />
         <TabBar hidden={!tabs} />
       </div>
       <Toast raised={tabs} top={logOpen || sheet !== null} />
       <LogSheet />
-      <StatSheets />
+      <SheetHost />
       {splash && <Splash />}
     </div>
   );
@@ -74,12 +78,14 @@ export default function App() {
   const logOpen = useDemo((s) => s.logOpen);
 
   useEffect(() => {
-    if (!location.hash) history.replaceState(null, '', routeToHash({ name: 'home' }));
-    window.addEventListener('popstate', sync);
-    window.addEventListener('hashchange', sync);
+    normalizeLocation();
+    const onPop = () => sync('popstate');
+    const onHash = () => sync('hashchange');
+    window.addEventListener('popstate', onPop);
+    window.addEventListener('hashchange', onHash);
     return () => {
-      window.removeEventListener('popstate', sync);
-      window.removeEventListener('hashchange', sync);
+      window.removeEventListener('popstate', onPop);
+      window.removeEventListener('hashchange', onHash);
     };
   }, [sync]);
 

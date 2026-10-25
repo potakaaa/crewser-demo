@@ -20,12 +20,12 @@ export function LogoMark({ tone = 'light', size = 24, className = '' }: { tone?:
   );
 }
 
-/** Mark plus the Crewser name. `tone` is the colour of the text and mark: light for dark backgrounds. */
+/** Mark plus the name, always lowercase in a lockup: "crewser". `tone` is the colour of the text and mark: light for dark backgrounds. */
 export function Wordmark({ tone = 'light', className = '' }: { tone?: Tone; className?: string }) {
   return (
     <span className={`wordmark wordmark-${tone} ${className}`}>
       <LogoMark tone={tone} size={0} className="wordmark-mark" />
-      Crewser
+      crewser
     </span>
   );
 }
@@ -46,7 +46,7 @@ export function Splash() {
     };
   }, [hide]);
   return (
-    <div className={`splash grain${leaving ? ' is-leaving' : ''}`} role="status" aria-label="Loading Crewser">
+    <div className={`splash grain${leaving ? ' is-leaving' : ''}`} role="status" aria-label="Loading crewser">
       <div className="splash-mark">
         <LogoMark size={88} className="splash-logo" />
         <Wordmark className="splash-wordmark" />

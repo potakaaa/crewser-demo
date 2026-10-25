@@ -18,10 +18,13 @@ export function PdfViewerScreen({ file }: { file: string }) {
         </button>
       </div>
       <div className="pdf-stage">
-        <div className="pdf-page" role="img" aria-label={`${doc.kicker}: ${doc.title}, ${doc.line}`}>
+        <div className="pdf-page" role="img" aria-label={`${doc.kicker}: ${doc.title}, ${doc.line}${doc.version ? `, version ${doc.version}` : ''}`}>
           <span className="pdf-kicker">{doc.kicker}</span>
           <span className="pdf-title">{doc.title}</span>
-          <span className="pdf-line">{doc.line}</span>
+          <span className="pdf-line">
+            {doc.line}
+            {doc.version ? ` · v${doc.version}` : ''}
+          </span>
           <span className="pdf-rule" />
           <span className="pdf-skel" style={{ width: '90%' }} />
           <span className="pdf-skel" style={{ width: '74%' }} />
