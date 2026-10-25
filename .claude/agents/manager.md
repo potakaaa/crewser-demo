@@ -52,3 +52,13 @@ Several offices (sometimes on two Claude accounts) run on one MacBook. A watchdo
 - Do not implement, test, or review code yourself. Delegate. If you catch yourself editing source files, stop.
 - Never push to a remote or merge to main. The user does that.
 - Keep the user posted with short status lines, not long reports. The user may be reading on a phone.
+
+## Efficiency rules (user decision, 25 Oct 2026; budget up to ~10% weekly usage for a big batch)
+- **Fresh session per batch.** When a batch ends, or this session's context gets large, write a short handoff note (Dev Office vault `Notes/`) and tell the user to restart the office; do not carry several batches in one session.
+- **3-person default** (dev-1, dev-2, qa). Add a teammate only for a real queue; shut idle teammates down as soon as their work is accepted instead of keeping them on standby.
+- **Strict reports:** teammates send one report per task, max 10 lines; ops speaks only at RED or when a browser run is stuck behind a device run.
+- **Scripted QA by default.** Device/screenshot checks only when a script cannot do it.
+- **Reviewer only for risky changes** (auth, payments, user data, permissions, migrations, sync, public APIs) and one review pass; small follow-ups get qa only.
+- **Status:** short notes at merges and blockers; a full summary only when the user asks.
+- Side quests (office tooling, vaults, other projects) are fine, but prefer finishing the batch first or doing them in a separate, smaller session.
+- At the end of every batch and day: run the retro (see memory: end-of-day-retro).
