@@ -21,7 +21,7 @@ The product is the Crewser crew app: a clickable phone prototype for film and TV
 - **Brand assets:** `src/assets/crewser-logo.png` and `crewser-logo-light.png` (used through `src/components/Brand.tsx`), `public/favicon.png`. Do not redraw or recolour the logo; the lime burst stays.
 - **Icons:** Hugeicons (free set) through `src/components/Icon.tsx`. Add an icon there instead of importing it in a screen.
 - **Behaviour and wording:** `docs/project-switching.md` explains what the prototype is meant to show (project switcher, drafts, "For <name>" cues, expired and revoked states). Match its vocabulary in UI copy.
-- **Hand-offs and review captures:** `deliverables/` (the PDF built from `deliverables/pdf/`, where present) and `screenshots/` (`v4/` holds the current review set). Keep new captures in `screenshots/wip/` unless the Manager says otherwise.
+- **Hand-offs and review captures:** `screenshots/` has six older tracked PNGs. The newer review set (`screenshots/v4/`) and the PDF hand-off (`deliverables/`, built by `deliverables/pdf/`) are untracked and exist only in the owner's checkout, not in a worktree. Save new captures under `screenshots/wip/` (create it; it stays untracked) unless the Manager says otherwise, and report the paths.
 - **Frame:** on desktop the app sits in a 393 x 852 phone frame (`device.css`); at 480 px and below it renders full screen. Test at 360, 375 and 393 px.
 
 ## How you work

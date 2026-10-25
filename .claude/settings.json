@@ -50,15 +50,6 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-checks.sh\"",
-            "timeout": 600
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-checks.sh\"",
             "timeout": 1200
           }
         ]

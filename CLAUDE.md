@@ -41,8 +41,8 @@ src/
   assets/               Crewser logo PNGs (dark and light)
 public/                 favicon
 docs/                   project-switching.md (the design proposal this prototype demonstrates)
-screenshots/            review captures (v4/ is the current set, wip/ is scratch; both can be untracked)
-deliverables/           PDF hand-off and its build scripts (deliverables/pdf); may be untracked locally
+screenshots/            six older review PNGs are tracked; the owner's local screenshots/v4 and screenshots/wip are untracked
+deliverables/           PDF hand-off and its build scripts: untracked, exists only in the owner's checkout (not in a worktree)
 .claude/, office.sh     agent office setup (agents, settings, hooks)
 ```
 
