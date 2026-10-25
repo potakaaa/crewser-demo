@@ -3,3 +3,7 @@ dist
 *.log
 .DS_Store
 .vercel
+.env*
+.claude/worktrees/
+.claude/settings.local.json
+.claude/*.bak.*
