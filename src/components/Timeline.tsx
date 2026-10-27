@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref, type RefObject } from 'react';
+import { today } from '../mock';
 import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewSpoken, samePreview, snapTarget, stepTarget, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
@@ -421,7 +422,7 @@ export function Timeline({
   const clusters = clusterOf(scrub.stops);
   const fanLead = preview ? clusters[preview.index]?.lead : undefined;
   return (
-    <section className="tl" aria-label="Preview what is coming up">
+    <section className="tl" data-preview={preview ? true : undefined} aria-label="Preview what is coming up">
       <div
         className="tl-scroll"
         ref={setEl}
@@ -474,6 +475,10 @@ export function Timeline({
       </div>
       <span className="tl-head" aria-hidden="true">
         <span className="tl-tick" ref={tickRef} />
+      </span>
+      {/* Timecode under the playhead, like an editing timeline: now at rest, the previewed note's time while scrubbing. */}
+      <span className="tl-tc num" aria-hidden="true">
+        {current ? (current.note.kind === 'time' ? `${current.note.time}:00` : 'ALL DAY') : `${today.time}:00`}
       </span>
       <p className="sr-only" id={hintId}>
         Left and right arrow keys move between notes. Home goes back to now.

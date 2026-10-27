@@ -10,7 +10,7 @@
   z-index: 1;
 }
 
-/* A note: one small neutral dot, like the calendar's. Only the note under the playhead lights up, in lime. */
+/* A note: one small neutral clip block on the track. Only the note in front lights up, in lime. */
 .tl .tl-pin {
   position: absolute;
   top: 8px;
@@ -23,11 +23,11 @@
 }
 .tl .tl-pin-dot {
   position: absolute;
-  left: -3px;
-  top: 0;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  left: -5px;
+  top: 1px;
+  width: 10px;
+  height: 5px;
+  border-radius: 2px;
   background: var(--on-dark-2);
   opacity: 0.75;
   transition:
@@ -41,7 +41,7 @@
 .tl .tl-pin[data-on='true'] .tl-pin-dot {
   background: var(--lime);
   opacity: 1;
-  transform: scale(1.6);
+  transform: scale(1.4);
 }
 /* Notes from earlier today: the same dot, quieter. */
 .tl .tl-dot {
@@ -59,4 +59,50 @@
   .tl .tl-pin-dot {
     transition: none;
   }
+}
+
+/* ───────── Film treatment: sprocket-hole ticks and an editing-timeline playhead ───────── */
+.tl {
+  --hole: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='6'%3E%3Crect width='4' height='5' rx='1.2' fill='%23fff' fill-opacity='.34'/%3E%3C/svg%3E");
+}
+/* The fine ticks become sprocket holes, 14 px apart like the ticks they replace. */
+.tl .tl-ruler::after,
+.tl .tl-past::after {
+  inset: 21px 0 auto;
+  height: 5px;
+  background: var(--hole) repeat-x;
+  background-position: -1.5px 0;
+}
+.tl .tl-past::after {
+  background-position: right -2.5px top 0;
+}
+/* An editing-timeline playhead: triangle head, timecode below. */
+.tl .tl-head::after {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--lime);
+}
+.tl .tl-tc {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--dark-tile);
+  color: var(--lime);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 14px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+/* At rest the timecode is Now: the mark's own label would say it twice. */
+.tl:not([data-preview]) .tl-mark[data-now='true'] .tl-label {
+  opacity: 0;
 }
