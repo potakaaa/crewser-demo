@@ -2604,8 +2604,8 @@
   position: relative;
   isolation: isolate;
 }
-/* Ticket stub: the time column sits on its own tile (--stub-bg). A non-zero --stub-edge breaks
-   the tile's edge up into film grain instead of a hard line. */
+/* Ticket stub: the time column sits on its own wash (--stub-bg). A non-zero --stub-edge breaks
+   the wash's edge up into film grain instead of a hard line. */
 [data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle) {
   position: relative;
   isolation: isolate;

@@ -142,10 +142,9 @@
     radial-gradient(85% 70% at 50% 12%, #3d6650 0%, rgba(46, 74, 64, 0.85) 38%, rgba(34, 48, 47, 0) 78%),
     linear-gradient(180deg, #263033 0%, #192124 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(200, 224, 60, 0.14), rgba(200, 224, 60, 0) 45%);
-  /* Note-card time stub: a flat raised tile, the time is the hero. Grain stays on the header.
-     Alternatives mocked in screenshots/v4-dark/options/ (orb, forest) put a grain layer first
-     (blend: overlay, normal) and set --stub-edge to ~24px for the dithered edge. */
-  --stub-bg: var(--card-2);
+  /* Note-card time stub: a frosted white wash, brightest behind the time, fading into the card
+     so the tile has no right edge. Mocks of other stubs live in screenshots/v4-dark/options/. */
+  --stub-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.09) 55%, rgba(255, 255, 255, 0) 100%);
   /* Signature bar beside condensed section headings. */
   --signature-bar: linear-gradient(90deg, #c8e03c 0%, #8fb046 38%, #4a6b55 100%);
   /* Ordinary cards are flat: grain only where a component opts back in (see screens.css). */

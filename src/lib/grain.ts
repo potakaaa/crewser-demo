@@ -20,7 +20,6 @@ export function installGrain(size = 160) {
     ctx.putImageData(img, 0, 0);
     root.setProperty('--grain-soft', `url(${canvas.toDataURL('image/png')})`);
     root.setProperty('--dissolve', installDissolve());
-    root.setProperty('--sparks', installSparks());
   } catch {
     // No canvas (very old browser or a locked-down preview): the headers just stay clean.
   }
@@ -53,22 +52,5 @@ function installDissolve() {
     }
   }
   ctx.putImageData(img, 0, 0);
-  return `url(${canvas.toDataURL('image/png')})`;
-}
-
-/** A few lime specks scattered around the dissolve, like light catching the grain. */
-function installSparks() {
-  const w = 44;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = EDGE_H;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return 'none';
-  for (let i = 0; i < 26; i++) {
-    const x = w * (0.2 + 0.7 * Math.random());
-    const y = Math.random() * EDGE_H;
-    ctx.fillStyle = `rgba(219, 242, 39, ${(0.35 + Math.random() * 0.5).toFixed(2)})`;
-    ctx.fillRect(Math.round(x), Math.round(y), 1, Math.random() < 0.3 ? 2 : 1);
-  }
   return `url(${canvas.toDataURL('image/png')})`;
 }
