@@ -5,7 +5,7 @@ import { initialRead, notificationsFor, type AppNotification, type NotifKind } f
 import { hoursOverview, todayPlan } from './lib/stats';
 import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
-import { addDays, addMonths, firstOfMonth } from './lib/dates';
+import { addDays, addMonths, firstOfMonth, toMinutes } from './lib/dates';
 
 export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'settings';
 
@@ -149,13 +149,14 @@ function saveTimer(t: WorkTimer | null) {
   }
 }
 
-/** "HH:MM" of a moment, rounded to the Log sheet's 5-minute steps. */
-const hhmm5 = (ms: number, up: boolean) => {
-  const d = new Date(ms);
-  const m = d.getHours() * 60 + d.getMinutes();
-  const r = Math.min(23 * 60 + 55, (up ? Math.ceil(m / 5) : Math.floor(m / 5)) * 5);
+/** "HH:MM" for minutes since midnight, rounded down to the Log sheet's 5-minute steps (clamped to the day). */
+const hhmm5 = (min: number) => {
+  const r = Math.max(0, Math.min(23 * 60 + 55, Math.floor(min / 5) * 5));
   return `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`;
 };
+
+/** When a timer of `elapsedMs` started on the demo clock: the demo's "now" is frozen, the elapsed time is real. */
+export const timerStartMin = (elapsedMs: number) => toMinutes(today.time) - Math.round(elapsedMs / 60000);
 
 function loadFontTheme(): FontTheme {
   try {
@@ -490,9 +491,10 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     saveTimer(null);
     set({ timer: null });
     const s = get();
-    s.setLogTime('logStart', hhmm5(t.startedAt, false));
+    // On the demo clock the timer ends now and started its elapsed time earlier, so the entry never lies in the future.
     const worked = Math.max(5 * 60000, timerElapsed(t));
-    s.setLogTime('logEnd', hhmm5(t.startedAt + worked, true));
+    s.setLogTime('logEnd', hhmm5(toMinutes(today.time)));
+    s.setLogTime('logStart', hhmm5(timerStartMin(worked)));
     // A timed stretch shorter than the default break was work only: drop the break rather than reject the entry.
     if (worked <= s.breakMin * 60000) s.setBreak(0);
     s.setLogOpen(true);

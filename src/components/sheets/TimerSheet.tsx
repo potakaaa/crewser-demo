@@ -1,8 +1,9 @@
-import { timerElapsed, useDemo } from '../../store';
+import { timerElapsed, timerStartMin, useDemo } from '../../store';
 import { Icon } from '../Icon';
 import { fmtElapsed, useTimerNow } from '../TimerChip';
 
-const clock = (ms: number) => new Date(ms).toTimeString().slice(0, 5);
+/** "08:12" from minutes since midnight. */
+const clock = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
 
 export const timerSheetMeta = () => ({ title: 'Work timer' });
 
@@ -30,7 +31,7 @@ export function TimerSheet() {
         {fmtElapsed(timerElapsed(timer, now))}
       </div>
       <p className="tsheet-sub">
-        Started {clock(timer.startedAt)}
+        Started {clock(Math.max(0, timerStartMin(timerElapsed(timer, now))))}
         {running ? '' : ' · paused'}
       </p>
       <div className="tsheet-actions">

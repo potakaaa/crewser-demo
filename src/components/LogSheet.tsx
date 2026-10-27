@@ -4,7 +4,7 @@ import { Icon } from './Icon';
 import { BottomSheet } from './BottomSheet';
 import { Collapse } from './Layout';
 import { TimeWheel } from './TimeWheel';
-import { fmtDayMonth } from '../lib/dates';
+import { fmtDayMonth, toMinutes } from '../lib/dates';
 import { fmtH, netMinutes, todayPlan } from '../lib/stats';
 import { project, today, todayLabel } from '../mock';
 
@@ -82,12 +82,19 @@ export function LogSheet() {
     end && endInfo ? `${fmtDayMonth(today.date)} · ${start}–${end}${endInfo.overnight ? ' (next day)' : ''} · ${fmtH(endInfo.hours)} h` : null;
 
   const badSpan = !!endInfo && !endInfo.valid;
+  // Hours can only go to production once they have happened: an end later than now stays a draft on this phone.
+  const ahead = !!end && !!endInfo && (endInfo.overnight || toMinutes(end) > toMinutes(today.time));
 
   const save = () => {
     if (badSpan) return;
     if (!end) {
       close();
       toast(link.isMe ? `Start time ${start} saved. Have a good shoot!` : `Start time${forName} saved`);
+      return;
+    }
+    if (ahead) {
+      close();
+      toast(`Saved as a draft${forName}. Send it after ${end}, once the day is over`);
       return;
     }
     if (!link.isMe && !confirming) {
@@ -181,7 +188,7 @@ export function LogSheet() {
         {summary(start, end, breakMin)}
       </p>
 
-      {sendLine && !badSpan && <p className="log-send">{sendLine}</p>}
+      {sendLine && !badSpan && <p className="log-send">{ahead ? `${sendLine} · ends after now, sends later` : sendLine}</p>}
       {badSpan && (
         <p className="log-confirm" id="log-bad-span" role="alert">
           {BAD_SPAN}
@@ -193,7 +200,7 @@ export function LogSheet() {
         </p>
       )}
       <button type="button" className="btn btn-lime btn-lg" aria-disabled={badSpan} aria-describedby={badSpan ? 'log-bad-span' : undefined} onClick={save}>
-        {!end ? 'Save start time' : confirming ? `Submit for ${link.personName}` : 'Submit hours'}
+        {!end ? 'Save start time' : ahead ? 'Save as draft' : confirming ? `Submit for ${link.personName}` : 'Submit hours'}
       </button>
       <button type="button" className="text-btn" onClick={() => toast('The full workday view is not part of this demo')}>
         Open full workday

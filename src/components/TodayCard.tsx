@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
-import { today, todayLabel, type Note } from '../mock';
+import { notes as allNotes, today, todayLabel, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
@@ -23,12 +23,20 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 /** The pill and the line beside it on today's card: where the shift stands. */
 function heroStatus(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): { pill: string; tone: Tone; rel: string } {
   const now = toMinutes(today.time);
+  const wrap = wrapOf(n);
   const wrapMin = wrapMinutes(n);
-  if (sent) return { pill: sent === 'saved' ? 'SAVED' : 'HOURS SENT', tone: 'neutral', rel: sent === 'saved' ? 'Sends when online' : `Wrapped at ${wrapOf(n)}` };
-  if (phase === 'before') return { pill: 'UP NEXT', tone: 'lime', rel: fmtCountdown(toMinutes(n.time!) - now) };
+  // A shoot day is over after the wrap; a travel day after its last timed item. Until then, hours sent change nothing here.
+  const lastToday = Math.max(...notesToday().map((x) => toMinutes(x.time!)));
+  const over = n.type === 'appointment' ? phase === 'after' : now >= lastToday;
+  if (sent && over) return { pill: sent === 'saved' ? 'SAVED' : 'HOURS SENT', tone: 'neutral', rel: sent === 'saved' ? 'Sends when online' : wrap ? `Wrapped at ${wrap}` : 'Day done' };
+  if (now < toMinutes(n.time!)) return { pill: 'UP NEXT', tone: 'lime', rel: fmtCountdown(toMinutes(n.time!) - now) };
+  if (n.type !== 'appointment') return over ? { pill: 'DONE', tone: 'neutral', rel: 'Day done' } : { pill: 'ON THE WAY', tone: 'teal', rel: 'Departed' };
   if (phase === 'during') return { pill: 'ON SET', tone: 'teal', rel: wrapMin !== null ? `wrap ${fmtCountdown(wrapMin - now)}` : 'wrap to be confirmed' };
-  return { pill: 'WRAPPED', tone: 'neutral', rel: `at ${wrapOf(n)}` };
+  return { pill: 'WRAPPED', tone: 'neutral', rel: wrap ? `at ${wrap}` : '' };
 }
+
+/** Today's timed notes; the travel day ends with the last of them. */
+const notesToday = () => allNotes.filter((x) => x.day === today.date && x.kind === 'time');
 
 type Tone = 'lime' | 'teal' | 'neutral';
 
@@ -116,6 +124,9 @@ function DeckCard({ card }: { card: CardModel }) {
       </button>
     );
   }
+
+  // Self-check while developing: a card never prints a value that is missing for its note type.
+  if (import.meta.env.DEV) console.assert(![status.pill, status.rel, sub, where].some((t) => String(t).includes('undefined')), 'deck card text has undefined', n.id);
 
   return (
     <div className="deck-body">
