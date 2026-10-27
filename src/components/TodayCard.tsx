@@ -16,6 +16,8 @@ const SWIPE_SHARE = 0.22;
 const FLICK = 0.45;
 /** How long the deck waits for the ruler to arrive before trusting the ruler again. */
 const SETTLE_MS = 1200;
+/** Movement before a gesture is judged horizontal (deck) or vertical (page). */
+const LOCK_PX = 10;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -200,11 +202,33 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
     }, SETTLE_MS);
   };
 
-  // Horizontal drags turn the deck; vertical ones scroll the page (touch-action: pan-y).
+  // Direction lock: after LOCK_PX of movement the gesture is either a deck swipe (|dx| > |dy|) or a page
+  // scroll, and stays that for the rest of the touch. touch-action: pan-y leaves horizontal pans to us.
   const deckRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState(0);
   const g = useRef<{ x: number; y: number; on: boolean; lx: number; lt: number; v: number } | null>(null);
   const swallowClick = useRef(false);
+  /** Settles a pending gesture: true once it is a deck swipe; a vertical one is dropped for good. */
+  const lock = (dx: number, dy: number) => {
+    const s = g.current;
+    if (!s || s.on) return !!s?.on;
+    if (Math.hypot(dx, dy) < LOCK_PX) return false;
+    if (Math.abs(dx) > Math.abs(dy)) return (s.on = true);
+    g.current = null;
+    return false;
+  };
+  // iOS Safari still scrolls the page under a locked swipe unless touchmove is cancelled (non-passive).
+  useEffect(() => {
+    const el = deckRef.current;
+    if (!el) return;
+    const onTouchMove = (e: TouchEvent) => {
+      const s = g.current;
+      const t = e.touches[0];
+      if (s && t && lock(t.clientX - s.x, t.clientY - s.y) && e.cancelable) e.preventDefault();
+    };
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', onTouchMove);
+  });
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 || count < 2) return;
     g.current = { x: e.clientX, y: e.clientY, on: false, lx: e.clientX, lt: e.timeStamp, v: 0 };
@@ -213,13 +237,9 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
     const s = g.current;
     if (!s) return;
     const dx = e.clientX - s.x;
-    const dy = e.clientY - s.y;
-    if (!s.on) {
-      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) return void (g.current = null);
-      if (Math.abs(dx) < 8) return;
-      s.on = true;
-      e.currentTarget.setPointerCapture(e.pointerId);
-    }
+    const wasOn = s.on;
+    if (!lock(dx, e.clientY - s.y)) return;
+    if (!wasOn) e.currentTarget.setPointerCapture(e.pointerId);
     const dt = e.timeStamp - s.lt;
     if (dt > 0) s.v = (e.clientX - s.lx) / dt;
     s.lx = e.clientX;
@@ -231,6 +251,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
   const onPointerEnd = (e: PointerEvent<HTMLDivElement>) => {
     const s = g.current;
     g.current = null;
+    setDrag(0);
     if (!s?.on) return;
     // The click that ends a drag must not open the card under the finger.
     swallowClick.current = true;
