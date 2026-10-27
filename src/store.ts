@@ -170,9 +170,6 @@ function loadFontTheme(): FontTheme {
 
 export type ExpandList = 'dashboard' | 'calendar';
 
-/** Brand accent on smart notes, switchable from the demo panel while we try them out. */
-export type NoteAccent = 'stub' | 'corner' | 'band' | 'edge' | 'none';
-
 interface Toast {
   id: number;
   message: string;
@@ -217,7 +214,6 @@ interface DemoState {
   /** The light sheet has scrolled under the status bar: show dark status bar text. */
   statusDark: boolean;
   toast: Toast | null;
-  noteAccent: NoteAccent;
   /** Ids of the notifications already read, per crew link. Read it with useNotifications(). */
   notifRead: Record<string, string[]>;
   /** The running or paused work timer; persisted, so it survives a reload. */
@@ -255,7 +251,6 @@ interface Actions {
   submitDay: (iso: string) => void;
   setStatusDark: (v: boolean) => void;
   showToast: (message: string, action?: Toast['action']) => void;
-  setNoteAccent: (a: NoteAccent) => void;
   /** Notification actions work on the active link's notifications. */
   markRead: (id: string) => void;
   markAllRead: () => void;
@@ -313,7 +308,6 @@ const initialState = (): DemoState => ({
   sheetPushed: false,
   statusDark: false,
   toast: null,
-  noteAccent: 'stub',
   notifRead: initialRead(),
   timer: loadTimer(),
 });
@@ -540,7 +534,6 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     }),
   setStatusDark: (v) => set({ statusDark: v }),
   showToast: (message, action) => set({ toast: { id: ++toastSeq, message, action } }),
-  setNoteAccent: (a) => set({ noteAccent: a }),
   markRead: (id) =>
     set((s) => {
       const read = s.notifRead[s.activeLinkId] ?? [];
@@ -572,8 +565,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     } catch {
       // Nothing saved to forget.
     }
-    const { noteAccent } = get();
-    set({ ...initialState(), stack: [{ route: { name: 'dashboard' }, pushed: false }], sheet: null, navDir: 'tab', splash: false, noteAccent });
+    set({ ...initialState(), stack: [{ route: { name: 'dashboard' }, pushed: false }], sheet: null, navDir: 'tab', splash: false });
   },
 }));
 

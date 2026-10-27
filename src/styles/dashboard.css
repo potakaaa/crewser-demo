@@ -552,7 +552,7 @@
   box-shadow: none;
 }
 /* Home: a slimmer ticket stub, so the title gets the width. */
-[data-accent='stub'] .sheet-dash .ccard-head {
+.app .sheet-dash .ccard-head {
   --stub-solid: 84px;
   grid-template-columns: 68px 36px minmax(0, 1fr) 18px;
 }

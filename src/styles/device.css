@@ -348,37 +348,6 @@
   color: var(--page-text);
 }
 
-/* Smart note accent picker */
-.dp-accents {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.dp-accent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-height: 44px;
-  padding: 8px 12px;
-  border: 1px solid var(--page-line);
-  border-radius: var(--r-control);
-  background: transparent;
-  color: var(--page-text);
-  font-size: 13px;
-  font-weight: 600;
-  text-align: left;
-}
-.dp-accent small {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--page-text-2);
-}
-.dp-accent[aria-checked='true'] {
-  border-color: var(--page-text);
-  box-shadow: inset 0 0 0 1px var(--page-text);
-}
-
 /* The side caption shows the logo version that reads on the page's theme (it follows the system, or data-theme). */
 .caption .only-dark-page {
   display: none;
@@ -396,4 +365,40 @@
 }
 :root[data-theme="dark"] .caption .only-light-page {
   display: none;
+}
+
+/* The demo panel fits the window and scrolls inside, with its title and close button pinned on top. */
+.demo-panel {
+  max-height: calc(100dvh - 240px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: 0;
+  padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
+}
+.dp-top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 -14px 2px;
+  padding: 10px 8px 8px 14px;
+  border-bottom: 1px solid var(--page-line);
+  background: var(--page-panel);
+  font-size: 13px;
+  font-weight: 700;
+}
+.dp-close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--page-text-2);
+  font-size: 20px;
+  line-height: 1;
+}
+.dp-close:hover {
+  background: var(--page-line);
 }

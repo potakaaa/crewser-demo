@@ -2449,8 +2449,8 @@
     transform: none;
   }
 }
-/* ───────── Smart note accents (switch in the demo panel) ─────────
-   Every variant borrows the header's material: teal gradient, lime glow, film grain. */
+/* ───────── Smart note time stub ─────────
+   The time column of note cards and rows sits on its own frosted wash (--stub-bg). */
 .ccard,
 .nrow {
   position: relative;
@@ -2458,17 +2458,17 @@
 }
 /* Ticket stub: the time column sits on its own wash (--stub-bg). A non-zero --stub-edge breaks
    the wash's edge up into film grain instead of a hard line. */
-[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle) {
+.app :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle) {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   --stub-solid: 88px;
   --stub-edge: 0px;
 }
-[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
+.app .nrow:not(.nrow-dashed) .nrow-toggle {
   --stub-solid: 82px;
 }
-[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle)::before {
+.app :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle)::before {
   content: '';
   position: absolute;
   z-index: -1;
@@ -2485,104 +2485,24 @@
     linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
     var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
 }
-[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-time {
+.app :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-time {
   color: #ffffff;
 }
 /* On the cards the time is the hero. */
-[data-accent='stub'] .ccard-head .stub-time {
+.app .ccard-head .stub-time {
   font-size: var(--fs-xl);
   font-weight: 700;
 }
-[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-sub {
+.app :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-sub {
   color: var(--text-2);
   font-weight: 500;
 }
 /* Room between the tile and the type chip */
-[data-accent='stub'] .ccard-head {
+.app .ccard-head {
   grid-template-columns: 74px 36px minmax(0, 1fr) 18px;
 }
-[data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
+.app .nrow:not(.nrow-dashed) .nrow-toggle {
   grid-template-columns: 86px 40px minmax(0, 1fr) 18px;
-}
-/* Corner glow: a lime light leak with grain in the top-right corner. */
-[data-accent='corner'] .ccard::before,
-[data-accent='corner'] .nrow::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  top: -40px;
-  right: -40px;
-  width: 190px;
-  height: 150px;
-  background: radial-gradient(closest-side, rgba(219, 242, 39, 0.3), rgba(111, 208, 200, 0.1) 60%, rgba(111, 208, 200, 0));
-  pointer-events: none;
-}
-[data-accent='corner'] .ccard::after,
-[data-accent='corner'] .nrow::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  right: 0;
-  width: 150px;
-  height: 110px;
-  background-image: var(--grain, none);
-  background-size: 160px 160px;
-  opacity: 0.08;
-  mix-blend-mode: multiply;
-  -webkit-mask: radial-gradient(circle at 100% 0%, #000, transparent 60%);
-  mask: radial-gradient(circle at 100% 0%, #000, transparent 60%);
-  pointer-events: none;
-}
-/* Header band: the whole title row sits on the brand gradient. */
-[data-accent='band'] .ccard-head,
-[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-top {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 96% 0%, rgba(219, 242, 39, 0.22), rgba(219, 242, 39, 0) 45%),
-    linear-gradient(120deg, #141d1e 0%, #1f3a3d 60%, #2d5559 100%);
-  color: #ffffff;
-}
-[data-accent='band'] .ccard-head::after,
-[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-top::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: var(--grain, none);
-  background-size: 160px 160px;
-  opacity: 0.14;
-  mix-blend-mode: overlay;
-}
-[data-accent='band'] .ccard-head + .ccard-body {
-  padding-top: var(--sp-4);
-}
-[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-toggle,
-[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-quick {
-  color: #ffffff;
-}
-[data-accent='band'] .nrow:not(.nrow-dashed) .nrow-quick {
-  border-left-color: rgba(255, 255, 255, 0.14);
-}
-[data-accent='band'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-top) :is(.row-t2, .stub-sub) {
-  color: var(--on-dark-2);
-}
-[data-accent='band'] :is(.ccard-head > svg, .nrow:not(.nrow-dashed) .chev svg, .nrow:not(.nrow-dashed) .nrow-quick svg) path {
-  stroke: #ffffff;
-}
-/* Bottom edge: a thin teal-to-lime line, like the light at the bottom of the header. */
-[data-accent='edge'] .ccard::after,
-[data-accent='edge'] .nrow:not(.nrow-dashed)::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #1f3a3d 0%, #2c6b72 45%, #6fd0c8 75%, var(--lime) 100%);
-  pointer-events: none;
 }
 /* ───────── Brand ───────── */
 .wordmark {
