@@ -161,8 +161,7 @@ button.day-action:active {
 /* Narrow phones (360 px): give the note titles the width the ticket stub was taking. */
 @media (max-width: 400px) {
   .app[data-accent] .sheet-cal .nrow:not(.nrow-dashed) .nrow-toggle {
-    --stub-solid: 66px;
-    --stub-edge: 20px;
+    --stub-solid: 80px;
     grid-template-columns: 74px 36px minmax(0, 1fr) 16px;
     gap: var(--sp-2);
     padding-left: var(--sp-3);

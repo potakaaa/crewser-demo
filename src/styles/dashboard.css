@@ -7,15 +7,12 @@
 }
 /* Rhythm: 8 px between cards in a group, a larger step before a section heading. */
 .sheet-dash {
-  gap: var(--sp-2);
-  padding-top: var(--sp-2);
-}
-.sheet-dash .stack {
-  gap: var(--sp-2);
+  gap: var(--card-gap);
+  padding-top: var(--sp-4);
 }
 .sheet-dash > section.stack,
 .sheet-dash > .empty-light {
-  margin-top: var(--sp-1);
+  margin-top: var(--section-gap);
 }
 
 .dash-who {
@@ -894,13 +891,12 @@
 }
 /* Home: a slimmer ticket stub, so the title gets the width. */
 [data-accent='stub'] .sheet-dash .ccard-head {
-  --stub-solid: 64px;
-  --stub-edge: 20px;
+  --stub-solid: 84px;
   grid-template-columns: 68px 36px minmax(0, 1fr) 18px;
 }
 .sheet-dash .ccard-head {
-  min-height: 56px;
-  padding-block: 8px;
+  min-height: 64px;
+  padding-block: var(--sp-3);
 }
 .sheet-dash .ccard-head .row-t1 {
   display: -webkit-box;
@@ -910,17 +906,17 @@
 }
 /* Room to breathe: the facts are one quiet line, not a row of boxes, and the CTA has air above it. */
 .sheet-dash .ccard-compact .ccard-body {
-  gap: 13px; /* also keeps a copy value's 44 px band clear of the CTA */
-  padding: 10px 14px 14px;
+  gap: var(--sp-4); /* also keeps a copy value's 44 px band clear of the CTA */
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
 }
 /* Facts side by side, a gap instead of separators, so a wrapped line never starts with a dot. */
 .ccard-facts {
   margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 16px;
+  gap: var(--sp-1) var(--sp-4);
   font-size: var(--fs-md);
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--text-3);
 }
 .ccard-fact {
@@ -976,11 +972,11 @@
   font-weight: 600;
 }
 .sheet-dash .nrow-toggle {
-  min-height: 56px;
-  padding-block: 8px;
+  min-height: 60px;
+  padding-block: 10px;
 }
 .sheet-dash .day-group {
-  gap: 8px;
+  gap: var(--sp-3);
 }
 .sheet-dash .day-group-h {
   padding-top: 4px;

@@ -179,7 +179,7 @@
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--card-gap);
 }
 /* Frosted band under the status bar once content scrolls up beneath it. */
 .sat-band {
@@ -778,7 +778,7 @@
 .row-t1 {
   font-size: var(--fs-base);
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.35;
   overflow-wrap: break-word;
 }
 .row-t1-lg {
@@ -791,7 +791,7 @@
 /* Never cut off: routes, places and codes wrap instead of trailing off. */
 .row-t2 {
   font-size: var(--fs-sm);
-  line-height: 1.4;
+  line-height: 1.5;
   color: var(--text-2);
   overflow-wrap: break-word;
 }
@@ -807,15 +807,15 @@
 .ccard-head {
   min-height: 64px;
   grid-template-columns: 52px 36px minmax(0, 1fr) 18px;
-  padding: 12px 14px 10px;
+  padding: var(--sp-3) var(--sp-4) 10px;
 }
 .ccard-head .chip-icon {
   width: 36px;
   height: 36px;
 }
 .ccard-body {
-  gap: 8px;
-  padding: 2px 14px 14px;
+  gap: var(--sp-3);
+  padding: var(--sp-1) var(--sp-4) var(--sp-4);
 }
 .ccard-body .crew-toggle {
   min-height: 40px;
@@ -2604,14 +2604,14 @@
   position: relative;
   isolation: isolate;
 }
-/* Ticket stub: the time column sits on the brand gradient, and its edge breaks
-   up into film grain (with a few lime specks) instead of ending in a hard line. */
+/* Ticket stub: the time column sits on its own tile (--stub-bg). A non-zero --stub-edge breaks
+   the tile's edge up into film grain instead of a hard line. */
 [data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle) {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  --stub-solid: 68px;
-  --stub-edge: 28px;
+  --stub-solid: 88px;
+  --stub-edge: 0px;
 }
 [data-accent='stub'] .nrow:not(.nrow-dashed) .nrow-toggle {
   --stub-solid: 82px;
@@ -2624,9 +2624,7 @@
   bottom: 0;
   left: 0;
   width: calc(var(--stub-solid) + var(--stub-edge));
-  background:
-    var(--grain-soft, none) 0 0 / 160px 160px,
-    var(--sky-gradient);
+  background: var(--stub-bg);
   background-blend-mode: overlay, normal;
   -webkit-mask:
     linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
@@ -2635,28 +2633,19 @@
     linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
     var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
 }
-[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle)::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--stub-solid) - 12px);
-  width: 44px;
-  opacity: 0.9;
-  background: var(--sparks, none) 0 0 / 44px 256px repeat-y;
-}
-[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) :is(.stub-time, .stub-sub) {
-  text-shadow: 0 1px 2px rgba(20, 34, 40, 0.35);
-}
 [data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-time {
   color: #ffffff;
 }
+/* On the cards the time is the hero. */
+[data-accent='stub'] .ccard-head .stub-time {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+}
 [data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-sub {
-  color: #ffffff;
+  color: var(--text-2);
   font-weight: 500;
 }
-/* Room for the grain edge between the time and the type chip */
+/* Room between the tile and the type chip */
 [data-accent='stub'] .ccard-head {
   grid-template-columns: 74px 36px minmax(0, 1fr) 18px;
 }
