@@ -1,9 +1,8 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { person, todayLabel, type CrewLink } from '../mock';
+import type { CrewLink } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { Icon } from './Icon';
-import { ForChip } from './ForChip';
-import { greeting } from '../lib/greeting';
+import { firstNameOf } from '../lib/greeting';
 import { useAxisDrag } from '../lib/useAxisDrag';
 import { stepTarget, switchTargets } from '../lib/switchTargets';
 
@@ -128,13 +127,6 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
         {turns > 0 && <span className="who-ring" key={turns} />}
       </span>
       <span className="home-greet">
-        {link.isMe ? (
-          <span className="home-hello">
-            {greeting()}, {person.firstName}
-          </span>
-        ) : (
-          <ForChip />
-        )}
         <span className="home-project who-line-zone">
           <span
             key={link.projectId}
@@ -144,10 +136,12 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
             data-hint={hint && projects.length > 1}
             style={{ '--lx': `${lx}px`, opacity: 1 - Math.min(1, Math.abs(lx) / 160) } as CSSProperties}
           >
-            {link.projectName} · {todayLabel}
-            <Icon name="down" size={14} color="#C4CFD0" strokeWidth={2} />
+            {/* On a colleague's link their name leads, so it is clear whose hours these are. */}
+            {!link.isMe && <span className="who-for">{firstNameOf(link)} ·</span>}
+            <span className="who-name">{link.projectName}</span>
+            <Icon name="down" size={16} color="#C4CFD0" strokeWidth={2} />
           </span>
-          <span className="sr-only">. Switch project</span>
+          <span className="sr-only">{link.isMe ? '' : `. Entering hours for ${link.personName}, ${link.position}`}. Switch project</span>
         </span>
       </span>
     </button>

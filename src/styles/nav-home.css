@@ -1164,3 +1164,19 @@
 :is(.hs-nudge, .day-action-unsent) .unsent-mark {
   color: var(--text-2);
 }
+
+/* Home header: avatar plus one bold line, the project (with whose link it is, when not yours). */
+.home-greet .home-project {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.who-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.who-for {
+  flex: none;
+  color: var(--lime);
+}
