@@ -6,7 +6,6 @@ import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../
 import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
-import { TodayBar } from '../components/TodayBar';
 import { NotifButton } from '../components/NotifButton';
 import { ForChip } from '../components/ForChip';
 import { HoursStrip } from '../components/HoursStrip';
@@ -36,7 +35,7 @@ export function DashboardScreen() {
   // The note under the ruler's playhead; it only changes when the note does, never per pixel.
   const [preview, setPreview] = useState<Preview | null>(null);
   const ruler = useRef<TimelineHandle>(null);
-  const backToNow = useCallback(() => ruler.current?.backToNow(), []);
+  const goTo = useCallback((i: number) => ruler.current?.goTo(i), []);
   useEffect(() => setPreview(null), [scrub]);
 
   return (
@@ -67,8 +66,7 @@ export function DashboardScreen() {
         </div>
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
-        <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onBack={backToNow} />
-        {sn.hero && <TodayBar hero={sn.hero} previewDay={preview ? scrub.stops[preview.index]?.note.day : undefined} />}
+        <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onGoTo={goTo} />
       </GradientHeader>
 
       <Sheet className="sheet-dash">

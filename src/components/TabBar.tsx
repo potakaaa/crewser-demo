@@ -1,16 +1,17 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import { useDemo, useRoute, type TabName } from '../store';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { contacts, today } from '../mock';
+import { useActiveLink, useDemo, useRoute, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 
+/** Three main routes, then the crew pass: Contacts and Settings live behind your initials. */
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'dashboard', label: 'Home', icon: 'dashboard' },
   { name: 'calendar', label: 'Calendar', icon: 'calendar' },
   { name: 'documents', label: 'Docs', icon: 'documents' },
-  { name: 'contacts', label: 'Contacts', icon: 'contacts' },
-  { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
+const PASS_ROUTES: Partial<Record<TabName, string>> = { contacts: 'Contacts', settings: 'Settings' };
+const SLOTS = TABS.length + 1;
 
-// Five tabs plus the Log button have to fit a 375 px phone, so the active tab stays compact.
 const ICON = 22;
 const PAD_L = 8;
 const PAD_R = 8;
@@ -22,28 +23,38 @@ const MIN_TAB = 40;
 interface Layout {
   w: number[];
   x: number[];
-  /** False on narrow phones: all five tabs are equal, icon-only. */
+  /** False on narrow phones: all tabs are equal, icon-only. */
   label: boolean;
 }
 
+type Menu = 'pass' | 'add' | null;
+
 /**
- * Floating tab bar. One white pill slides to the active tab while that tab widens
- * to show its label; widths are computed up front so pill, icons and label move
- * on the same curve instead of chasing each other.
+ * Floating tab bar. One white pill slides to the active tab while that tab widens to show its label;
+ * widths are computed up front so pill, icons and label move on the same curve. The last slot is your
+ * crew pass, which opens Contacts and Settings; the lime + beside the bar adds time or an invoice.
  */
 export function TabBar({ hidden }: { hidden: boolean }) {
   const route = useRoute();
   const navigate = useDemo((s) => s.navigate);
   const openLog = useDemo((s) => s.setLogOpen);
+  const openSheet = useDemo((s) => s.openSheet);
+  const link = useActiveLink();
   const navRef = useRef<HTMLElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [layout, setLayout] = useState<Layout | null>(null);
+  const [menu, setMenu] = useState<Menu>(null);
+  const menuId = useId();
 
   // Keep the last tab while a detail screen is on top, so the bar comes back where it left.
   const lastActive = useRef(0);
-  const idx = TABS.findIndex((t) => t.name === route.name);
+  const passLabel = PASS_ROUTES[route.name as TabName];
+  const idx = passLabel ? TABS.length : TABS.findIndex((t) => t.name === route.name);
   if (idx >= 0) lastActive.current = idx;
   const active = lastActive.current;
+  const lastPass = useRef('Contacts');
+  if (passLabel) lastPass.current = passLabel;
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -56,14 +67,14 @@ export function TabBar({ hidden }: { hidden: boolean }) {
       const widths = labelRefs.current.map((el) => el?.scrollWidth ?? 0);
       // Labels not laid out yet (fonts, first paint): a max of 0 would wrongly switch the label mode on. The font and resize hooks measure again.
       if (Math.max(...widths) <= 0) return;
-      const room = inner - gap * (TABS.length - 1);
+      const room = inner - gap * (SLOTS - 1);
       const pill = (labelW: number) => PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
       // The label mode is decided by the longest label, so every tab behaves the same on a given phone.
-      const label = (room - pill(Math.max(...widths))) / (TABS.length - 1) >= MIN_TAB;
+      const label = (room - pill(Math.max(...widths))) / (SLOTS - 1) >= MIN_TAB;
       let activeW = pill(widths[active]);
-      let otherW = (room - activeW) / (TABS.length - 1);
-      if (!label) activeW = otherW = room / TABS.length;
-      const w = TABS.map((_, i) => (i === active ? activeW : otherW));
+      let otherW = (room - activeW) / (SLOTS - 1);
+      if (!label) activeW = otherW = room / SLOTS;
+      const w = Array.from({ length: SLOTS }, (_, i) => (i === active ? activeW : otherW));
       const x: number[] = [];
       w.reduce((acc, v) => (x.push(acc), acc + v + gap), padL);
       setLayout({ w, x, label });
@@ -73,49 +84,150 @@ export function TabBar({ hidden }: { hidden: boolean }) {
     const ro = new ResizeObserver(measure);
     ro.observe(nav);
     return () => ro.disconnect();
-  }, [active]);
+  }, [active, passLabel]);
+
+  // A menu never outlives the screen it was opened on.
+  useEffect(() => setMenu(null), [route, hidden]);
+  // Focus goes into the menu as it opens.
+  useEffect(() => {
+    if (menu) document.getElementById(menuId)?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+  }, [menu, menuId]);
+
+  const toggle = (m: Exclude<Menu, null>) => setMenu((cur) => (cur === m ? null : m));
+  const close = (refocus: boolean) => {
+    if (refocus) wrapRef.current?.querySelector<HTMLElement>(`[aria-controls="${menuId}"][aria-expanded="true"]`)?.focus();
+    setMenu(null);
+  };
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && menu) {
+      e.stopPropagation();
+      close(true);
+    }
+  };
+  // Tabbing out of the bar closes the menu, like any disclosure.
+  const onBlur = (e: FocusEvent) => {
+    if (menu && e.relatedTarget && !wrapRef.current?.contains(e.relatedTarget as Node)) setMenu(null);
+  };
+  const pick = (run: () => void) => () => {
+    setMenu(null);
+    run();
+  };
+
+  const slotStyle = (i: number): CSSProperties | undefined =>
+    layout ? { width: layout.w[i], paddingLeft: i === active && layout.label ? PAD_L : (layout.w[i] - ICON) / 2 } : undefined;
+  const slot = (i: number, label: string, icon: ReactNode, props: { onClick: () => void; ariaLabel: string; current: boolean; menu?: boolean; title?: string }) => {
+    const on = i === active;
+    return (
+      <button
+        type="button"
+        key={i}
+        className="tab"
+        style={slotStyle(i)}
+        aria-current={props.current ? 'page' : undefined}
+        aria-label={props.ariaLabel}
+        aria-expanded={props.menu ? menu === 'pass' : undefined}
+        aria-controls={props.menu ? menuId : undefined}
+        title={on ? undefined : (props.title ?? label)}
+        onClick={props.onClick}
+      >
+        <span className="tab-icon">{icon}</span>
+        <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on && (layout?.label ?? true)}>
+          {label}
+        </span>
+      </button>
+    );
+  };
 
   return (
     <>
       <div className={`tab-fade${hidden ? ' is-hidden' : ''}`} aria-hidden="true" />
-      <div className={`tabbar-wrap${hidden ? ' is-hidden' : ''}`} inert={hidden}>
-        <nav className={`tabbar${layout ? ' is-measured' : ''}`} aria-label="Tabs" ref={navRef}>
-          {layout && (
-            <span
-              className="tab-pill"
-              aria-hidden="true"
-              style={{ width: layout.w[active], transform: `translateX(${layout.x[active]}px)` }}
-            />
-          )}
-          {TABS.map((t, i) => {
-            const on = i === active;
-            const style: CSSProperties | undefined = layout
-              ? { width: layout.w[i], paddingLeft: on && layout.label ? PAD_L : (layout.w[i] - ICON) / 2 }
-              : undefined;
-            return (
-              <button
-                type="button"
-                key={t.name}
-                className="tab"
-                style={style}
-                aria-current={on && idx >= 0 ? 'page' : undefined}
-                aria-label={t.label}
-                title={on ? undefined : t.label}
-                onClick={() => navigate({ name: t.name })}
-              >
-                <span className="tab-icon">
-                  <Icon name={t.icon} size={ICON} color={on ? '#111A1B' : '#3F5155'} strokeWidth={on ? 1.8 : 1.6} />
+      {menu && <div className="tb-scrim" aria-hidden="true" onClick={() => close(false)} />}
+      <div className={`tabbar-wrap${hidden ? ' is-hidden' : ''}${menu ? ' is-open' : ''}`} inert={hidden} ref={wrapRef} onKeyDown={onKeyDown} onBlur={onBlur}>
+        {menu === 'pass' && (
+          <div className="tb-pass" id={menuId} role="group" aria-label="Your crew pass">
+            <div className="tb-pass-head">
+              <span className="tb-pass-avatar" aria-hidden="true">
+                {link.initials}
+              </span>
+              <span className="tb-pass-who">
+                <strong>{link.personName}</strong>
+                <span>
+                  {link.position} · {link.department}
                 </span>
-                <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on && (layout?.label ?? true)}>
-                  {t.label}
-                </span>
+              </span>
+              <span className="tb-pass-day num" aria-label={`Shoot day ${today.shootDay}`}>
+                D{today.shootDay}
+              </span>
+            </div>
+            <div className="tb-pass-tiles">
+              <button type="button" className="tb-tile" aria-current={route.name === 'contacts' ? 'page' : undefined} onClick={pick(() => navigate({ name: 'contacts' }))}>
+                <Icon name="contacts" size={22} color="#111A1B" strokeWidth={1.7} />
+                <span className="tb-tile-t">Contacts</span>
+                <span className="tb-tile-s">{contacts.length} crew</span>
               </button>
-            );
-          })}
+              <button type="button" className="tb-tile" aria-current={route.name === 'settings' ? 'page' : undefined} onClick={pick(() => navigate({ name: 'settings' }))}>
+                <Icon name="settings" size={22} color="#111A1B" strokeWidth={1.7} />
+                <span className="tb-tile-t">Settings</span>
+                <span className="tb-tile-s">Preferences</span>
+              </button>
+            </div>
+            <button type="button" className="tb-pass-row" aria-label={`${link.projectName}. Switch project`} onClick={pick(() => openSheet('project'))}>
+              <Icon name="users" size={18} color="#3F5155" strokeWidth={1.7} />
+              <span>{link.projectName}</span>
+              <span className="tb-pass-row-s">Switch</span>
+              <Icon name="right" size={16} color="#54686C" />
+            </button>
+          </div>
+        )}
+        {menu === 'add' && (
+          <div className="tb-dial" id={menuId} role="group" aria-label="Add">
+            <button type="button" className="tb-dial-item" style={{ '--i': 1 } as CSSProperties} onClick={pick(() => openSheet('invoice'))}>
+              <span className="tb-dial-t">Scan invoice</span>
+              <span className="tb-dial-icon">
+                <Icon name="scan" size={20} color="#111A1B" strokeWidth={1.8} />
+              </span>
+            </button>
+            <button type="button" className="tb-dial-item" style={{ '--i': 0 } as CSSProperties} onClick={pick(() => openLog(true))}>
+              <span className="tb-dial-t">Log time</span>
+              <span className="tb-dial-icon">
+                <Icon name="logTime" size={20} color="#111A1B" strokeWidth={1.8} />
+              </span>
+            </button>
+          </div>
+        )}
+        <nav className={`tabbar${layout ? ' is-measured' : ''}`} aria-label="Tabs" ref={navRef}>
+          {layout && <span className="tab-pill" aria-hidden="true" style={{ width: layout.w[active], transform: `translateX(${layout.x[active]}px)` }} />}
+          {TABS.map((t, i) =>
+            slot(i, t.label, <Icon name={t.icon} size={ICON} color={i === active ? '#111A1B' : '#3F5155'} strokeWidth={i === active ? 1.8 : 1.6} />, {
+              onClick: () => navigate({ name: t.name }),
+              ariaLabel: t.label,
+              current: i === active && idx >= 0,
+            }),
+          )}
+          {slot(
+            TABS.length,
+            lastPass.current,
+            <span className="tab-avatar" data-on={active === TABS.length}>
+              {link.initials}
+            </span>,
+            {
+              onClick: () => toggle('pass'),
+              ariaLabel: passLabel ? `${passLabel}. Your pass: contacts, settings, projects` : 'Your pass: contacts, settings, projects',
+              current: !!passLabel,
+              menu: true,
+              title: 'Your pass',
+            },
+          )}
         </nav>
-        <button type="button" className="log-btn" aria-label="Log today's hours" aria-haspopup="dialog" onClick={() => openLog(true)} id="log-button">
-          <Icon name="logTime" size={22} color="#111A1B" strokeWidth={1.7} />
-          <span>Log</span>
+        <button
+          type="button"
+          className="add-btn"
+          aria-label="Add time or invoice"
+          aria-expanded={menu === 'add'}
+          aria-controls={menuId}
+          onClick={() => toggle('add')}
+        >
+          <Icon name="plus" size={26} color="#111A1B" strokeWidth={2} />
         </button>
       </div>
     </>

@@ -25,6 +25,8 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 export interface TimelineHandle {
   /** Scroll the playhead back to Now. */
   backToNow: () => void;
+  /** Glide the playhead to a note (an index into `scrub.stops`), or to Now with -1. */
+  goTo: (index: number) => void;
 }
 
 /** What the Timeline can ask of the scrubber: glide the ruler to a position, and where a glide is heading. */
@@ -388,7 +390,14 @@ export function Timeline({
   useEffect(() => {
     backToNowRef.current = backToNow;
   }, [backToNow]);
-  useImperativeHandle(handle, () => ({ backToNow: () => backToNow() }), [backToNow]);
+  useImperativeHandle(
+    handle,
+    () => ({
+      backToNow: () => backToNow(),
+      goTo: (i) => (i < 0 ? backToNow() : glider.current.glideTo(scrub.stops[i]?.x ?? 0)),
+    }),
+    [backToNow, glider, scrub],
+  );
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (!el) return;

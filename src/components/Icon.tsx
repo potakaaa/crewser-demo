@@ -31,6 +31,7 @@ import {
   Notification03Icon,
   Pdf01Icon,
   QrCodeIcon,
+  ReceiptEuroIcon,
   SecurityCheckIcon,
   TextFontIcon,
   UserIcon,
@@ -104,6 +105,7 @@ export const icons = {
   alert: Alert02Icon,
   minus: MinusSignIcon,
   plus: PlusSignIcon,
+  scan: ReceiptEuroIcon,
 } satisfies Record<string, IconSvgElement>;
 
 export type IconName = keyof typeof icons;

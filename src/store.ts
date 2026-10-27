@@ -12,7 +12,7 @@ export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'set
 export type Route = { name: TabName } | { name: 'ticket' } | { name: 'pdf'; file: string };
 
 /** Things that open in a bottom sheet over the current tab. `id` picks the note, contact, project... */
-export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications';
+export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice';
 export interface SheetState {
   kind: SheetKind;
   id?: string;

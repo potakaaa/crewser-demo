@@ -16,6 +16,7 @@ import './styles/dashboard.css';
 import './styles/timeline.css';
 import './styles/screens.css';
 import './styles/notifications.css';
+import './styles/nav-home.css';
 import bebasUrl from '@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url';
 import App from './App';
 import { installGrain } from './lib/grain';
