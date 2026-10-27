@@ -1165,18 +1165,44 @@
   color: var(--text-2);
 }
 
-/* Home header: avatar plus one bold line, the project (with whose link it is, when not yours). */
-.home-greet .home-project {
+/* Home header: who (bold) over the project (muted, with the chevron). A colleague's name is lime. */
+.who-person {
+  min-width: 0;
+  overflow: hidden;
   font-size: var(--fs-lg);
   font-weight: 600;
   letter-spacing: -0.01em;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.who-person[data-other] {
+  color: var(--lime);
+}
+.home-greet .home-project {
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--on-dark-2);
 }
 .who-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.who-for {
+.lrow-name {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+}
+.lrow-name-t {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lrow-you {
   flex: none;
-  color: var(--lime);
+  font-weight: 500;
+  color: var(--text-3);
 }

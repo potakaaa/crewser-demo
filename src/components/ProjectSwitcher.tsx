@@ -38,7 +38,10 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
         {link.initials}
       </span>
       <span className="lrow-text">
-        <span className="lrow-name">{link.isMe ? 'You' : link.personName}</span>
+        <span className="lrow-name">
+          <span className="lrow-name-t">{link.personName}</span>
+          {link.isMe && <span className="lrow-you">(You)</span>}
+        </span>
         <span className="lrow-sub">{link.position}</span>
       </span>
       {active ? (

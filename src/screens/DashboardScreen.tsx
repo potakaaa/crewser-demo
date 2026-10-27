@@ -66,7 +66,7 @@ export function DashboardScreen() {
           {turn && (
             <div className="fx-flash" aria-hidden="true">
               <span className="fx-flash-av">{link.initials}</span>
-              {turn.kind === 'project' ? link.projectName : link.isMe ? 'You' : link.personName} · {link.position}
+              {turn.kind === 'project' ? link.projectName : `${link.personName}${link.isMe ? ' (You)' : ''}`} · {link.position}
             </div>
           )}
         </div>

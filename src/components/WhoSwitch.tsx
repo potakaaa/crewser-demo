@@ -2,7 +2,6 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import type { CrewLink } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { Icon } from './Icon';
-import { firstNameOf } from '../lib/greeting';
 import { useAxisDrag } from '../lib/useAxisDrag';
 import { stepTarget, switchTargets } from '../lib/switchTargets';
 
@@ -79,7 +78,7 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
         window.setTimeout(() => {
           setGlide(false);
           setAy(0);
-          switchTo(to, to.isMe ? 'your own link' : to.personName, { kind: 'person', dir: fwd ? 1 : -1 });
+          switchTo(to, to.isMe ? `${to.personName} (You)` : to.personName, { kind: 'person', dir: fwd ? 1 : -1 });
         }, SLIDE_MS);
       } else {
         const to = fwd || back ? stepTarget(projects, isHere, fwd ? 1 : -1) : null;
@@ -127,6 +126,10 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
         {turns > 0 && <span className="who-ring" key={turns} />}
       </span>
       <span className="home-greet">
+        {/* Who: crew who handle several people's links need to see whose hours these are. */}
+        <span className="who-person" data-other={!link.isMe || undefined} key={link.id}>
+          {link.personName}
+        </span>
         <span className="home-project who-line-zone">
           <span
             key={link.projectId}
@@ -136,12 +139,10 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
             data-hint={hint && projects.length > 1}
             style={{ '--lx': `${lx}px`, opacity: 1 - Math.min(1, Math.abs(lx) / 160) } as CSSProperties}
           >
-            {/* On a colleague's link their name leads, so it is clear whose hours these are. */}
-            {!link.isMe && <span className="who-for">{firstNameOf(link)} ·</span>}
             <span className="who-name">{link.projectName}</span>
             <Icon name="down" size={16} color="#C4CFD0" strokeWidth={2} />
           </span>
-          <span className="sr-only">{link.isMe ? '' : `. Entering hours for ${link.personName}, ${link.position}`}. Switch project</span>
+          <span className="sr-only">{link.isMe ? '' : `. Entering hours for ${link.personName}, ${link.position}`}. Switch person or project</span>
         </span>
       </span>
     </button>
