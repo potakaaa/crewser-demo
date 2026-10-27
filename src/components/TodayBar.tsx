@@ -46,7 +46,7 @@ export function TodayBar({ hero, previewDay }: { hero: Note | undefined; preview
             aria-label={`Open call sheet for ${fmtDayMonth(day)}, ${shortTitle(sheet.title)}`}
             onClick={() => a.openPdf(sheet.file)}
           >
-            <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
+            <Icon name="file" size={18} color="currentColor" strokeWidth={1.8} />
             {/* Keyed by day, so the label fades in when the preview moves to another day (xf-in respects reduced motion). */}
             <span className="today-sheet-label xf-in" key={day}>
               Call sheet
@@ -62,7 +62,7 @@ export function TodayBar({ hero, previewDay }: { hero: Note | undefined; preview
               aria-label={`No call sheet for ${fmtDayMonth(day)}`}
               onClick={() => a.toast(`No call sheet for ${fmtDayMonth(day)} yet`)}
             >
-              <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
+              <Icon name="file" size={18} color="currentColor" strokeWidth={1.8} />
               <span className="today-sheet-label xf-in" key={day}>
                 No call sheet
                 <span className="today-sheet-day">{fmtDayShort(day)}</span>
@@ -78,7 +78,7 @@ export function TodayBar({ hero, previewDay }: { hero: Note | undefined; preview
               onClick={() => setLogOpen(true)}
               aria-label={sent ? `${offline ? 'Saved on this phone' : 'Sent'}: ${fmtDayMonth(today.date)}, ${shiftLabel(sent).replace(' · ', ', ')}. Review` : 'Hours submitted. Review'}
             >
-              <Icon name="check" size={18} color="#2B3300" strokeWidth={2.2} />
+              <Icon name="check" size={18} color="#172022" strokeWidth={2.2} />
               <span className="today-sent-text">
                 <strong>{offline ? 'Saved on phone' : 'Sent'}</strong>
                 {offline ? <span>Sends when online</span> : sent && <span>{shiftLabel(sent)}</span>}
@@ -87,7 +87,7 @@ export function TodayBar({ hero, previewDay }: { hero: Note | undefined; preview
           </div>
         ) : (
           <button type="button" className={`btn today-seg today-submit${phase === 'after' ? ' btn-lime' : ''}`} onClick={() => setLogOpen(true)}>
-            <Icon name="logTime" size={18} color="#111A1B" strokeWidth={1.8} />
+            <Icon name="logTime" size={18} color="currentColor" strokeWidth={1.8} />
             Submit hours
           </button>
         )}

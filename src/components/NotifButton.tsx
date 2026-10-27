@@ -15,7 +15,7 @@ export function NotifButton({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
       aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
       onClick={() => openSheet('notifications')}
     >
-      <Icon name="bell" size={20} color={tone === 'dark' ? '#FFFFFF' : '#111A1B'} />
+      <Icon name="bell" size={20} color={tone === 'dark' ? '#FFFFFF' : 'currentColor'} />
       {unread > 0 && (
         <span className="notif-badge" aria-hidden="true">
           {unread > 9 ? '9+' : unread}

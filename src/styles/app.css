@@ -4,13 +4,14 @@
   /* Safe areas: in the desktop frame the fake status bar is 54 px; on real phones use env(). */
   --sat: 54px;
   --sab: 0px;
-  --brand-surface:
-    radial-gradient(160px 70px at 100% 0%, rgba(219, 242, 39, 0.22), rgba(219, 242, 39, 0)),
-    linear-gradient(135deg, #172123 0%, #1f3a3d 60%, #2a5155 100%);
-  --brand-surface-hover:
-    radial-gradient(180px 80px at 100% 0%, rgba(219, 242, 39, 0.3), rgba(219, 242, 39, 0)),
-    linear-gradient(135deg, #1b2729 0%, #244448 60%, #305b60 100%);
-  --shadow-card: 0 1px 2px rgba(17, 26, 27, 0.04), 0 6px 18px rgba(17, 26, 27, 0.04);
+  /* Dark mode: "brand" tiles sit flat, one step above the card, like the production app.
+     The grain + gradient look lives only on --brand-focal (the header orb, one hero per screen). */
+  --brand-surface: var(--card-2);
+  --brand-surface-hover: #3b474a;
+  --brand-focal:
+    radial-gradient(160px 70px at 100% 0%, rgba(200, 224, 60, 0.18), rgba(200, 224, 60, 0)),
+    radial-gradient(140% 120% at 20% 0%, #3d6650 0%, #2c4a3e 48%, #22302f 100%);
+  --shadow-card: none;
   /* Motion: one iOS-like curve for anything that moves, a softer one for fades. */
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -66,8 +67,8 @@
   display: none;
 }
 .screen-white {
-  background: #ffffff;
-  color: #0e1314;
+  background: var(--dark-tile);
+  color: var(--ink);
 }
 /* ───────── Screen transitions ───────── */
 .layer {
@@ -78,7 +79,7 @@
 .layer-current.nav-push {
   z-index: 2;
   animation: push-in var(--t-nav) var(--ease-ios) both;
-  box-shadow: -10px 0 36px rgba(17, 26, 27, 0.14);
+  box-shadow: -10px 0 36px rgba(0, 0, 0, 0.35);
 }
 .layer-leaving.nav-push {
   z-index: 1;
@@ -91,7 +92,7 @@
 .layer-leaving.nav-pop {
   z-index: 2;
   animation: pop-out var(--t-nav) var(--ease-ios) both;
-  box-shadow: -10px 0 36px rgba(17, 26, 27, 0.14);
+  box-shadow: -10px 0 36px rgba(0, 0, 0, 0.35);
 }
 .layer-current.nav-tab {
   z-index: 2;
@@ -108,7 +109,7 @@
   position: absolute;
   inset: 0;
   z-index: 100;
-  background: rgba(17, 26, 27, 0.14);
+  background: rgba(0, 0, 0, 0.3);
   pointer-events: none;
   animation: dim-in var(--t-nav) var(--ease-ios) both;
 }
@@ -187,7 +188,7 @@
   top: 0;
   height: var(--sat);
   margin-bottom: calc(-1 * var(--sat));
-  background: rgba(242, 245, 244, 0.86);
+  background: rgba(34, 43, 46, 0.86);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   backdrop-filter: blur(18px) saturate(160%);
   opacity: 0;
@@ -349,7 +350,7 @@
   color: var(--ink);
 }
 .btn-soft:hover {
-  background: #e3eae9;
+  background: var(--soft-hover);
 }
 .btn-ink {
   background: var(--brand-surface);
@@ -377,24 +378,24 @@
 }
 .btn-lime {
   background: var(--lime);
-  color: var(--ink);
+  color: var(--on-lime);
   font-weight: 600;
 }
 .btn-lime:hover {
-  background: #cbe21c;
+  background: var(--lime-hover);
 }
 .btn-outline {
-  background: #ffffff;
-  border: 1px solid rgba(17, 26, 27, 0.12);
+  background: transparent;
+  border: 1px solid var(--line);
   color: var(--ink);
 }
 .btn-outline:hover {
-  background: #f7f9f8;
+  background: rgba(255, 255, 255, 0.04);
 }
 .btn-outline-ink {
-  background: #ffffff;
-  border: 1.5px solid #0e1314;
-  color: #0e1314;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--ink);
 }
 .btn-md {
   min-height: 48px;
@@ -482,7 +483,7 @@
   padding: 5px 9px;
   border-radius: var(--r-control);
   background: var(--lime);
-  color: var(--ink);
+  color: var(--on-lime);
   font-size: var(--fs-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -921,7 +922,7 @@
     transform 180ms var(--ease-out);
 }
 .copy-btn:hover {
-  background: #dbe5e4;
+  background: var(--soft-hover);
 }
 .copy-btn:active {
   transform: scale(0.9);
@@ -1179,7 +1180,7 @@
 .mday.is-sel {
   --focus: #2c6b72;
   background: #ffffff;
-  color: var(--ink);
+  color: var(--on-lime);
   border-color: #ffffff;
 }
 .mday .wday-dots {
@@ -1248,7 +1249,7 @@
 }
 .wday.is-sel {
   --focus: #2c6b72;
-  color: var(--ink);
+  color: var(--on-lime);
 }
 .wday-wd {
   font-size: var(--fs-xs);
@@ -1327,7 +1328,7 @@
 }
 .route-city {
   font-size: var(--fs-md);
-  color: #394c50;
+  color: var(--text-2);
 }
 .route-dark .route-city {
   color: var(--on-dark-2);
@@ -1474,13 +1475,13 @@
   gap: var(--sp-1);
   border: 1px solid rgba(143, 42, 35, 0.16);
   border-radius: var(--r-card);
-  background: #fbeeec;
+  background: var(--danger-surface);
   text-decoration: none;
   transition: transform 180ms var(--ease-out);
 }
 .ns-sos-btn:active {
   transform: scale(0.97);
-  background: #f8e4e1;
+  background: rgba(255, 120, 105, 0.2);
 }
 .ns-sos-num {
   font-family: var(--font-numeral);
@@ -1488,7 +1489,7 @@
   font-size: calc(var(--fs-3xl) * var(--numeral-scale));
   letter-spacing: var(--numeral-track);
   line-height: 1;
-  color: #8f2a23;
+  color: var(--danger-text);
 }
 .ns-sos-k {
   max-width: 100%;
@@ -1498,7 +1499,7 @@
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #7a2a24;
+  color: var(--danger-text);
 }
 /* "EU-wide" / "AT only": a small tag under the service, so where it works reads at a glance. */
 .ns-sos-note {
@@ -1507,12 +1508,12 @@
   height: 20px;
   padding: 0 var(--sp-2);
   border-radius: 10px;
-  background: #f3d7d3;
+  background: var(--danger-surface);
   font-size: var(--fs-xs);
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
-  color: #7a2a24;
+  color: var(--danger-text);
 }
 .ns-block {
   display: flex;
@@ -1896,7 +1897,7 @@
   gap: 6px;
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--r-control);
-  background: #f4f4f2;
+  background: var(--card-2);
   font-size: var(--fs-sm);
   font-weight: 500;
 }
@@ -1932,7 +1933,7 @@
 .notice-amber span {
   font-size: var(--fs-md);
   line-height: 1.55;
-  color: #3f3a2a;
+  color: var(--text-2);
 }
 .card {
   border: 1px solid var(--hairline);
@@ -1956,7 +1957,7 @@
 }
 /* ───────── PDF viewer ───────── */
 .screen-pdf {
-  background: #263133;
+  background: var(--dark-tile);
   color: #f1f4f3;
 }
 .pdf-stage {
@@ -2025,7 +2026,7 @@
   right: 0;
   bottom: 0;
   height: 120px;
-  background: linear-gradient(180deg, rgba(242, 245, 244, 0) 0%, rgba(242, 245, 244, 0.92) 65%);
+  background: linear-gradient(180deg, rgba(28, 36, 39, 0) 0%, rgba(28, 36, 39, 0.92) 65%);
   pointer-events: none;
   transition: opacity var(--t-med) ease;
 }
@@ -2059,12 +2060,12 @@
   padding: 9px 6px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(40, 50, 53, 0.82);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
   backdrop-filter: blur(22px) saturate(160%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 10px 30px rgba(17, 26, 27, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 30px rgba(0, 0, 0, 0.35);
 }
 .tab {
   position: relative;
@@ -2105,10 +2106,9 @@
   left: 0;
   height: 44px;
   border-radius: var(--r-control);
-  background: #ffffff;
+  background: var(--chip);
   box-shadow:
-    0 2px 10px rgba(17, 26, 27, 0.12),
-    0 0 0 1px rgba(17, 26, 27, 0.05);
+    0 0 0 1px rgba(255, 255, 255, 0.06);
   transition:
     transform var(--t-nav) var(--ease-ios),
     width var(--t-nav) var(--ease-ios);
@@ -2148,16 +2148,16 @@
   border: 0;
   border-radius: var(--r-card);
   background: var(--lime);
-  color: var(--ink);
+  color: var(--on-lime);
   box-shadow:
-    0 10px 30px rgba(17, 26, 27, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
   transition:
     transform 200ms var(--ease-spring),
     background 150ms ease;
 }
 .log-btn:hover {
-  background: #cbe21c;
+  background: var(--lime-hover);
 }
 .log-btn:active {
   transform: scale(0.94);
@@ -2190,7 +2190,7 @@
   z-index: 40;
   display: flex;
   flex-direction: column;
-  background: rgba(17, 26, 27, 0.5);
+  background: rgba(8, 12, 13, 0.6);
   animation: fade-in var(--t-med) ease both;
 }
 .scrim.closing {
@@ -2211,7 +2211,7 @@
   gap: var(--sp-5);
   padding: var(--sp-3) var(--sp-5) max(var(--sp-6), calc(var(--sab) + var(--sp-4)));
   border-radius: var(--r-card) var(--r-card) 0 0;
-  background: #ffffff;
+  background: var(--card);
   animation: sheet-up var(--t-nav) var(--ease-ios) both;
 }
 .scrim.closing .log-dialog {
@@ -2257,7 +2257,7 @@
   height: 5px;
   margin-bottom: calc(-1 * var(--sp-1));
   border-radius: 3px;
-  background: rgba(17, 26, 27, 0.16);
+  background: rgba(255, 255, 255, 0.22);
 }
 /* A taller target than the 5 px bar. */
 .grabber::before {
@@ -2298,14 +2298,14 @@
   justify-content: center;
   gap: var(--sp-1);
   padding: 0 18px;
-  border: 1px solid rgba(17, 26, 27, 0.08);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-card);
   background: var(--sheet);
   color: var(--ink);
   text-align: left;
 }
 .time-tile-open {
-  border: 1.5px dashed rgba(17, 26, 27, 0.28);
+  border: var(--dashed);
   background: none;
 }
 .time-tile {
@@ -2315,7 +2315,7 @@
 }
 .time-tile[data-active='true'] {
   border: 1.5px solid var(--teal);
-  box-shadow: 0 0 0 3px rgba(44, 107, 114, 0.12);
+  box-shadow: 0 0 0 3px rgba(143, 208, 198, 0.16);
 }
 /* Inline time picker: two snapping wheels plus quick picks */
 .log-picker {
@@ -2341,8 +2341,8 @@
   height: 36px;
   margin-top: -18px;
   border-radius: var(--r-control);
-  background: #ffffff;
-  box-shadow: 0 0 0 1px var(--hairline), 0 2px 8px rgba(17, 26, 27, 0.06);
+  background: var(--card-2);
+  box-shadow: 0 0 0 1px var(--hairline);
   pointer-events: none;
 }
 .wheel {
@@ -2405,7 +2405,7 @@
   padding: 0 var(--sp-3);
   border: 1px solid var(--hairline);
   border-radius: var(--r-control);
-  background: #ffffff;
+  background: var(--card);
   font-size: var(--fs-md);
   font-weight: 500;
   color: var(--ink);
@@ -2413,7 +2413,7 @@
 }
 .picker-chip[data-on='true'] {
   border-color: var(--teal);
-  background: #e1efee;
+  background: rgba(143, 208, 198, 0.12);
   color: var(--teal);
   font-weight: 600;
 }
@@ -2479,7 +2479,7 @@
   justify-content: center;
   border: 0;
   border-radius: var(--r-control);
-  background: #ffffff;
+  background: var(--card-2);
   box-shadow: 0 0 0 1px var(--hairline);
 }
 .step-val {
@@ -2561,7 +2561,7 @@
   font-size: var(--fs-md);
   font-weight: 500;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(17, 26, 27, 0.22);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   opacity: 0;
   transform: translateY(12px) scale(0.96);
   transition:
@@ -2627,11 +2627,7 @@
   bottom: 0;
   left: 0;
   width: calc(var(--stub-solid) + var(--stub-edge));
-  background:
-    var(--grain-soft, none) 0 0 / 160px 160px,
-    radial-gradient(120px 90px at 0% 0%, rgba(219, 242, 39, 0.26), rgba(219, 242, 39, 0)),
-    var(--header-gradient);
-  background-blend-mode: overlay, normal, normal;
+  background: var(--dark-tile);
   -webkit-mask:
     linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
     var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
@@ -2910,7 +2906,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: var(--ink);
+  color: var(--on-lime);
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -2918,7 +2914,7 @@
   width: 28px;
   height: 28px;
   margin-left: -6px;
-  border: 2px solid var(--avatar-ring, #ffffff);
+  border: 2px solid var(--avatar-ring, var(--card));
   font-size: 10px;
 }
 .avatar-md {
@@ -2927,7 +2923,7 @@
   font-size: 11.5px;
 }
 .avatar-more {
-  background: #ededeb;
+  background: var(--chip);
   color: var(--text-2);
 }
 .crew-label {
@@ -3102,8 +3098,27 @@
 .ns-title {
   font-size: calc(var(--fs-xl) * var(--display-scale));
 }
-.section-titles h2 {
-  font-size: calc(var(--fs-lg) * var(--display-scale));
+/* The signature from the production app, the same in every font theme: condensed capitals,
+   then a bar filling the row, lime fading into forest green. */
+.app .section-titles h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-family: var(--ff-poster);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.app .section-titles h2::after {
+  content: '';
+  flex: 1;
+  min-width: var(--sp-6);
+  height: 0.7em;
+  border-radius: 2px;
+  background: var(--signature-bar);
 }
 .log-titles h2 {
   font-size: calc(18px * var(--display-scale));

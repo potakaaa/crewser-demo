@@ -30,7 +30,7 @@ export function QrPreview({ note }: { note: Note }) {
     return (
       <button type="button" className="qr-preview" onClick={() => a.openPdf(file)} aria-label={`No scannable code in ${file}. Open the PDF`}>
         <span className="qr-thumb qr-thumb-empty" aria-hidden="true">
-          <Icon name="ticket" size={24} color="#54686C" />
+          <Icon name="ticket" size={24} color="#9AAAAC" />
           <span>No code</span>
         </span>
         <span className="qr-copy">

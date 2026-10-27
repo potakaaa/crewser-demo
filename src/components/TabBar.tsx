@@ -104,7 +104,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                 onClick={() => navigate({ name: t.name })}
               >
                 <span className="tab-icon">
-                  <Icon name={t.icon} size={ICON} color={on ? '#111A1B' : '#3F5155'} strokeWidth={on ? 1.8 : 1.6} />
+                  <Icon name={t.icon} size={ICON} color={on ? 'currentColor' : '#9AAAAC'} strokeWidth={on ? 1.8 : 1.6} />
                 </span>
                 <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on && (layout?.label ?? true)}>
                   {t.label}
@@ -114,7 +114,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
           })}
         </nav>
         <button type="button" className="log-btn" aria-label="Log today's hours" aria-haspopup="dialog" onClick={() => openLog(true)} id="log-button">
-          <Icon name="logTime" size={22} color="#111A1B" strokeWidth={1.7} />
+          <Icon name="logTime" size={22} color="currentColor" strokeWidth={1.7} />
           <span>Log</span>
         </button>
       </div>

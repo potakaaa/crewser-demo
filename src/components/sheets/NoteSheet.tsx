@@ -57,7 +57,7 @@ function InfoBlocks({ info }: { info: NoteInfo }) {
                   {c.note && <span className="ns-contact-note">{c.note}</span>}
                 </span>
                 <button type="button" className="icon-btn ns-copy" aria-label={`Copy ${c.label} number: ${c.phone}`} onClick={() => a.copy(c.phone)}>
-                  <Icon name="copy" size={17} color="#2A3B3F" />
+                  <Icon name="copy" size={17} color="currentColor" />
                 </button>
                 <a className="icon-btn ns-call" href={telHref(c.phone)} aria-label={`Call ${c.name ?? c.label}, ${c.phone}`}>
                   <Icon name="call" size={18} color="#FFFFFF" />
@@ -205,7 +205,7 @@ export function NoteSheet({ id }: { id?: string }) {
       {note.attachments.map((att) => (
         <button type="button" key={att.file} className="att-row" onClick={() => a.openPdf(att.file)}>
           <span className="todo-icon todo-icon-neutral">
-            <Icon name="file" size={20} color="#2A3B3F" />
+            <Icon name="file" size={20} color="currentColor" />
           </span>
           <span className="todo-titles">
             <span className="att-name">{att.file}</span>
@@ -220,7 +220,7 @@ export function NoteSheet({ id }: { id?: string }) {
       </div>
       {note.source && (
         <div className="crew-line">
-          <Icon name="calendar" size={16} color="#54686C" />
+          <Icon name="calendar" size={16} color="#9AAAAC" />
           <span>From {note.source}</span>
         </div>
       )}

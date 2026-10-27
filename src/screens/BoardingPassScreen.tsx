@@ -28,7 +28,7 @@ function BoardingPass() {
           aria-label="Close boarding pass"
           onClick={back}
         >
-          <Icon name="close" size={20} color="#0E1314" strokeWidth={1.8} />
+          <Icon name="close" size={20} color="currentColor" strokeWidth={1.8} />
         </button>
         <h1 className="topbar-title">Boarding pass</h1>
         <span />
@@ -62,7 +62,7 @@ function BoardingPass() {
                 <Icon
                   name="arrowRight"
                   size={24}
-                  color="#DBF227"
+                  color="#C8E03C"
                   strokeWidth={1.8}
                   className="route-arrow"
                 />
@@ -89,7 +89,7 @@ function BoardingPass() {
         </div>
         <div className="bp-chips">
           <span className="bp-chip">
-            <Icon name="sun" size={15} color="#0E1314" />
+            <Icon name="sun" size={15} color="currentColor" />
             Turn brightness up
           </span>
           <span className="bp-chip">Screen stays on</span>
@@ -123,7 +123,7 @@ function BoardingPassFallback() {
           aria-label="Back"
           onClick={back}
         >
-          <Icon name="left" size={22} color="#111A1B" />
+          <Icon name="left" size={22} color="currentColor" />
         </button>
         <h1 className="topbar-title">Boarding pass</h1>
         <span />
@@ -158,7 +158,7 @@ function BoardingPassFallback() {
             <Icon
               name="arrowRight"
               size={22}
-              color="#54686C"
+              color="#9AAAAC"
               className="route-arrow"
             />
             <div className="route-end">
@@ -173,7 +173,7 @@ function BoardingPassFallback() {
           className="btn btn-soft btn-lg"
           onClick={() => a.copy(flightNo)}
         >
-          <Icon name="copy" size={18} color="#111A1B" />
+          <Icon name="copy" size={18} color="currentColor" />
           Copy flight number
         </button>
       </div>

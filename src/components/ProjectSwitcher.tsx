@@ -50,7 +50,7 @@ function LinkRow({ link, active, onPick }: { link: CrewLink; active: boolean; on
       </span>
       {active ? (
         <span className="lchip lchip-active">
-          <Icon name="check" size={13} color="#111A1B" strokeWidth={2.4} />
+          <Icon name="check" size={13} color="currentColor" strokeWidth={2.4} />
           Active
         </span>
       ) : v.chip ? (

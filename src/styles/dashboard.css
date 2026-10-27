@@ -253,9 +253,9 @@
   gap: 0;
   padding: 8px 14px 12px;
   border-radius: var(--r-card);
-  background: #ffffff;
+  background: var(--card);
   color: var(--ink);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 10px 28px rgba(8, 14, 15, 0.2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 28px rgba(0, 0, 0, 0.25);
   overflow: clip;
 }
 .today-card > * {
@@ -445,7 +445,7 @@
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   border-radius: var(--r-card);
-  background: #ffffff;
+  background: var(--card);
   box-shadow: 0 10px 28px rgba(8, 14, 15, 0.2);
   overflow: hidden;
 }
@@ -457,7 +457,7 @@
   font-weight: 600;
 }
 .today-seg:hover {
-  background: #f7f9f8;
+  background: var(--card-2);
 }
 .today-seg:active {
   background: var(--soft);
@@ -525,8 +525,8 @@
   justify-content: flex-start;
   gap: 6px;
   padding: 0 8px 0 12px;
-  background: rgba(219, 242, 39, 0.3);
-  color: #2b3300;
+  background: rgba(200, 224, 60, 0.16);
+  color: var(--lime);
   font-weight: 600;
 }
 
@@ -573,7 +573,7 @@
 .btn.btn-primary.today-action {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 2px 6px rgba(17, 33, 35, 0.2);
+    0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* ───────── Primary button for a note's own action (NotePrimaryAction) ─────────
@@ -588,7 +588,7 @@
   font-weight: 600;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 4px 12px rgba(17, 33, 35, 0.24);
+    0 4px 12px rgba(0, 0, 0, 0.25);
   transition:
     transform 180ms var(--ease-out),
     box-shadow var(--t-fast) ease;
@@ -611,7 +611,7 @@
   transform: scale(0.98);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 1px 4px rgba(31, 58, 61, 0.2);
+    0 1px 4px rgba(0, 0, 0, 0.25);
 }
 .btn.btn-primary:focus-visible {
   outline: 2px solid var(--focus);
@@ -718,7 +718,7 @@
   isolation: isolate;
   border-radius: var(--r-card);
   background: var(--brand-surface);
-  box-shadow: 0 8px 22px rgba(17, 33, 35, 0.22);
+  box-shadow: none;
   color: #ffffff;
   overflow: hidden;
 }
@@ -1080,12 +1080,12 @@
   text-align: center;
 }
 .hsheet-approved {
-  background: #e1efee;
-  color: #2c6b72;
+  background: rgba(143, 208, 198, 0.14);
+  color: var(--teal);
 }
 .hsheet-submitted {
-  background: #e3ecf9;
-  color: #2f66b3;
+  background: rgba(141, 184, 245, 0.14);
+  color: #a9c8f7;
 }
 .hsheet-draft {
   background: var(--amber-surface);
@@ -1136,7 +1136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid rgba(17, 26, 27, 0.28);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
   border-radius: 11px;
 }
 .info-check[data-done='true'] {

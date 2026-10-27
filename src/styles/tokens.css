@@ -85,6 +85,63 @@
   --page-line: rgba(17, 26, 27, 0.12);
 }
 
+/*
+ * Inside the phone the app is dark only, close to the production Crewser app: slate-teal sheet,
+ * flat cards one step lighter, lime used sparingly. The page around the phone keeps the :root values.
+ * Contrast (on --card #2c3639): ink 11:1, text-2 6.9:1, text-3 5.1:1, lime 8.4:1, teal 7:1.
+ */
+.app {
+  color-scheme: dark;
+  --ink: #eef3f2;
+  --text-2: #b8c4c5;
+  --text-3: #9aaaac;
+  --sheet: #222b2e;
+  --sheet-top: #2a3437;
+  --sheet-bottom: #1c2427;
+  --card: #2c3639;
+  --card-2: #343f42;
+  --hairline: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.14);
+  --chip: #3a4649;
+  --chip-icon: #dfe7e6;
+  --soft: #343f42;
+  --soft-hover: #3b474a;
+  --dark-tile: #1c2427;
+  --lime: #c8e03c;
+  --lime-hover: #d4ec3a;
+  --on-lime: #172022;
+  --forest: #4a6b55;
+
+  --data-regular: #7fa1a8;
+  --data-night-dark: #a6adff;
+  --teal: #8fd0c6;
+  --night: #8a93e8;
+  --night-text: #a6adff;
+  --danger-text: #ff9a8f;
+  --danger-surface: rgba(255, 120, 105, 0.12);
+
+  --amber-surface: rgba(244, 195, 90, 0.12);
+  --amber-border: rgba(244, 195, 90, 0.42);
+  --amber-text: #f4c35a;
+  --amber-dark: #f4c35a;
+
+  --on-dark-2: #c4cfd0;
+  --on-dark-3: #a9b7b9;
+
+  --dashed: 1.5px dashed rgba(255, 255, 255, 0.24);
+  --focus: var(--lime);
+
+  /* The one grainy focal point per screen: a dark green orb, like the original's working-time circle. */
+  --header-gradient:
+    radial-gradient(85% 70% at 50% 12%, #3d6650 0%, rgba(46, 74, 64, 0.85) 38%, rgba(34, 48, 47, 0) 78%),
+    linear-gradient(180deg, #2a3437 0%, #222b2e 100%);
+  --header-glow: radial-gradient(circle at 92% 0%, rgba(200, 224, 60, 0.14), rgba(200, 224, 60, 0) 45%);
+  /* Signature bar beside condensed section headings. */
+  --signature-bar: linear-gradient(90deg, #c8e03c 0%, #8fb046 38%, #4a6b55 100%);
+  /* Ordinary cards are flat: grain only where a component opts back in (see screens.css). */
+  --grain-card-opacity: 0;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --page-bg: #161c1d;

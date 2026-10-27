@@ -43,7 +43,8 @@ interface FrameProps {
 }
 
 /** iPhone 16 frame, scaled down with transform: scale() to fit the space it is given. */
-export function DeviceFrame({ children, side, statusTone, indicatorTone }: FrameProps) {
+// The app inside is dark-only, so the status bar and home indicator always draw light.
+export function DeviceFrame({ children, side }: FrameProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<HTMLDivElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
@@ -84,9 +85,9 @@ export function DeviceFrame({ children, side, statusTone, indicatorTone }: Frame
             <span className="hw hw-camera" aria-hidden="true" />
             <div className="device-screen" style={{ width: SCREEN_W, height: SCREEN_H }}>
               {children}
-              <StatusBar tone={statusTone} />
+              <StatusBar tone="light" />
               <span className="island" aria-hidden="true" />
-              <span className={`home-indicator ${indicatorTone}`} aria-hidden="true" />
+              <span className="home-indicator light" aria-hidden="true" />
             </div>
           </div>
         </div>

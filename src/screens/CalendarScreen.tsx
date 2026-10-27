@@ -210,7 +210,7 @@ export function CalendarScreen() {
       </GradientHeader>
 
       <Sheet className="sheet-cal">
-        {offline && <OfflineBanner tone="light" />}
+        {offline && <OfflineBanner tone="dark" />}
         <div key={calDate} className="day-list">
           <div className="day-heading">
             <h2>{dayLabel}</h2>

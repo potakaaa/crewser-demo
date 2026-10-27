@@ -28,7 +28,7 @@ export function OfflineBanner({ tone }: { tone: 'dark' | 'light' }) {
   if (tone === 'light') {
     return (
       <div className="offline offline-light" role="status">
-        <Icon name="wifiOff" size={16} color="#6B4A00" />
+        <Icon name="wifiOff" size={16} color="#F4C35A" />
         Offline · last synced {today.lastSynced}
       </div>
     );

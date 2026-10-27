@@ -197,7 +197,7 @@ function SheetBody({ onClose, title, subtitle, tone = 'white', contentKey, child
             {subtitle && <span>{subtitle}</span>}
           </div>
           <button type="button" className="icon-btn icon-btn-soft" aria-label="Close" onClick={onClose} data-autofocus>
-            <Icon name="close" size={18} color="#111A1B" />
+            <Icon name="close" size={18} color="currentColor" />
           </button>
         </div>
         <div className="sheet-scroll">{children}</div>

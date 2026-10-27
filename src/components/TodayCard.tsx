@@ -127,7 +127,7 @@ function UrgentBody({ u }: { u: Urgent }) {
           <span className="today-t1">{u.title}</span>
           {u.sub && <span className="today-t2">{u.sub}</span>}
         </span>
-        <Icon name="right" size={18} color="#54686C" />
+        <Icon name="right" size={18} color="#9AAAAC" />
       </button>
       <NotePrimaryAction note={note} className="today-action" />
       {attachment && (
