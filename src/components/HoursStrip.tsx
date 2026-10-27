@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { UnsentMark } from './UnsentMark';
 import { project, today, workdaysFor } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { useSubmitted } from '../lib/useSubmitted';
@@ -79,7 +80,7 @@ export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
   };
   return (
     <div className={`hs-nudge${solo ? ' hs-nudge-solo' : ''}`}>
-      <span className="hs-nudge-dot" aria-hidden="true" />
+      <UnsentMark />
       <span className="hs-nudge-text" role={confirming ? 'status' : undefined}>
         {confirming ? `Sending hours for ${link.personName}, not for you` : `${what}${forName} not sent`}
         {!confirming && <span className="sr-only"> to production yet</span>}

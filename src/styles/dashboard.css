@@ -461,14 +461,6 @@
 .hs-card .hs-send:active {
   background: rgba(255, 255, 255, 0.18);
 }
-.hs-nudge-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--amber-dark);
-  box-shadow: 0 0 0 3px rgba(244, 195, 90, 0.28);
-}
 .hs-nudge-text {
   flex: 1;
   min-width: 0;
@@ -739,8 +731,8 @@
   color: #a9c8f7;
 }
 .hsheet-draft {
-  background: var(--amber-surface);
-  color: var(--amber-text);
+  background: var(--chip);
+  color: var(--ink);
 }
 
 /* ───────── Info sheet ───────── */

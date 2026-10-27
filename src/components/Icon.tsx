@@ -46,6 +46,7 @@ import {
   StickyNote01Icon,
   Sun03Icon,
   Tick02Icon,
+  Upload04Icon,
   Ticket01Icon,
   TimeQuarterPassIcon,
   UserAccountIcon,
@@ -106,6 +107,7 @@ export const icons = {
   minus: MinusSignIcon,
   plus: PlusSignIcon,
   scan: ReceiptEuroIcon,
+  upload: Upload04Icon,
 } satisfies Record<string, IconSvgElement>;
 
 export type IconName = keyof typeof icons;

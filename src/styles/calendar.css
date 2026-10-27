@@ -4,7 +4,7 @@
   position: relative;
 }
 
-/* Corner mark: hours still open (an amber "!" badge, unlike the round note dot under the date). */
+/* Corner mark: hours still open (the shared .unsent-mark in nav-home.css), clear of the note dot under the date. */
 .day-marks {
   position: absolute;
   top: 4px;
@@ -12,41 +12,14 @@
   left: 4px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   pointer-events: none;
   color: currentColor;
-}
-/* Ink on amber, 11:1, on the dark strip and on the white selected day alike. */
-.mark-unsent {
-  flex: none;
-  width: 12px;
-  height: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--amber-dark);
-  box-shadow: 0 0 0 1.5px rgba(20, 29, 30, 0.35);
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 9px;
-  font-weight: 800;
-  line-height: 1;
-}
-/* On the white selected day: a deeper amber with a dark ring (5.6:1 against white); the "!" stays ink (6:1). */
-.is-sel .mark-unsent {
-  background: #c98a00;
-  box-shadow: 0 0 0 1px #8a5f00;
 }
 .mday .day-marks {
   top: 2px;
   right: 2px;
   left: 2px;
-}
-.mday .mday .mark-unsent {
-  width: 10px;
-  height: 10px;
-  font-size: 8px;
 }
 .mday.is-out .day-marks {
   opacity: 0.4;
@@ -101,7 +74,7 @@ button.day-action:active {
   mix-blend-mode: var(--grain-card-blend);
   pointer-events: none;
 }
-/* Not sent: the same quiet line as the hours card, a hairline chip with the same amber "!" badge as the day marks. */
+/* Not sent: the same quiet line as the hours card, a hairline chip with the same mark as the day cells. */
 .day-action-unsent {
   border: 1px solid var(--line);
   background: var(--card);
@@ -110,23 +83,6 @@ button.day-action:active {
 }
 .day-action-unsent::before {
   inset: -7px 0;
-}
-/* The selected-day badge (.is-sel .mark-unsent), since the chip sits on white too. */
-.day-action-badge {
-  flex: none;
-  width: 14px;
-  height: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #c98a00;
-  box-shadow: 0 0 0 1px #8a5f00;
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1;
 }
 @media (prefers-reduced-motion: reduce) {
   button.day-action:active {

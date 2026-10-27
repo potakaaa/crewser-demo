@@ -4,6 +4,7 @@ import { useActiveLink, useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type WorkDay } from '../mock';
 import { ForChip } from '../components/ForChip';
 import { TimerChip } from '../components/TimerChip';
+import { UnsentMark } from '../components/UnsentMark';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
@@ -34,7 +35,7 @@ function DayMarks({ unsent }: { unsent: boolean }) {
   if (!unsent) return null;
   return (
     <span className="day-marks" aria-hidden="true">
-      <span className="mark-unsent">!</span>
+      <UnsentMark />
     </span>
   );
 }
@@ -216,13 +217,13 @@ export function CalendarScreen() {
                   // Only today can be logged in the Log sheet; earlier logged days just need sending.
                   onClick={() => (isToday ? openLog(true) : openSheet('hours', 'week'))}
                 >
-                  <span className="day-action-badge" aria-hidden="true">!</span>
+                  <UnsentMark />
                   {isToday ? 'Hours not sent' : 'Hours not sent · Send'}
                 </button>
               )}
               {unsent && !isToday && !loggedDraft && (
                 <span className="day-action day-action-unsent" role="note">
-                  <span className="day-action-badge" aria-hidden="true">!</span>
+                  <UnsentMark />
                   Hours not sent
                 </span>
               )}

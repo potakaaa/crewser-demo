@@ -1148,3 +1148,19 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-2);
 }
+
+/* ───────── Hours not sent: one marker everywhere (UnsentMark) ───────── */
+/* An upload arrow: these hours are waiting to go out. Neutral, so it never competes with the lime note dot. */
+.unsent-mark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-dark-2);
+}
+.is-sel .unsent-mark {
+  color: var(--on-lime);
+}
+:is(.hs-nudge, .day-action-unsent) .unsent-mark {
+  color: var(--text-2);
+}
