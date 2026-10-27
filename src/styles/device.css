@@ -378,3 +378,22 @@
   border-color: var(--page-text);
   box-shadow: inset 0 0 0 1px var(--page-text);
 }
+
+/* The side caption shows the logo version that reads on the page's theme (it follows the system, or data-theme). */
+.caption .only-dark-page {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .caption .only-dark-page {
+    display: inline-flex;
+  }
+  :root:not([data-theme="light"]) .caption .only-light-page {
+    display: none;
+  }
+}
+:root[data-theme="dark"] .caption .only-dark-page {
+  display: inline-flex;
+}
+:root[data-theme="dark"] .caption .only-light-page {
+  display: none;
+}

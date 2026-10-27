@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { FONT_THEMES, useDemo, type NoteAccent, type Route } from '../store';
 import { Wordmark } from './Brand';
+import { version } from '../../package.json';
+import { today } from '../mock';
+import { fmtDayMonth } from '../lib/dates';
+
+/** package.json is 0.N.0 while this is a prototype: N is the crew app generation (v4). */
+const GENERATION = `v${version.split('.')[1]}`;
 
 const JUMPS: { label: string; route?: Route; note?: string; log?: boolean }[] = [
   { label: 'Dashboard', route: { name: 'dashboard' } },
@@ -19,7 +25,7 @@ const ACCENTS: { value: NoteAccent; label: string; hint: string }[] = [
   { value: 'corner', label: 'Corner glow', hint: 'Lime light leak, top right' },
   { value: 'band', label: 'Header band', hint: 'Whole title row on the gradient' },
   { value: 'edge', label: 'Bottom edge', hint: 'Thin teal-to-lime line' },
-  { value: 'none', label: 'None', hint: 'Plain white cards' },
+  { value: 'none', label: 'None', hint: 'Plain cards' },
 ];
 
 function Toggle({ label, hint, checked, onChange }: { label: string; hint: string; checked: boolean; onChange: (v: boolean) => void }) {
@@ -54,10 +60,14 @@ export function DemoPanel() {
   return (
     <aside className="side">
       <div className="caption">
-        <Wordmark tone="dark" className="caption-wordmark" />
+        {/* The mark has a dark and a light version; the page follows the system theme, so show the one that reads. */}
+        <Wordmark tone="dark" className="caption-wordmark only-light-page" />
+        <Wordmark tone="light" className="caption-wordmark only-dark-page" />
         <div>
           <p className="caption-title">Crew app · prototype with mock data</p>
-          <p className="caption-sub">Crew v3 · Wed 21 Oct 2026, 08:30 · nothing here is live.</p>
+          <p className="caption-sub">
+            Crew {GENERATION} · {fmtDayMonth(today.date)} 2026, {today.time} · nothing here is live.
+          </p>
         </div>
       </div>
       <div className="side-actions">

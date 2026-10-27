@@ -1,7 +1,7 @@
 {
-  "name": "crewser-crew-app-v3",
+  "name": "crewser-crew-app-v4",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
