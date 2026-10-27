@@ -12,7 +12,7 @@ export interface AppNotification {
   kind: NotifKind;
   title: string;
   body?: string;
-  /** When it arrived, an ISO timestamp with offset. The demo clock is Mon 19 Oct 2026, 08:40 (UTC+2). */
+  /** When it arrived, an ISO timestamp with offset. The demo clock is Wed 21 Oct 2026, 08:30 (UTC+2). */
   at: string;
   target: NotifTarget;
   /** For an hours notification: the day (ISO) it is about. It disappears once that day has been sent. */
@@ -21,47 +21,47 @@ export interface AppNotification {
   read: boolean;
 }
 
-const tomorrowCallSheet = (id: string): AppNotification => ({
+const travelCallSheet = (id: string): AppNotification => ({
   id,
   kind: 'callsheet',
-  title: "Tomorrow's call sheet is out",
-  body: 'Shoot day 8 · call 08:00 at Café Prückel',
-  at: '2026-10-19T07:55:00+02:00',
-  target: { pdf: 'Callsheet_D08_10-20.pdf' },
+  title: 'Travel day call sheet is out',
+  body: 'Pickup 09:45 at the hotel lobby · OS487 at 12:05',
+  at: '2026-10-20T20:40:00+02:00',
+  target: { pdf: 'Callsheet_Travel_10-21.pdf' },
   read: false,
 });
 
-const cateringNote = (id: string): AppNotification => ({
+const vanNote = (id: string): AppNotification => ({
   id,
   kind: 'note',
-  title: 'New smart note: Catering for shoot day 8',
-  body: 'Delivery 12:00 to set',
-  at: '2026-10-19T08:28:00+02:00',
-  target: { sheet: 'note', id: 'cat' },
+  title: 'New smart note: Pick up van',
+  body: 'Funchal airport, rental desk at 16:30',
+  at: '2026-10-21T07:50:00+02:00',
+  target: { sheet: 'note', id: 're' },
   read: false,
 });
 
 /** Notifications of each crew link. A link that is not listed has none. */
 const byLink: Record<string, AppNotification[]> = {
   'lk-ferry-me': [
-    tomorrowCallSheet('ferry-me-callsheet-d8'),
-    cateringNote('ferry-me-note-cat'),
+    travelCallSheet('ferry-me-callsheet-travel'),
+    vanNote('ferry-me-note-van'),
     {
-      id: 'ferry-me-hours-sun',
+      id: 'ferry-me-hours-tue',
       kind: 'hours',
-      day: '2026-10-18',
-      title: 'Sun 18 hours not sent',
+      day: '2026-10-20',
+      title: 'Tue 20 hours not sent',
       body: 'Still a draft. Send them so production can approve.',
-      at: '2026-10-19T07:30:00+02:00',
+      at: '2026-10-21T07:30:00+02:00',
       target: { sheet: 'hours', id: 'week' },
       read: false,
     },
     {
       id: 'ferry-me-link-hinterland',
       kind: 'link',
-      title: 'Your link for Hinterland Nights expires in 3 days',
+      title: 'Your link for Hinterland Nights expires tomorrow',
       body: 'Ends Thu 22 Oct. Ask Amber Pictures for a new one.',
-      at: '2026-10-18T18:00:00+02:00',
+      at: '2026-10-20T18:00:00+02:00',
       target: { sheet: 'project' },
       read: false,
     },
@@ -79,23 +79,23 @@ const byLink: Record<string, AppNotification[]> = {
     {
       id: 'hinterland-me-link-expiring',
       kind: 'link',
-      title: 'This link expires in 3 days',
+      title: 'This link expires tomorrow',
       body: 'Ends Thu 22 Oct. Ask Amber Pictures for a new one.',
-      at: '2026-10-18T18:00:00+02:00',
+      at: '2026-10-20T18:00:00+02:00',
       target: { sheet: 'project' },
       read: false,
     },
   ],
-  'lk-ferry-bianca': [tomorrowCallSheet('ferry-bianca-callsheet-d8'), { ...cateringNote('ferry-bianca-note-cat'), read: true }],
+  'lk-ferry-bianca': [travelCallSheet('ferry-bianca-callsheet-travel'), { ...vanNote('ferry-bianca-note-van'), read: true }],
   'lk-ferry-samir': [
-    tomorrowCallSheet('ferry-samir-callsheet-d8'),
+    travelCallSheet('ferry-samir-callsheet-travel'),
     {
-      id: 'ferry-samir-hours-sun',
+      id: 'ferry-samir-hours-tue',
       kind: 'hours',
-      day: '2026-10-18',
-      title: 'Sun 18 hours are still a draft',
+      day: '2026-10-20',
+      title: 'Tue 20 hours are still a draft',
       body: 'Check them with Samir and send.',
-      at: '2026-10-19T07:30:00+02:00',
+      at: '2026-10-21T07:30:00+02:00',
       target: { sheet: 'hours', id: 'week' },
       read: false,
     },

@@ -16,7 +16,7 @@ const isMetric = (id?: string): id is HoursMetric => METRICS.includes(id as Hour
 export function hoursSheetMeta(id?: string) {
   const metric: HoursMetric = isMetric(id) ? id : 'week';
   const title = { week: 'Last 7 days', overtime: 'Overtime', days: 'Shoot days' }[metric];
-  return { title, subtitle: metric === 'days' ? `Day ${today.shootDay} of ${project.totalShootDays}` : hoursOverview().rangeLabel };
+  return { title, subtitle: metric === 'days' ? `${today.shootDay} of ${project.totalShootDays} done` : hoursOverview().rangeLabel };
 }
 
 function Row({ day, hours }: { day: DayStat; hours: string }) {

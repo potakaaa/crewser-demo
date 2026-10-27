@@ -42,7 +42,7 @@ export function metricCopy(o: HoursOverview, metric: HoursMetric) {
         short: 'Days left',
         value: String(o.shootLeft),
         unit: '',
-        sentence: `Today is day ${today.shootDay} of ${project.totalShootDays}.`,
+        sentence: today.dayLabel ? `${today.shootDay} of ${project.totalShootDays} shoot days done. Today is a ${today.dayLabel.toLowerCase()}.` : `Today is day ${today.shootDay} of ${project.totalShootDays}.`,
       };
   }
 }

@@ -54,9 +54,16 @@ export interface SmartNotes {
   undated: Note[];
 }
 
+/** Today's lead note: the call on a shoot day, otherwise the next timed trip or call today (the flight on a travel day). */
+export function todayHero(list: Note[] = allNotes): Note | undefined {
+  const timedToday = sortNotes(list).filter((n) => n.kind === 'time' && n.day === today.date);
+  const now = today.time;
+  return timedToday.find((n) => n.type === 'appointment') ?? timedToday.find((n) => PRIORITY_TYPES.includes(n.type) && n.time! >= now);
+}
+
 export function smartNotes(list: Note[] = allNotes): SmartNotes {
   const sorted = sortNotes(list);
-  const hero = sorted.find((n) => n.type === 'appointment' && n.kind === 'time' && n.day === today.date);
+  const hero = todayHero(sorted);
   const undated = undatedNotes(list);
   const upcoming = sorted.filter((n) => n !== hero && n.day && diffDays(n.day, today.date) >= 0);
   const top = upcoming.filter((n) => n.kind === 'time' && PRIORITY_TYPES.includes(n.type)).slice(0, 3);

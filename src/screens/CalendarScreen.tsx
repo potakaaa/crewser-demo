@@ -129,7 +129,7 @@ export function CalendarScreen() {
           <button type="button" className="icon-btn glass-btn" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
             <Icon name="right" size={18} color="#FFFFFF" />
           </button>
-          <TimerChip />
+          <TimerChip compact />
         </div>
 
         <div className="cal-panel">

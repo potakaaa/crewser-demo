@@ -57,7 +57,7 @@ export function DemoPanel() {
         <Wordmark tone="dark" className="caption-wordmark" />
         <div>
           <p className="caption-title">Crew app · prototype with mock data</p>
-          <p className="caption-sub">Crew v3 · Mon 19 Oct 2026, 08:40 · nothing here is live.</p>
+          <p className="caption-sub">Crew v3 · Wed 21 Oct 2026, 08:30 · nothing here is live.</p>
         </div>
       </div>
       <div className="side-actions">

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
-import { today, type Note } from '../mock';
+import { today, todayLabel, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
@@ -55,7 +55,7 @@ function DeckCard({ card }: { card: CardModel }) {
       <div className="deck-body">
         <div className="today-top">
           <span className="today-tag">TODAY</span>
-          <span className="today-meta">Shoot day {today.shootDay}</span>
+          <span className="today-meta">{todayLabel}</span>
         </div>
         <div className="deck-empty">
           <span className="deck-t1">Nothing on your sheet yet</span>
@@ -67,7 +67,8 @@ function DeckCard({ card }: { card: CardModel }) {
 
   const isHero = !card.stop;
   const phase = phaseOf(n);
-  const sheet = n.type === 'appointment' && n.day ? callSheetFor(n.day) : undefined;
+  // Shoot days and travel days both have a call sheet (the travel one is the movement order).
+  const sheet = (n.type === 'appointment' || n.type === 'flight') && n.day ? callSheetFor(n.day) : undefined;
   const attachment = !n.primaryAction && quickAction(n);
   const time = n.kind === 'time' ? n.time : 'All day';
   // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
@@ -77,15 +78,19 @@ function DeckCard({ card }: { card: CardModel }) {
     : { pill: n.day && dayWord(n.day) === 'Tomorrow' ? 'TOMORROW' : TYPE_LABEL[n.type].toUpperCase(), tone: 'neutral' as Tone, rel: card.stop!.rel };
   const wrap = n.facts.find((f) => f.label === 'Wrap');
   const flightNo = n.type === 'flight' ? n.facts.find((f) => f.action === 'copy')?.value : undefined;
+  const pickup = n.facts.find((f) => f.label === 'Pickup')?.value;
+  const pickupAt = n.facts.find((f) => f.label === 'Pickup point')?.value;
   const sub =
     n.type === 'appointment'
       ? `Call · wrap ${!wrap || wrap.unconfirmed ? 'TBC' : wrap.value}`
-      : flightNo && n.day
-        ? `${flightNo} · ${fmtDayShort(n.day)}`
-        : card.stop?.when;
+      : pickup
+        ? `Pickup ${pickup}${pickupAt ? ` · ${pickupAt.toLowerCase()}` : ''}`
+        : flightNo && n.day
+          ? `${flightNo} · ${fmtDayShort(n.day)}`
+          : card.stop?.when;
   const place = n.facts.find((f) => f.action === 'map')?.value;
-  // A flight's subtitle repeats its number: the row keeps just the route.
-  const where = place ?? (flightNo ? n.subtitle?.replace(`${flightNo} · `, '') : n.subtitle);
+  // A flight's subtitle repeats its number when the line above already has it: then the row keeps just the route.
+  const where = place ?? (flightNo && !pickup ? n.subtitle?.replace(`${flightNo} · `, '') : n.subtitle);
 
   let primary: ReactNode = null;
   if (isHero && phase === 'after' && !submitted) {

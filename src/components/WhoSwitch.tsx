@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { person, today, type CrewLink } from '../mock';
+import { person, todayLabel, type CrewLink } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { Icon } from './Icon';
 import { ForChip } from './ForChip';
@@ -144,7 +144,7 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
             data-hint={hint && projects.length > 1}
             style={{ '--lx': `${lx}px`, opacity: 1 - Math.min(1, Math.abs(lx) / 160) } as CSSProperties}
           >
-            {link.projectName} · Shoot day {today.shootDay}
+            {link.projectName} · {todayLabel}
             <Icon name="down" size={14} color="#C4CFD0" strokeWidth={2} />
           </span>
           <span className="sr-only">. Switch project</span>

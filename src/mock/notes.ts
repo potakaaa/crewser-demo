@@ -66,6 +66,8 @@ export const notes: Note[] = [
     route: { from: { code: 'VIE', city: 'Vienna' }, to: { code: 'FNC', city: 'Funchal' } },
     facts: [
       { label: 'Flight no.', value: 'OS487', action: 'copy' },
+      { label: 'Pickup', value: '09:45' },
+      { label: 'Pickup point', value: 'Hotel lobby' },
       { label: 'Terminal / gate', value: 'to be confirmed', unconfirmed: true },
     ],
     text: 'Plan 30 min extra for check-in. Camera gear is registered as bulky luggage.',

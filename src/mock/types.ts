@@ -138,7 +138,10 @@ export interface Today {
   date: string;
   /** Clock time the demo is frozen to, "HH:MM". */
   time: string;
+  /** Shoot days done or under way; on a day without shooting it is the last one. */
   shootDay: number;
+  /** Set on days that are not shoot days, e.g. "Travel day"; headers show it instead of "Shoot day N". */
+  dayLabel?: string;
   lastSynced: string;
   defaultBreakMin: number;
 }

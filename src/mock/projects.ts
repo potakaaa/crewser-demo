@@ -90,7 +90,7 @@ const rawLinks: Omit<CrewLink, 'status'>[] = [
   },
 ];
 
-/** The demo clock: Mon 19 Oct 2026, 08:40 in Vienna (CEST, UTC+2). */
+/** The demo clock: Wed 21 Oct 2026, 08:30 in Vienna (CEST, UTC+2). */
 export const NOW = Date.parse(`${today.date}T${today.time}:00+02:00`);
 const DAY_MS = 86_400_000;
 /** A link counts as "expiring" this many days before it ends. */
@@ -118,6 +118,8 @@ const workdaysByLink: Record<string, WorkDay[]> = {
     { date: '2026-10-15', kind: 'shoot', start: '08:00', end: '18:30', breakMin: 30, status: 'approved' },
     { date: '2026-10-16', kind: 'shoot', start: '11:30', end: '00:00', breakMin: 30, status: 'submitted' },
     { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '22:30', breakMin: 30, status: 'submitted' },
+    { date: '2026-10-19', kind: 'shoot', start: '11:00', end: '22:00', breakMin: 30, status: 'submitted' },
+    { date: '2026-10-20', kind: 'shoot', start: '08:00', end: '19:00', breakMin: 45, status: 'submitted' },
   ],
   'lk-ferry-samir': [
     { date: '2026-10-12', kind: 'shoot', start: '07:00', end: '18:00', breakMin: 45, status: 'approved' },
@@ -125,7 +127,9 @@ const workdaysByLink: Record<string, WorkDay[]> = {
     { date: '2026-10-14', kind: 'shoot', start: '06:30', end: '18:00', breakMin: 30, status: 'approved' },
     { date: '2026-10-15', kind: 'shoot', start: '08:00', end: '19:00', breakMin: 30, status: 'approved' },
     { date: '2026-10-16', kind: 'shoot', start: '11:30', end: '23:30', breakMin: 30, status: 'submitted' },
-    { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '22:00', breakMin: 30, status: 'draft' },
+    { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '22:00', breakMin: 30, status: 'submitted' },
+    { date: '2026-10-19', kind: 'shoot', start: '11:00', end: '22:00', breakMin: 30, status: 'submitted' },
+    { date: '2026-10-20', kind: 'shoot', start: '08:00', end: '19:30', breakMin: 45, status: 'draft' },
   ],
 };
 

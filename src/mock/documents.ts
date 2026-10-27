@@ -1,7 +1,7 @@
 import type { Doc, PdfDoc } from './types';
 import { fmtDayMonth } from '../lib/dates';
 
-/** Shoot days so far plus tomorrow. Sat 17 Oct was the day off, so there is no call sheet for it. */
+/** Shoot days in Vienna. Sat 17 Oct was the day off, so there is no call sheet for it. */
 const SHOOT_DAYS: { n: number; day: string; updated: string; size: string; version: number; isNew?: boolean }[] = [
   { n: 1, day: '2026-10-12', updated: '2026-10-11T19:40', size: '212 KB', version: 1 },
   { n: 2, day: '2026-10-13', updated: '2026-10-12T20:05', size: '208 KB', version: 1 },
@@ -10,7 +10,7 @@ const SHOOT_DAYS: { n: number; day: string; updated: string; size: string; versi
   { n: 5, day: '2026-10-16', updated: '2026-10-15T21:03', size: '219 KB', version: 1 },
   { n: 6, day: '2026-10-18', updated: '2026-10-17T18:30', size: '211 KB', version: 1 },
   { n: 7, day: '2026-10-19', updated: '2026-10-18T20:20', size: '223 KB', version: 2 },
-  { n: 8, day: '2026-10-20', updated: '2026-10-19T07:55', size: '226 KB', version: 1, isNew: true },
+  { n: 8, day: '2026-10-20', updated: '2026-10-19T07:55', size: '226 KB', version: 1 },
 ];
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -28,6 +28,19 @@ const callsheets: Doc[] = SHOOT_DAYS.map((d) => ({
   isNew: d.isNew,
 }));
 
+/** The movement order for today's flight to Madeira: productions issue a call sheet for travel days too. */
+const travelSheet: Doc = {
+  id: 'cs-travel',
+  file: 'Callsheet_Travel_10-21.pdf',
+  title: 'Call sheet · Travel day',
+  kind: 'callsheet',
+  day: '2026-10-21',
+  updated: '2026-10-20T20:40',
+  size: '184 KB',
+  version: 1,
+  isNew: true,
+};
+
 const others: Doc[] = [
   { id: 'sched', file: 'Shooting-Schedule_v4.pdf', title: 'Shooting schedule', kind: 'schedule', updated: '2026-10-16T17:10', size: '348 KB', version: 4, isNew: true },
   { id: 'oneliner', file: 'One-liner_v3.pdf', title: 'Script one-liner', kind: 'schedule', updated: '2026-10-05T11:20', size: '96 KB', version: 3 },
@@ -37,7 +50,7 @@ const others: Doc[] = [
 ];
 
 /** Newest first within each kind; the screen groups them. */
-export const docs: Doc[] = [...callsheets.slice().reverse(), ...others];
+export const docs: Doc[] = [travelSheet, ...callsheets.slice().reverse(), ...others];
 
 const KICKER: Record<Doc['kind'], string> = {
   callsheet: 'CALL SHEET',

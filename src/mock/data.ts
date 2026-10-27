@@ -2,9 +2,8 @@ import { docPdfs } from './documents';
 import type { PdfDoc, Person, Project, Today, WorkDay } from './types';
 
 /**
- * Every logged day so far: camera prep at the rental house, then shoot days 1–6.
- * Sat 17 is the day off. Hours per shoot day: Mon 10.25 · Tue 11.5 · Wed 12 ·
- * Thu 10.5 · Fri 12.5 (2.5 at night) · Sun 10.75 (1 at night).
+ * Every logged day so far: camera prep at the rental house, then shoot days 1–8 in Vienna.
+ * Sat 17 is the day off. Tue 20, the last Vienna day, is still a draft: today is the travel day.
  */
 export const workdays: WorkDay[] = [
   { date: '2026-10-07', kind: 'prep', start: '09:00', end: '18:30', breakMin: 30, status: 'approved' },
@@ -15,7 +14,9 @@ export const workdays: WorkDay[] = [
   { date: '2026-10-14', kind: 'shoot', start: '06:00', end: '18:30', breakMin: 30, status: 'approved' },
   { date: '2026-10-15', kind: 'shoot', start: '08:00', end: '19:00', breakMin: 30, status: 'approved' },
   { date: '2026-10-16', kind: 'shoot', start: '11:30', end: '00:30', breakMin: 30, status: 'submitted' },
-  { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '23:00', breakMin: 30, status: 'draft' },
+  { date: '2026-10-18', kind: 'shoot', start: '11:45', end: '23:00', breakMin: 30, status: 'submitted' },
+  { date: '2026-10-19', kind: 'shoot', start: '11:00', end: '22:00', breakMin: 30, status: 'submitted' },
+  { date: '2026-10-20', kind: 'shoot', start: '08:00', end: '19:30', breakMin: 45, status: 'draft' },
 ];
 
 export const person: Person = {
@@ -34,14 +35,18 @@ export const project: Project = {
   dayLabels: { '2026-10-21': 'travel to Madeira' },
 };
 
-/** The demo is frozen to Mon 19 Oct 2026, 08:40, so it never depends on the real clock. */
+/** The demo is frozen to Wed 21 Oct 2026, 08:30, the travel day to Madeira, so it never depends on the real clock. */
 export const today: Today = {
-  date: '2026-10-19',
-  time: '08:40',
-  shootDay: 7,
-  lastSynced: '08:12',
+  date: '2026-10-21',
+  time: '08:30',
+  shootDay: 8,
+  dayLabel: 'Travel day',
+  lastSynced: '08:05',
   defaultBreakMin: 30,
 };
+
+/** "Travel day" or "Shoot day 7": what today is, for headers and sheets. */
+export const todayLabel = today.dayLabel ?? `Shoot day ${today.shootDay}`;
 
 export const pdfs: Record<string, PdfDoc> = {
   'Ticket_OS487.pdf': {

@@ -1,4 +1,5 @@
 import { notes, project, today, workdays } from '../mock';
+import { todayHero } from './notes';
 import type { ApprovalStatus, DayKind, WorkDay } from '../mock';
 import { addDays, fmtDayShort, rangeLabel, toMinutes, weekday } from './dates';
 
@@ -113,8 +114,9 @@ export function hoursOverview(submitted: string[] = [], shift?: TodayShift | nul
 
 /** Today's planned call and wrap, taken from the shoot-day note's facts. */
 export function todayPlan() {
-  const shoot = notes.find((n) => n.day === today.date && n.type === 'appointment' && n.kind === 'time');
-  const call = shoot?.facts.find((f) => f.label === 'Call')?.value ?? shoot?.time ?? '—';
+  const shoot = todayHero(notes);
+  // A travel day starts at the pickup, a shoot day at the call.
+  const call = shoot?.facts.find((f) => f.label === 'Call' || f.label === 'Pickup')?.value ?? shoot?.time ?? '—';
   const wrap = shoot?.facts.find((f) => f.label === 'Wrap' && !f.unconfirmed)?.value;
   return { call, wrap };
 }

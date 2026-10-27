@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
-import { contacts, today } from '../mock';
+import { contacts, today, todayLabel } from '../mock';
 import { useActiveLink, useDemo, useRoute, useUnreadCount, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 import { useAddActions } from '../lib/addActions';
@@ -161,8 +161,8 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                   {link.position} · {link.department}
                 </span>
               </span>
-              <span className="tb-pass-day num" aria-label={`Shoot day ${today.shootDay}`}>
-                D{today.shootDay}
+              <span className="tb-pass-day num" aria-label={todayLabel}>
+                {today.dayLabel ? 'TRV' : `D${today.shootDay}`}
               </span>
             </div>
             <div className="tb-pass-tiles">

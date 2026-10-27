@@ -6,7 +6,7 @@ import { Collapse } from './Layout';
 import { TimeWheel } from './TimeWheel';
 import { fmtDayMonth } from '../lib/dates';
 import { fmtH, netMinutes, todayPlan } from '../lib/stats';
-import { project, today } from '../mock';
+import { project, today, todayLabel } from '../mock';
 
 type Field = 'start' | 'end';
 
@@ -105,7 +105,7 @@ export function LogSheet() {
       open={open}
       onClose={close}
       title={link.isMe ? 'Log today' : `Hours for ${link.personName}`}
-      subtitle={`${fmtDayMonth(today.date)} · Shoot day ${today.shootDay}${link.isMe ? '' : ` · ${link.position}`}`}
+      subtitle={`${fmtDayMonth(today.date)} · ${todayLabel}${link.isMe ? '' : ` · ${link.position}`}`}
     >
       <div className="log-times">
         <button type="button" className="time-tile" data-active={editing === 'start'} aria-expanded={editing === 'start'} aria-controls="log-picker" onClick={() => toggle('start')}>

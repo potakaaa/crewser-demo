@@ -26,7 +26,7 @@ const RECENT = 3;
 function DocRow({ doc }: { doc: Doc }) {
   const navigate = useDemo((s) => s.navigate);
   const day = doc.kind === 'callsheet' ? doc.day : undefined;
-  const title = day && doc.shootDay ? `Shoot day ${doc.shootDay}` : doc.title;
+  const title = day ? doc.title.replace(/^Call sheet · /, '') : doc.title;
   return (
     <button type="button" className="drow" onClick={() => navigate({ name: 'pdf', file: doc.file })}>
       <span className="drow-main">
@@ -57,7 +57,7 @@ function PinnedCallSheet({ doc }: { doc: CallSheet }) {
         </span>
         {doc.isNew && <span className="chip-lime chip-lime-sm">new</span>}
       </span>
-      <span className="dpin-title">{doc.shootDay ? `Shoot day ${doc.shootDay}` : 'Call sheet'}</span>
+      <span className="dpin-title">{doc.title.replace(/^Call sheet · /, '')}</span>
       <span className="dpin-cta">
         Open call sheet
         <Icon name="arrowRight" size={18} color="currentColor" />

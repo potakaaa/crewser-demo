@@ -35,7 +35,8 @@ export function useTimerNow(timer: WorkTimer | null) {
  * The work timer in every header, where the bell was. Idle: tap for manual entry (Log sheet), hold to start.
  * Running or paused: shows the time and opens the timer sheet.
  */
-export function TimerChip() {
+/** `compact`: the idle chip shows only its icon, for headers that are already full (Calendar's arrows). */
+export function TimerChip({ compact = false }: { compact?: boolean }) {
   const timer = useDemo((s) => s.timer);
   const startTimer = useDemo((s) => s.startTimer);
   const setLogOpen = useDemo((s) => s.setLogOpen);
@@ -118,7 +119,7 @@ export function TimerChip() {
     >
       <span className="timer-ring" aria-hidden="true" />
       <Icon name="logTime" size={18} color="currentColor" strokeWidth={1.8} />
-      <span>Start</span>
+      {!compact && <span>Start</span>}
     </button>
   );
 }

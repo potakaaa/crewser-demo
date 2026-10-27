@@ -13,7 +13,7 @@ export interface ScannedInvoice {
 export const scannedInvoice: ScannedInvoice = {
   vendor: 'Bauhaus Wien Mitte',
   address: 'Landstraßer Hauptstraße 1, 1030 Wien',
-  date: '2026-10-19',
+  date: '2026-10-20',
   total: 48.6,
   vat: 8.1,
   number: 'R-2026-118342',
