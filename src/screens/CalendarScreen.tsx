@@ -28,13 +28,12 @@ function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): bo
   return !submitted.includes(iso);
 }
 
-/** Small marks in the corner of a day: a call sheet is out, hours are still open. */
-function DayMarks({ call, unsent }: { call: boolean; unsent: boolean }) {
-  if (!call && !unsent) return null;
+/** The corner mark of a day: hours still open. Call sheets are reached from the day's chip below the grid. */
+function DayMarks({ unsent }: { unsent: boolean }) {
+  if (!unsent) return null;
   return (
     <span className="day-marks" aria-hidden="true">
-      {unsent && <span className="mark-unsent">!</span>}
-      {call && <Icon name="file" size={11} strokeWidth={2} />}
+      <span className="mark-unsent">!</span>
     </span>
   );
 }
@@ -153,7 +152,7 @@ export function CalendarScreen() {
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} />
-                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
+                      <DayMarks unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
@@ -183,7 +182,7 @@ export function CalendarScreen() {
                     >
                       <span className="mday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} />
-                      <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
+                      <DayMarks unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}

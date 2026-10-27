@@ -4,8 +4,7 @@
   position: relative;
 }
 
-/* Corner marks: a call sheet is out (file glyph), hours still open (an amber "!" badge, unlike the
-   round note dots under the date). The day's aria-label says both. */
+/* Corner mark: hours still open (an amber "!" badge, unlike the round note dot under the date). */
 .day-marks {
   position: absolute;
   top: 4px;
@@ -16,10 +15,6 @@
   justify-content: space-between;
   pointer-events: none;
   color: currentColor;
-}
-.day-marks svg {
-  margin-left: auto;
-  opacity: 0.8;
 }
 /* Ink on amber, 11:1, on the dark strip and on the white selected day alike. */
 .mark-unsent {
@@ -48,11 +43,7 @@
   right: 2px;
   left: 2px;
 }
-.mday .day-marks svg {
-  width: 9px;
-  height: 9px;
-}
-.mday .mark-unsent {
+.mday .mday .mark-unsent {
   width: 10px;
   height: 10px;
   font-size: 8px;
