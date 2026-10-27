@@ -381,12 +381,9 @@ export function Timeline({
     (focus = false) => {
       if (!el) return;
       if (glider.current.target() === 0) return; // already on its way
-      // The "Back to now" button disappears as the preview ends and takes focus with it:
-      // once the ruler has settled, focus goes to the ruler instead of the page. A double tap on the ruler focuses it.
-      const settle = () => {
-        if (focus || !document.activeElement || document.activeElement === document.body) el.focus({ preventScroll: true });
-      };
-      glider.current.glideTo(0, settle);
+      // Only a double tap on the ruler itself takes focus there. Calls from outside (the deck turning back, a switch)
+      // never move focus: focusing the ruler after a swipe left a focus ring on it.
+      glider.current.glideTo(0, focus ? () => el.focus({ preventScroll: true }) : undefined);
     },
     [el, glider],
   );

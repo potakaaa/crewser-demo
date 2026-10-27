@@ -448,8 +448,10 @@
   font-weight: 500;
   transition: background 150ms ease;
 }
-.glass-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+@media (hover: hover) {
+  .glass-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 .link-btn {
   flex: none;

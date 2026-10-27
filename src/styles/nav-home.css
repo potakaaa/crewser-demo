@@ -189,8 +189,10 @@
   background: var(--lime);
   color: var(--on-lime);
 }
-.btn.btn-primary.deck-cta:hover {
-  background: var(--lime-hover);
+@media (hover: hover) {
+  .btn.btn-primary.deck-cta:hover {
+    background: var(--lime-hover);
+  }
 }
 .btn.btn-primary.deck-cta:focus-visible {
   outline: 2px solid var(--ink);
@@ -303,8 +305,10 @@
     transform 200ms var(--ease-spring),
     background 150ms ease;
 }
-.add-btn:hover {
-  background: var(--lime-hover);
+@media (hover: hover) {
+  .add-btn:hover {
+    background: var(--lime-hover);
+  }
 }
 .add-btn:active {
   transform: scale(0.94);
