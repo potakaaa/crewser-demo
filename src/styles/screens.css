@@ -125,11 +125,6 @@
   line-height: 1.18;
   text-wrap: balance;
 }
-.dpin-meta {
-  font-size: var(--fs-sm);
-  /* One step lighter than the other dark cards: the grain lifts the lightest speck behind the text, and on-dark-3 would drop below 4.5:1 there. */
-  color: var(--on-dark-2);
-}
 .dpin-cta {
   margin-top: var(--sp-2);
   min-height: 40px;
@@ -174,19 +169,12 @@
   font-weight: 600;
 }
 .drow-meta {
-  display: flex;
-  min-width: 0;
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-  white-space: pre;
-}
-.drow-meta-text {
   min-width: 0;
   overflow: hidden;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
   text-overflow: ellipsis;
-}
-.drow-ver {
-  flex: none;
+  white-space: nowrap;
 }
 .drow-today {
   padding: 2px 7px;
@@ -739,11 +727,6 @@
   flex-direction: column;
   gap: var(--sp-4);
 }
-.lintro {
-  font-size: var(--fs-sm);
-  line-height: 1.55;
-  color: var(--text-2);
-}
 .lgroup {
   display: flex;
   flex-direction: column;
@@ -759,10 +742,6 @@
   font-size: var(--fs-lg);
   font-weight: 600;
   letter-spacing: -0.01em;
-}
-.lgroup-h span {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
 }
 .lrow {
   width: 100%;
@@ -808,20 +787,11 @@
   font-size: var(--fs-base);
   font-weight: 600;
 }
-.lrow-role {
-  font-weight: 400;
-  color: var(--text-2);
-}
 .lrow-sub {
   font-size: var(--fs-sm);
   color: var(--text-2);
   line-height: 1.35;
   overflow-wrap: anywhere;
-}
-.lrow-ask {
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  color: var(--teal);
 }
 .lrow.is-blocked .lrow-av {
   opacity: 0.5;
@@ -852,21 +822,8 @@
   background: var(--chip);
   color: var(--text-3);
 }
-.lradio {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border: 1.5px solid rgba(255, 255, 255, 0.32);
-  border-radius: 11px;
-}
 .btn-add {
   flex: none;
-}
-.lfoot {
-  margin-top: calc(-1 * var(--sp-2));
-  text-align: center;
-  font-size: var(--fs-sm);
-  color: var(--text-2);
 }
 
 .setbanner {

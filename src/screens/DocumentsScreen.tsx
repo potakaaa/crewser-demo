@@ -15,36 +15,20 @@ const FILTERS: { value: Filter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'callsheet', label: 'Call sheets' },
   { value: 'schedule', label: 'Schedules' },
-  { value: 'safety', label: 'Location & safety' },
+  { value: 'safety', label: 'Safety' },
   { value: 'other', label: 'Other' },
 ];
 
 /** Call sheets shown before the rest fold into "Earlier days". */
 const RECENT = 3;
 
-/** The version always shows: the rest of the line gives way (ellipsis) before it does. */
-function VersionMeta({ text, version }: { text: string; version: number }) {
-  return (
-    <>
-      <span className="drow-meta-text">{text}</span>
-      <span className="drow-ver" aria-hidden="true">
-        {' · '}v{version}
-      </span>
-      <span className="sr-only">, version {version}</span>
-    </>
-  );
-}
-
+/** A row is the title and the one date that matters; size and version live in the viewer. */
 function DocRow({ doc }: { doc: Doc }) {
   const navigate = useDemo((s) => s.navigate);
   const day = doc.kind === 'callsheet' ? doc.day : undefined;
   const title = day && doc.shootDay ? `Shoot day ${doc.shootDay}` : doc.title;
-  const meta = day ? `${fmtDayMonth(day)} · ${doc.size}` : `Updated ${updatedLabel(doc.updated)} · ${doc.size}`;
   return (
     <button type="button" className="drow" onClick={() => navigate({ name: 'pdf', file: doc.file })}>
-      <span className="chip-icon">
-        <Icon name="file" size={20} color="currentColor" />
-      </span>
       <span className="drow-main">
         <span className="drow-title">
           {title}
@@ -56,9 +40,7 @@ function DocRow({ doc }: { doc: Doc }) {
           )}
           {day === today.date && <span className="drow-today">Today</span>}
         </span>
-        <span className="drow-meta">
-          <VersionMeta text={meta} version={doc.version} />
-        </span>
+        <span className="drow-meta">{day ? fmtDayMonth(day) : `Updated ${updatedLabel(doc.updated)}`}</span>
       </span>
       <Icon name="right" size={18} color="#9AAAAC" />
     </button>
@@ -67,22 +49,15 @@ function DocRow({ doc }: { doc: Doc }) {
 
 function PinnedCallSheet({ doc }: { doc: CallSheet }) {
   const navigate = useDemo((s) => s.navigate);
-  const projectName = useActiveLink().projectName;
   return (
     <button type="button" className="dpin" onClick={() => navigate({ name: 'pdf', file: doc.file })}>
       <span className="dpin-top">
         <span className="dpin-kicker">
-          <Icon name="pin" size={15} color="#C4CFD0" />
-          {dayWord(doc.day)}{doc.shootDay ? ` · Shoot day ${doc.shootDay}` : ''}
+          {dayWord(doc.day)} · {fmtDayMonth(doc.day)}
         </span>
         {doc.isNew && <span className="chip-lime chip-lime-sm">new</span>}
       </span>
-      <span className="dpin-title">{fmtDayMonth(doc.day)} · call sheet</span>
-      <span className="dpin-meta">
-        {projectName} · updated {updatedLabel(doc.updated)} · {doc.size}
-        <span aria-hidden="true"> · v{doc.version}</span>
-        <span className="sr-only">, version {doc.version}</span>
-      </span>
+      <span className="dpin-title">{doc.shootDay ? `Shoot day ${doc.shootDay}` : 'Call sheet'}</span>
       <span className="dpin-cta">
         Open call sheet
         <Icon name="arrowRight" size={18} color="currentColor" />
@@ -139,7 +114,7 @@ export function DocumentsScreen() {
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <ScreenTitle eyebrow={`${projectName} · ${docs.length} files`} title="Documents">
+        <ScreenTitle eyebrow={projectName} title="Documents">
           <ForChip compact />
           <NotifButton tone="dark" />
         </ScreenTitle>

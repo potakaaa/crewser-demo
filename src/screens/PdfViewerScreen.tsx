@@ -1,4 +1,5 @@
-import { pdfs } from '../mock';
+import { docs, pdfs } from '../mock';
+import { updatedLabel } from '../components/docs/docs';
 import { useDemo } from '../store';
 import { Icon } from '../components/Icon';
 
@@ -6,6 +7,8 @@ export function PdfViewerScreen({ file }: { file: string }) {
   const doc = pdfs[file];
   const back = useDemo((s) => s.back);
   const toast = useDemo((s) => s.showToast);
+  // The file details the Documents list leaves out.
+  const meta = docs.find((d) => d.file === file);
   return (
     <div className="screen screen-col screen-pdf">
       <div className="topbar topbar-dark">
@@ -34,7 +37,9 @@ export function PdfViewerScreen({ file }: { file: string }) {
           <span className="pdf-skel" style={{ width: '70%' }} />
         </div>
       </div>
-      <p className="pdf-foot">Pinch to zoom · saved for offline use</p>
+      <p className="pdf-foot">
+        {meta ? `Updated ${updatedLabel(meta.updated)} · ${meta.size} · saved for offline use` : 'Pinch to zoom · saved for offline use'}
+      </p>
     </div>
   );
 }
