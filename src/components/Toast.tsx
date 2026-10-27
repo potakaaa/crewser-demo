@@ -8,7 +8,8 @@ export function Toast({ raised, top = false }: { raised: boolean; top?: boolean 
   useEffect(() => {
     if (!toast) return;
     setVisible(true);
-    const t = window.setTimeout(() => setVisible(false), 2000);
+    // A toast with an action stays long enough to reach it.
+    const t = window.setTimeout(() => setVisible(false), toast.action ? 4500 : 2000);
     return () => window.clearTimeout(t);
   }, [toast]);
 
@@ -20,6 +21,18 @@ export function Toast({ raised, top = false }: { raised: boolean; top?: boolean 
             <path d="M12 2.5v6M12 15.5v6M2.5 12h6M15.5 12h6M5.3 5.3l4.2 4.2M14.5 14.5l4.2 4.2M18.7 5.3l-4.2 4.2M9.5 14.5l-4.2 4.2" />
           </svg>
           <span>{toast.message}</span>
+          {toast.action && (
+            <button
+              type="button"
+              className="toast-action"
+              onClick={() => {
+                setVisible(false);
+                toast.action!.run();
+              }}
+            >
+              {toast.action.label}
+            </button>
+          )}
         </div>
       )}
     </div>

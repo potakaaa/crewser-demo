@@ -139,6 +139,8 @@ export type NoteAccent = 'stub' | 'corner' | 'band' | 'edge' | 'none';
 interface Toast {
   id: number;
   message: string;
+  /** One inline action, such as Undo. */
+  action?: { label: string; run: () => void };
 }
 
 interface DemoState {
@@ -208,7 +210,7 @@ interface Actions {
   hideSplash: () => void;
   submitDay: (iso: string) => void;
   setStatusDark: (v: boolean) => void;
-  showToast: (message: string) => void;
+  showToast: (message: string, action?: Toast['action']) => void;
   setNoteAccent: (a: NoteAccent) => void;
   /** Notification actions work on the active link's notifications. */
   markRead: (id: string) => void;
@@ -464,7 +466,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
       return days.includes(iso) ? {} : { submitted: { ...s.submitted, [s.activeLinkId]: [...days, iso] } };
     }),
   setStatusDark: (v) => set({ statusDark: v }),
-  showToast: (message) => set({ toast: { id: ++toastSeq, message } }),
+  showToast: (message, action) => set({ toast: { id: ++toastSeq, message, action } }),
   setNoteAccent: (a) => set({ noteAccent: a }),
   markRead: (id) =>
     set((s) => {

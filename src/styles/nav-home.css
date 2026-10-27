@@ -782,3 +782,107 @@
   grid-template-columns: 1fr 2fr;
   gap: var(--sp-2);
 }
+
+/* ───────── Home header: swipe the avatar for a person, the project line for a project ───────── */
+.toast-action {
+  flex: none;
+  min-height: 32px;
+  margin: -6px -6px -6px 4px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--lime);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  pointer-events: auto;
+}
+.who-avatar {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+.who-reel {
+  position: absolute;
+  inset: 0;
+  transform: translateY(var(--ay, 0));
+}
+.who-reel[data-glide='true'] {
+  transition: transform 200ms var(--ease-out);
+}
+.who-av {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.who-av-prev {
+  transform: translateY(-100%);
+}
+.who-av-next {
+  transform: translateY(100%);
+}
+.who-line-zone {
+  touch-action: pan-y;
+  overflow: hidden;
+}
+.who-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+  transform: translateX(var(--lx, 0));
+}
+.who-line[data-glide='true'] {
+  transition:
+    transform 200ms var(--ease-out),
+    opacity 200ms ease;
+}
+@keyframes who-in-right {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+@keyframes who-in-left {
+  from {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+}
+.who-line[data-enter='right'] {
+  animation: who-in-right 260ms var(--ease-out) both;
+}
+.who-line[data-enter='left'] {
+  animation: who-in-left 260ms var(--ease-out) both;
+}
+/* The one-time hint: the avatar peeks at the next person, then the project line leans towards the next project. */
+@keyframes who-nudge-y {
+  40% {
+    transform: translateY(-14px);
+  }
+}
+@keyframes who-nudge-x {
+  40% {
+    transform: translateX(-16px);
+  }
+}
+.who-avatar[data-hint='true'] .who-reel {
+  animation: who-nudge-y 700ms var(--ease-out) 1;
+}
+.who-line[data-hint='true'] {
+  animation: who-nudge-x 700ms var(--ease-out) 900ms 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .who-reel[data-glide='true'],
+  .who-line[data-glide='true'] {
+    transition: none;
+  }
+  .who-line[data-enter],
+  .who-avatar[data-hint='true'] .who-reel,
+  .who-line[data-hint='true'] {
+    animation: none;
+  }
+}

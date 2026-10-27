@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { notes, person, today } from '../mock';
+import { notes } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../components/Layout';
@@ -7,13 +7,12 @@ import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { NotifButton } from '../components/NotifButton';
-import { ForChip } from '../components/ForChip';
+import { WhoSwitch } from '../components/WhoSwitch';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { QuickActions } from '../components/QuickActions';
 import { Wordmark } from '../components/Brand';
 import { smartNotes } from '../lib/notes';
-import { greeting } from '../lib/greeting';
 import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
 
@@ -43,25 +42,7 @@ export function DashboardScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-home grain-strong gh-dash">
         <div className="home-top">
-          <button type="button" className="dash-who" onClick={() => openSheet('project')}>
-            <span className="avatar" aria-hidden="true">
-              {link.initials}
-            </span>
-            <span className="home-greet">
-              {link.isMe ? (
-                <span className="home-hello">
-                  {greeting()}, {person.firstName}
-                </span>
-              ) : (
-                <ForChip />
-              )}
-              <span className="home-project">
-                {link.projectName} · Shoot day {today.shootDay}
-                <Icon name="down" size={14} color="#C4CFD0" strokeWidth={2} />
-                <span className="sr-only">. Switch project</span>
-              </span>
-            </span>
-          </button>
+          <WhoSwitch />
           <NotifButton tone="dark" />
         </div>
         {offline && <OfflineBanner tone="dark" />}
