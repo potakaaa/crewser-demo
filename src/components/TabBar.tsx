@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { useActiveLink, useDemo, useRoute, useUnreadCount, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 import { useAddActions } from '../lib/addActions';
+import { AvatarReel, SwitchPill, useSwitchGesture } from './SwitchKit';
 
 /** Two main routes, then the crew pass: Documents, Contacts and Settings live behind your initials. */
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
@@ -44,6 +45,12 @@ export function TabBar({ hidden }: { hidden: boolean }) {
   const openSheet = useDemo((s) => s.openSheet);
   const addActions = useAddActions();
   const unread = useUnreadCount();
+  const [passTurn, setPassTurn] = useState(0);
+  const [passUndo, setPassUndo] = useState<string>();
+  const who = useSwitchGesture<HTMLDivElement>('y', 'pass', (m) => {
+    setPassUndo(m.from);
+    setPassTurn((n) => n + 1);
+  });
   const link = useActiveLink();
   const navRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -150,16 +157,16 @@ export function TabBar({ hidden }: { hidden: boolean }) {
       <div className={`tabbar-wrap${hidden ? ' is-hidden' : ''}${menu ? ' is-open' : ''}`} inert={hidden} ref={wrapRef} onKeyDown={onKeyDown} onBlur={onBlur}>
         {menu === 'pass' && (
           <div className="tb-pass" id={menuId} role="group" aria-label="Your crew pass">
-            <div className="tb-pass-head">
-              <span className="tb-pass-avatar" aria-hidden="true">
-                {link.initials}
-              </span>
+            {/* Swipe the identity row up or down to switch person, as on the Home header; the Pass stays open. */}
+            <div className="tb-pass-head" ref={who.ref} {...who.handlers}>
+              <AvatarReel g={who} className="tb-pass-avatar" />
               <span className="tb-pass-who">
                 <strong>{link.personName}</strong>
                 <span>
                   {link.position} · {link.department}
                 </span>
               </span>
+              {passTurn > 0 && <SwitchPill n={passTurn} kind="person" undo={passUndo} origin="pass" className="tb-pass-pill" />}
             </div>
             <div className="tb-pass-tiles">
               {PASS_ROUTES.map((r) => (

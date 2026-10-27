@@ -370,6 +370,15 @@
   align-items: center;
   gap: var(--sp-3);
   padding: 0 4px 12px;
+  /* The row takes vertical swipes (person switch); nothing in the Pass scrolls. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+/* The Pass's switch confirmation floats just above the card. */
+.fx-flash.tb-pass-pill {
+  top: auto;
+  bottom: calc(100% + 10px);
 }
 .tb-pass-avatar {
   flex: none;

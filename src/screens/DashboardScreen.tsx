@@ -7,7 +7,8 @@ import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { TimerChip } from '../components/TimerChip';
-import { WhoSwitch, type SwitchMotion } from '../components/WhoSwitch';
+import { WhoSwitch } from '../components/WhoSwitch';
+import { SwitchPill, takeSwitchMotion, type SwitchMotion } from '../components/SwitchKit';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { QuickActions } from '../components/QuickActions';
@@ -15,9 +16,6 @@ import { Wordmark } from '../components/Brand';
 import { smartNotes } from '../lib/notes';
 import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
-
-/** How long the switch confirmation stays; matches the fx-flash animation in nav-home.css. */
-const FLASH_MS = 3000;
 
 export function DashboardScreen() {
   const ref = useScrollRestore<HTMLDivElement>('dashboard', useDemo((s) => s.setStatusDark));
@@ -43,34 +41,17 @@ export function DashboardScreen() {
   // A switch to another person or project turns the screen over, even when the notes look the same: the deck
   // re-deals and the sheet slides in from the swipe's side, with a short flash of who you are now.
   // Switches from the sheet or Undo have no direction and just fade.
-  const motion = useRef<SwitchMotion | null>(null);
-  const [turn, setTurn] = useState<{ n: number; kind: SwitchMotion['kind'] | 'fade'; dir: 1 | -1; undo?: string } | null>(null);
+  const [turn, setTurn] = useState<{ n: number; kind: SwitchMotion['kind'] | 'fade'; dir: 1 | -1; undo?: string; pill: boolean } | null>(null);
   const [shownLink, setShownLink] = useState(link.id);
   if (shownLink !== link.id) {
     setShownLink(link.id);
-    const m = motion.current;
-    motion.current = null;
-    setTurn({ n: (turn?.n ?? 0) + 1, kind: m?.kind ?? 'fade', dir: m?.dir ?? 1, undo: m?.from });
+    const m = takeSwitchMotion();
+    setTurn({ n: (turn?.n ?? 0) + 1, kind: m?.kind ?? 'fade', dir: m?.dir ?? 1, undo: m?.from || undefined, pill: m?.origin !== 'pass' });
   }
   // A preview from the ruler belongs to the link it was made on: a switch starts the new one at Now.
   useEffect(() => {
     if (turn) ruler.current?.backToNow();
   }, [turn]);
-  // The pill stays long enough to reach Undo; a tap anywhere else, or the next switch, ends it.
-  const [flash, setFlash] = useState(0);
-  const pillRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!turn) return;
-    setFlash(turn.n);
-    const t = window.setTimeout(() => setFlash(0), FLASH_MS);
-    const away = (e: PointerEvent) => !pillRef.current?.contains(e.target as Node) && setFlash(0);
-    document.addEventListener('pointerdown', away);
-    return () => {
-      window.clearTimeout(t);
-      document.removeEventListener('pointerdown', away);
-    };
-  }, [turn]);
-  const setActiveLink = useDemo((s) => s.setActiveLink);
   const turnClass = turn ? ` fx-in fx-${turn.kind}${turn.dir < 0 ? ' fx-rev' : ''}` : '';
 
   return (
@@ -78,36 +59,14 @@ export function DashboardScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-home grain-strong gh-dash">
         <div className="home-top">
-          <WhoSwitch onSwitch={(m) => (motion.current = m)} />
+          <WhoSwitch />
           <TimerChip />
         </div>
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} restStop={scrub.stops.findIndex((s) => s.note.id === sn.hero?.id)} />
         <div className={`fx-deck${turnClass}`} key={turn?.n ?? 0}>
           <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onGoTo={goTo} />
-          {turn && flash === turn.n && (
-            <div className="fx-flash" ref={pillRef} role="status">
-              <span className="fx-flash-av" aria-hidden="true">
-                {link.initials}
-              </span>
-              <span className="fx-flash-text">
-                <strong>{turn.kind === 'project' ? link.projectName : `${link.personName}${link.isMe ? ' (You)' : ''}`}</strong>
-                <span>{turn.kind === 'project' ? `${link.personName} · ${link.position}` : `${link.position} · ${link.projectName}`}</span>
-              </span>
-              {turn.undo && (
-                <button
-                  type="button"
-                  className="fx-flash-undo"
-                  onClick={() => {
-                    setFlash(0);
-                    setActiveLink(turn.undo!);
-                  }}
-                >
-                  Undo
-                </button>
-              )}
-            </div>
-          )}
+          {turn?.pill && <SwitchPill n={turn.n} kind={turn.kind} undo={turn.undo} />}
         </div>
       </GradientHeader>
 
