@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref, type RefObject } from 'react';
-import { TYPE_COLOR } from '../lib/noteStyle';
 import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewSpoken, samePreview, snapTarget, stepTarget, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
@@ -441,7 +440,7 @@ export function Timeline({
                 Earlier
               </span>
               {scrub.past.map((d) => (
-                <span className="tl-dot" key={d.note.id} style={{ left: `calc(100% + ${d.x}px)`, background: TYPE_COLOR[d.note.type].dot }} />
+                <span className="tl-dot" key={d.note.id} style={{ left: `calc(100% + ${d.x}px)` }} />
               ))}
             </span>
             {scrub.marks.map((m) => (
@@ -459,13 +458,11 @@ export function Timeline({
                   className="tl-pin"
                   key={s.note.id}
                   data-on={preview?.index === i}
-                  data-n={c && c.lead === i ? true : undefined}
                   data-fan={fanned ? true : undefined}
-                  style={{ left: s.x, '--pin': TYPE_COLOR[s.note.type].dot, '--span': `${c?.span ?? 0}px`, '--fan': `${offset}px` } as CSSProperties}
+                  style={{ left: s.x, '--fan': `${offset}px` } as CSSProperties}
                   aria-hidden="true"
                 >
                   <span className="tl-pin-dot" />
-                  {c && c.lead === i && <span className="tl-pin-n">{c.n}</span>}
                 </span>
               );
             })}

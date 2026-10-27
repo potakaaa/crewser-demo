@@ -10,82 +10,43 @@
   z-index: 1;
 }
 
-/* A note: a stem rising from the baseline in the note's colour, a dot on top. */
+/* A note: one small neutral dot, like the calendar's. Only the note under the playhead lights up, in lime. */
 .tl .tl-pin {
   position: absolute;
-  top: 5px;
+  top: 8px;
   width: 0;
-  height: 14px;
+  height: 8px;
   z-index: 1;
   /* A cluster fans out around the locked note (visual only: the stop's scroll position does not change). */
   transform: translateX(var(--fan, 0px));
   transition: transform 150ms var(--ease-out);
 }
-.tl .tl-pin::before {
-  content: '';
-  position: absolute;
-  left: -1px;
-  top: 5px;
-  width: 2px;
-  height: 9px;
-  border-radius: 1px 1px 0 0;
-  background: var(--pin);
-  opacity: 0.85;
-}
 .tl .tl-pin-dot {
   position: absolute;
-  left: -5px;
+  left: -3px;
   top: 0;
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--pin);
-  box-shadow: 0 0 0 1.5px rgba(8, 20, 22, 0.7);
+  background: var(--on-dark-2);
+  opacity: 0.75;
   transition:
     transform 160ms var(--ease-out),
-    box-shadow 160ms ease;
+    background 160ms ease,
+    opacity 160ms ease;
 }
-/* Tied notes: the count sits just right of the last dot in the cluster. */
-.tl .tl-pin[data-n] {
-  z-index: 2;
-}
-.tl .tl-pin-n {
-  position: absolute;
-  left: calc(var(--span) + 7px);
-  top: -1px;
-  min-width: 12px;
-  height: 12px;
-  padding: 0 3px;
-  border-radius: 6px;
-  background: #ffffff;
-  color: var(--ink);
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 12px;
-  text-align: center;
-  box-shadow: 0 0 0 1.5px rgba(8, 20, 22, 0.7);
-}
-.tl .tl-pin[data-fan] .tl-pin-n {
-  opacity: 0;
-}
-.tl .tl-pin-n {
-  transition: opacity 150ms ease;
-}
-/* Locked under the playhead: bigger and ringed in white. Lime stays with Now and the playhead, the brightest things on the ruler. */
 .tl .tl-pin[data-on='true'] {
   z-index: 3;
 }
-.tl .tl-pin[data-on='true']::before {
-  width: 3px;
-  left: -1.5px;
-  opacity: 1;
-}
 .tl .tl-pin[data-on='true'] .tl-pin-dot {
-  transform: scale(1.35);
-  /* No blur: the ruler clips at its top edge, and a glow would show a flat cut there. */
-  box-shadow:
-    0 0 0 2px #ffffff,
-    0 0 0 3px rgba(8, 20, 22, 0.5);
+  background: var(--lime);
+  opacity: 1;
+  transform: scale(1.6);
+}
+/* Notes from earlier today: the same dot, quieter. */
+.tl .tl-dot {
+  background: var(--on-dark-3);
+  opacity: 0.45;
 }
 
 /* Double tap resets the ruler: no highlight flash on the tap. (touch-action is set in dashboard.css.) */
@@ -95,7 +56,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tl .tl-pin,
-  .tl .tl-pin-n,
   .tl .tl-pin-dot {
     transition: none;
   }
