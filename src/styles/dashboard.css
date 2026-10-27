@@ -570,7 +570,7 @@
   outline-color: var(--lime);
   outline-offset: -3px;
 }
-/* The hero card's action is the screen's one filled lime anchor; note cards keep the outlined version. */
+/* The hero card's action is the screen's one filled lime anchor. */
 .btn.btn-primary.today-action {
   border-color: var(--lime);
   background: var(--lime);
@@ -582,21 +582,21 @@
 }
 
 /* ───────── Primary button for a note's own action (NotePrimaryAction) ─────────
-   Lime outline and lime text (8:1 on the card): the one anchor per card. */
+   A raised slate control (--elev-2), light text 8:1. */
 .btn.btn-primary {
   position: relative;
   isolation: isolate;
-  border: 1px solid rgba(200, 224, 60, 0.6);
-  background: rgba(200, 224, 60, 0.1);
-  color: var(--lime);
+  border: 0;
+  background: var(--card-2);
+  color: var(--ink);
   font-weight: 600;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: var(--elev-2);
   transition:
     transform 180ms var(--ease-out),
     background var(--t-fast) ease;
 }
 .btn.btn-primary:hover {
-  background: rgba(200, 224, 60, 0.16);
+  background: var(--soft-hover);
 }
 .btn.btn-primary:active {
   transform: scale(0.98);

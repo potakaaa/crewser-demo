@@ -27,7 +27,6 @@ export function DashboardScreen() {
   const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const masterDataDone = useDemo((s) => s.masterDataDone);
   const openSheet = useDemo((s) => s.openSheet);
-  const navigate = useDemo((s) => s.navigate);
   const toast = useDemo((s) => s.showToast);
   const link = useActiveLink();
   const sn = smartNotes(empty ? [] : notes);
@@ -91,7 +90,7 @@ export function DashboardScreen() {
 
         {hasNotes ? (
           <section className="stack" aria-label="Smart notes">
-            <SectionHead title="Smart notes" link="Calendar" onLink={() => navigate({ name: 'calendar' })} />
+            <SectionHead title="Smart notes" />
             {sn.top.map((n) => (
               <ContentCard key={n.id} note={n} />
             ))}

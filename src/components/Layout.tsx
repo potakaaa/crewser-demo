@@ -44,18 +44,13 @@ export function OfflineBanner({ tone }: { tone: 'dark' | 'light' }) {
   );
 }
 
-export function SectionHead({ title, sub, link, onLink }: { title: string; sub?: string; link?: string; onLink?: () => void }) {
+export function SectionHead({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="section-head">
       <div className="section-titles">
         <h2>{title}</h2>
         {sub && <span>{sub}</span>}
       </div>
-      {link && (
-        <button type="button" className="link-btn" onClick={onLink}>
-          {link}
-        </button>
-      )}
     </div>
   );
 }

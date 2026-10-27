@@ -710,9 +710,6 @@
   font-size: var(--fs-sm);
   color: var(--text-2);
 }
-.section-head .link-btn {
-  margin-bottom: -12px;
-}
 /* ───────── Content cards ───────── */
 .ccard {
   overflow: hidden;
@@ -2627,7 +2624,10 @@
   bottom: 0;
   left: 0;
   width: calc(var(--stub-solid) + var(--stub-edge));
-  background: var(--dark-tile);
+  background:
+    var(--grain-soft, none) 0 0 / 160px 160px,
+    var(--sky-gradient);
+  background-blend-mode: overlay, normal;
   -webkit-mask:
     linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
     var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
@@ -2646,11 +2646,15 @@
   opacity: 0.9;
   background: var(--sparks, none) 0 0 / 44px 256px repeat-y;
 }
+[data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) :is(.stub-time, .stub-sub) {
+  text-shadow: 0 1px 2px rgba(20, 34, 40, 0.35);
+}
 [data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-time {
   color: #ffffff;
 }
 [data-accent='stub'] :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-sub {
-  color: var(--on-dark-2);
+  color: #ffffff;
+  font-weight: 500;
 }
 /* Room for the grain edge between the time and the type chip */
 [data-accent='stub'] .ccard-head {
@@ -3098,17 +3102,17 @@
 .ns-title {
   font-size: calc(var(--fs-xl) * var(--display-scale));
 }
-/* The signature from the production app, the same in every font theme: condensed capitals,
-   then a bar filling the row, lime fading into forest green. */
+/* The signature from the production app, the same in every font theme: bold capitals in the
+   UI face, then a bar filling the row, lime fading into forest green. */
 .app .section-titles h2 {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  font-family: var(--ff-poster);
-  font-weight: 400;
-  font-size: 26px;
-  line-height: 1;
-  letter-spacing: 0.02em;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: var(--fs-base);
+  line-height: 1.2;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -3116,7 +3120,7 @@
   content: '';
   flex: 1;
   min-width: var(--sp-6);
-  height: 0.7em;
+  height: 0.85em;
   border-radius: 2px;
   background: var(--signature-bar);
 }

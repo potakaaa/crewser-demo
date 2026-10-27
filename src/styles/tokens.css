@@ -139,6 +139,9 @@
     radial-gradient(85% 70% at 50% 12%, #3d6650 0%, rgba(46, 74, 64, 0.85) 38%, rgba(34, 48, 47, 0) 78%),
     linear-gradient(180deg, #263033 0%, #192124 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(200, 224, 60, 0.14), rgba(200, 224, 60, 0) 45%);
+  /* The crewser.app landing-page sky: hazy steel-teal into misty blue-teal, worn with grain.
+     The misty light end stays below the text line so white stub text keeps 4.5:1. */
+  --sky-gradient: linear-gradient(180deg, #3c5560 0%, #435e68 50%, #4f6b73 80%, #93b2b3 100%);
   /* Signature bar beside condensed section headings. */
   --signature-bar: linear-gradient(90deg, #c8e03c 0%, #8fb046 38%, #4a6b55 100%);
   /* Ordinary cards are flat: grain only where a component opts back in (see screens.css). */
