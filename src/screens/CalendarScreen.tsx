@@ -18,11 +18,12 @@ const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
 const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
 
 /**
- * Shoot days up to today whose hours have not gone to production: logged as a draft, or not logged yet.
+ * Past shoot days whose hours have not gone to production: logged as a draft, or not logged yet. Today never
+ * counts: its hours cannot be due before the day is over.
  * The draft part must agree with hoursOverview's `unsent` (lib/stats.ts); days nobody logged are extra, which `unsent` cannot know about.
  */
 function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): boolean {
-  if (iso > today.date || !callSheetByDay.has(iso)) return false;
+  if (iso >= today.date || !callSheetByDay.has(iso)) return false;
   const logged = workdays.find((w) => w.date === iso);
   if (logged && logged.status !== 'draft') return false;
   return !submitted.includes(iso);

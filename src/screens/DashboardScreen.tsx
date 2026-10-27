@@ -60,7 +60,7 @@ export function DashboardScreen() {
           <TimerChip />
         </div>
         {offline && <OfflineBanner tone="dark" />}
-        <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
+        <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} restStop={scrub.stops.findIndex((s) => s.note.id === sn.hero?.id)} />
         <div className={`fx-deck${turnClass}`} key={turn?.n ?? 0}>
           <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onGoTo={goTo} />
           {turn && (

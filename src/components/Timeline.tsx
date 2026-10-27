@@ -315,11 +315,14 @@ export function Timeline({
   preview,
   onPreview,
   handle,
+  restStop = -1,
 }: {
   scrub: Scrub;
   preview: Preview | null;
   onPreview: (p: Preview | null) => void;
   handle?: Ref<TimelineHandle>;
+  /** The stop the deck's front card stands for while nothing is previewed (today's lead note), or -1. */
+  restStop?: number;
 }) {
   // A callback ref in state, so the listeners attach again when the ruler comes back (toggling Empty).
   const [el, setEl] = useState<HTMLDivElement | null>(null);
@@ -457,7 +460,7 @@ export function Timeline({
                 <span
                   className="tl-pin"
                   key={s.note.id}
-                  data-on={preview?.index === i}
+                  data-on={preview ? preview.index === i : i === restStop}
                   data-fan={fanned ? true : undefined}
                   style={{ left: s.x, '--fan': `${offset}px` } as CSSProperties}
                   aria-hidden="true"
