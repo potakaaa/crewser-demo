@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { contacts, today } from '../mock';
 import { useActiveLink, useDemo, useRoute, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
+import { useAddActions } from '../lib/addActions';
 
 /** Three main routes, then the crew pass: Contacts and Settings live behind your initials. */
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
@@ -9,7 +10,11 @@ const TABS: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'calendar', label: 'Calendar', icon: 'calendar' },
   { name: 'documents', label: 'Docs', icon: 'documents' },
 ];
-const PASS_ROUTES: Partial<Record<TabName, string>> = { contacts: 'Contacts', settings: 'Settings' };
+/** Routes behind the crew pass: its tiles, and the label the pass slot takes while one is open. */
+const PASS_ROUTES: { name: TabName; label: string; hint: string; icon: IconName }[] = [
+  { name: 'contacts', label: 'Contacts', hint: `${contacts.length} crew`, icon: 'contacts' },
+  { name: 'settings', label: 'Settings', hint: 'Preferences', icon: 'settings' },
+];
 const SLOTS = TABS.length + 1;
 
 const ICON = 22;
@@ -37,8 +42,8 @@ type Menu = 'pass' | 'add' | null;
 export function TabBar({ hidden }: { hidden: boolean }) {
   const route = useRoute();
   const navigate = useDemo((s) => s.navigate);
-  const openLog = useDemo((s) => s.setLogOpen);
   const openSheet = useDemo((s) => s.openSheet);
+  const addActions = useAddActions();
   const link = useActiveLink();
   const navRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -49,7 +54,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
 
   // Keep the last tab while a detail screen is on top, so the bar comes back where it left.
   const lastActive = useRef(0);
-  const passLabel = PASS_ROUTES[route.name as TabName];
+  const passLabel = PASS_ROUTES.find((r) => r.name === route.name)?.label;
   const idx = passLabel ? TABS.length : TABS.findIndex((t) => t.name === route.name);
   if (idx >= 0) lastActive.current = idx;
   const active = lastActive.current;
@@ -160,16 +165,13 @@ export function TabBar({ hidden }: { hidden: boolean }) {
               </span>
             </div>
             <div className="tb-pass-tiles">
-              <button type="button" className="tb-tile" aria-current={route.name === 'contacts' ? 'page' : undefined} onClick={pick(() => navigate({ name: 'contacts' }))}>
-                <Icon name="contacts" size={22} color="#111A1B" strokeWidth={1.7} />
-                <span className="tb-tile-t">Contacts</span>
-                <span className="tb-tile-s">{contacts.length} crew</span>
-              </button>
-              <button type="button" className="tb-tile" aria-current={route.name === 'settings' ? 'page' : undefined} onClick={pick(() => navigate({ name: 'settings' }))}>
-                <Icon name="settings" size={22} color="#111A1B" strokeWidth={1.7} />
-                <span className="tb-tile-t">Settings</span>
-                <span className="tb-tile-s">Preferences</span>
-              </button>
+              {PASS_ROUTES.map((r) => (
+                <button type="button" key={r.name} className="tb-tile" aria-current={route.name === r.name ? 'page' : undefined} onClick={pick(() => navigate({ name: r.name }))}>
+                  <Icon name={r.icon} size={22} color="#111A1B" strokeWidth={1.7} />
+                  <span className="tb-tile-t">{r.label}</span>
+                  <span className="tb-tile-s">{r.hint}</span>
+                </button>
+              ))}
             </div>
             <button type="button" className="tb-pass-row" aria-label={`${link.projectName}. Switch project`} onClick={pick(() => openSheet('project'))}>
               <Icon name="users" size={18} color="#3F5155" strokeWidth={1.7} />
@@ -181,18 +183,14 @@ export function TabBar({ hidden }: { hidden: boolean }) {
         )}
         {menu === 'add' && (
           <div className="tb-dial" id={menuId} role="group" aria-label="Add">
-            <button type="button" className="tb-dial-item" style={{ '--i': 1 } as CSSProperties} onClick={pick(() => openSheet('invoice'))}>
-              <span className="tb-dial-t">Scan invoice</span>
-              <span className="tb-dial-icon">
-                <Icon name="scan" size={20} color="#111A1B" strokeWidth={1.8} />
-              </span>
-            </button>
-            <button type="button" className="tb-dial-item" style={{ '--i': 0 } as CSSProperties} onClick={pick(() => openLog(true))}>
-              <span className="tb-dial-t">Log time</span>
-              <span className="tb-dial-icon">
-                <Icon name="logTime" size={20} color="#111A1B" strokeWidth={1.8} />
-              </span>
-            </button>
+            {addActions.map((a, k) => (
+              <button type="button" key={a.id} className="tb-dial-item" style={{ '--i': k } as CSSProperties} onClick={pick(a.run)}>
+                <span className="tb-dial-t">{a.label}</span>
+                <span className="tb-dial-icon">
+                  <Icon name={a.icon} size={20} color="#111A1B" strokeWidth={1.8} />
+                </span>
+              </button>
+            ))}
           </div>
         )}
         <nav className={`tabbar${layout ? ' is-measured' : ''}`} aria-label="Tabs" ref={navRef}>

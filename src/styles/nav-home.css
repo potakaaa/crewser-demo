@@ -22,7 +22,7 @@
   grid-area: 1 / 1;
   height: 252px;
   border-radius: var(--r-card);
-  background: #ffffff;
+  background: var(--card);
   color: var(--ink);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.4) inset,
@@ -249,9 +249,62 @@
     width 300ms var(--ease-ios),
     background var(--t-fast) ease;
 }
+.deck-dot[data-more] {
+  transform: scale(0.6);
+}
 .deck-dot[data-on='true'] {
   width: 18px;
   background: var(--lime);
+}
+
+/* Home's one-tap row: quieter than the deck's CTAs, icon tiles on the sheet. */
+.quick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+.quick-tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  background: var(--card);
+  color: var(--ink);
+  text-align: left;
+  transition: transform 180ms var(--ease-out);
+}
+.quick-tile:active {
+  transform: scale(0.98);
+}
+.quick-icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-control);
+  background: var(--lime);
+}
+.quick-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.quick-t {
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+.quick-s {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ───────── Tab bar: crew pass slot and the + ───────── */
@@ -273,7 +326,7 @@
 }
 .tab-avatar[data-on='true'] {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--card);
 }
 .tb-scrim {
   position: absolute;
@@ -338,7 +391,7 @@
   padding: 18px 12px 12px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
-  background: #ffffff;
+  background: var(--card);
   box-shadow: 0 18px 48px rgba(17, 26, 27, 0.28);
   transform-origin: 88% 100%;
   animation: tb-pop 280ms var(--ease-out) both;
@@ -479,7 +532,8 @@
   right: 0;
   bottom: calc(100% + 12px);
   display: flex;
-  flex-direction: column;
+  /* The first action sits nearest the +, and comes first for focus too. */
+  flex-direction: column-reverse;
   align-items: flex-end;
   gap: 10px;
 }
@@ -491,7 +545,7 @@
   padding: 6px 6px 6px 18px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
-  background: #ffffff;
+  background: var(--card);
   color: var(--ink);
   font-size: var(--fs-base);
   font-weight: 600;
@@ -663,7 +717,7 @@
   padding: 5px;
   border: 3px solid var(--ink);
   border-radius: 36px;
-  background: #ffffff;
+  background: var(--card);
   transition: transform 180ms var(--ease-out);
 }
 .inv-shutter span {
@@ -687,7 +741,7 @@
 .inv-result {
   padding: 16px;
   border-radius: var(--r-card);
-  background: #ffffff;
+  background: var(--card);
 }
 .inv-total {
   display: flex;
@@ -750,7 +804,7 @@
   padding: 0 14px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-control);
-  background: #ffffff;
+  background: var(--card);
   font-size: var(--fs-md);
   font-weight: 500;
 }
@@ -763,7 +817,7 @@
 .inv-cat[data-on='true'] {
   border-color: var(--ink);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--card);
 }
 .inv-cat:focus-within {
   outline: 2px solid var(--focus);

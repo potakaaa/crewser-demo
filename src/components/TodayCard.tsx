@@ -17,6 +17,7 @@ const SWIPE_SHARE = 0.22;
 const FLICK = 0.45;
 /** How long the deck waits for the ruler to arrive before trusting the ruler again. */
 const SETTLE_MS = 1200;
+const MAX_DOTS = 5;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -296,6 +297,8 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
       '--shade': Math.min(pos, 2) * 0.1,
     }) as CSSProperties;
 
+  // A window of dots that follows the current card, so a long deck never reads as a row of noise.
+  const dotFrom = Math.max(0, Math.min(i - Math.floor(MAX_DOTS / 2), count - MAX_DOTS));
   const label = (k: number) => {
     const c = cards[k];
     return c.note ? `${c.stop ? c.stop.when : 'Today'}, ${c.note.title}` : 'Today';
@@ -352,7 +355,12 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
             <Icon name="left" size={18} color="currentColor" strokeWidth={2} />
           </button>
           <span className="deck-dots" aria-hidden="true">
-            {count <= 9 ? cards.map((c, k) => <span key={c.key} className="deck-dot" data-on={k === i} />) : `${i + 1} / ${count}`}
+            {cards.slice(dotFrom, dotFrom + MAX_DOTS).map((c, d) => {
+              const k = dotFrom + d;
+              // An end dot shrinks when more cards lie past it.
+              const more = (d === 0 && k > 0) || (d === MAX_DOTS - 1 && k < count - 1);
+              return <span key={c.key} className="deck-dot" data-on={k === i} data-more={more || undefined} />;
+            })}
           </span>
           <button type="button" className="deck-arrow" disabled={i === count - 1} onClick={() => go(i + 1)} aria-label={i < count - 1 ? `Next: ${label(i + 1)}` : 'Next'}>
             <Icon name="right" size={18} color="currentColor" strokeWidth={2} />

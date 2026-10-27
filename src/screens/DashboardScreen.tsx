@@ -10,6 +10,7 @@ import { NotifButton } from '../components/NotifButton';
 import { ForChip } from '../components/ForChip';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
+import { QuickActions } from '../components/QuickActions';
 import { Wordmark } from '../components/Brand';
 import { smartNotes } from '../lib/notes';
 import { greeting } from '../lib/greeting';
@@ -70,6 +71,7 @@ export function DashboardScreen() {
       </GradientHeader>
 
       <Sheet className="sheet-dash">
+        <QuickActions />
         {link.isMe && !masterDataDone && (
           <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
             <span className="master-icon">
