@@ -1,0 +1,59 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "BASH_DEFAULT_TIMEOUT_MS": "300000",
+    "BASH_MAX_TIMEOUT_MS": "1800000"
+  },
+  "teammateMode": "in-process",
+  "permissions": {
+    "allow": [
+      "Bash(bun run *)",
+      "Bash(bun test*)",
+      "Bash(git add *)",
+      "Bash(git checkout -b *)",
+      "Bash(git commit *)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git status*)",
+      "Bash(git switch *)",
+      "Bash(npm install*)",
+      "Bash(npm run *)",
+      "Bash(npm test*)",
+      "Bash(npx tsc*)",
+      "Bash(office reap*)",
+      "Bash(office status*)",
+      "Bash(office top*)",
+      "Bash(office watch*)",
+      "Bash(pnpm *)",
+      "Bash(test-gate * -- bun *)",
+      "Bash(test-gate * -- npm run *)",
+      "Bash(test-gate * -- npm test*)",
+      "Bash(test-gate * -- npx jest*)",
+      "Bash(test-gate * -- npx playwright *)",
+      "Bash(test-gate * -- npx vitest*)",
+      "Bash(test-gate * -- pnpm *)",
+      "Bash(test-gate * -- xcodebuild *)",
+      "Bash(test-gate * -- yarn *)",
+      "Bash(test-gate list*)",
+      "Bash(yarn *)",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(rm -rf *)"
+    ]
+  },
+  "hooks": {
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-checks.sh\"",
+            "timeout": 1200
+          }
+        ]
+      }
+    ]
+  }
+}
