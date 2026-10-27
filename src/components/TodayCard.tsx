@@ -4,11 +4,11 @@ import { useDemo } from '../store';
 import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
-import { quickAction, TYPE_LABEL } from '../lib/notes';
+import { hasScanCode, quickAction, TYPE_LABEL } from '../lib/notes';
 import { callSheetFor, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { dayWord } from './docs/docs';
-import { fmtCountdown, toMinutes } from '../lib/dates';
+import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
 import type { Preview, Scrub, ScrubStop } from '../lib/timeline';
 import { useAxisDrag } from '../lib/useAxisDrag';
 
@@ -76,9 +76,16 @@ function DeckCard({ card }: { card: CardModel }) {
     ? heroStatus(n, phase, submitted ? (offline ? 'saved' : 'sent') : null)
     : { pill: n.day && dayWord(n.day) === 'Tomorrow' ? 'TOMORROW' : TYPE_LABEL[n.type].toUpperCase(), tone: 'neutral' as Tone, rel: card.stop!.rel };
   const wrap = n.facts.find((f) => f.label === 'Wrap');
-  const sub = n.type === 'appointment' ? `Call · wrap ${!wrap || wrap.unconfirmed ? 'TBC' : wrap.value}` : card.stop?.when;
+  const flightNo = n.type === 'flight' ? n.facts.find((f) => f.action === 'copy')?.value : undefined;
+  const sub =
+    n.type === 'appointment'
+      ? `Call · wrap ${!wrap || wrap.unconfirmed ? 'TBC' : wrap.value}`
+      : flightNo && n.day
+        ? `${flightNo} · ${fmtDayShort(n.day)}`
+        : card.stop?.when;
   const place = n.facts.find((f) => f.action === 'map')?.value;
-  const where = place ?? n.subtitle;
+  // A flight's subtitle repeats its number: the row keeps just the route.
+  const where = place ?? (flightNo ? n.subtitle?.replace(`${flightNo} · `, '') : n.subtitle);
 
   let primary: ReactNode = null;
   if (isHero && phase === 'after' && !submitted) {
@@ -93,7 +100,7 @@ function DeckCard({ card }: { card: CardModel }) {
     primary = (
       <button type="button" className="btn btn-primary deck-cta" onClick={() => a.primary(n)}>
         <Icon name={boarding ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
-        {boarding ? n.primaryAction.label : n.primaryAction.short}
+        {n.primaryAction.short}
       </button>
     );
   } else if (attachment) {
@@ -147,12 +154,13 @@ function DeckCard({ card }: { card: CardModel }) {
             {sheet.isNew && <span className="deck-new" aria-hidden="true" />}
           </button>
         )}
-        {primary ??
-          (!sheet && (
-            <button type="button" className="btn deck-cta deck-sheet" onClick={() => a.openNote(n.id)}>
-              Details
-            </button>
-          ))}
+        {/* Without a call sheet, Details takes the grey slot, so every card offers two actions. */}
+        {!sheet && (
+          <button type="button" className="btn deck-cta deck-sheet" onClick={() => a.openNote(n.id)}>
+            Details
+          </button>
+        )}
+        {primary}
       </div>
     </div>
   );
@@ -164,10 +172,14 @@ function DeckCard({ card }: { card: CardModel }) {
  * the ruler turns the deck the same way. The ruler's preview stays the one truth for which note is shown.
  */
 export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undefined; scrub: Scrub; preview: Preview | null; onGoTo: (stopIndex: number) => void }) {
-  // Today's call is also a stop on the ruler; it is the front card, not a second one.
+  // Today's call is also a stop on the ruler; it is the front card, not a second one. The next trip with a
+  // boarding pass comes right behind it, the one card you must not miss; the rest follow in time order.
+  // Each card keeps its own stop index, so the ruler still glides to the real time of whichever card is in front.
+  const later: CardModel[] = scrub.stops.flatMap((s, si) => (s.note.id === hero?.id ? [] : [{ key: s.note.id, note: s.note, stop: s, si }]));
+  const trip = later.findIndex((c) => hasScanCode(c.note!));
   const cards: CardModel[] = [
     { key: hero ? `hero-${hero.id}` : 'empty', note: hero },
-    ...scrub.stops.flatMap((s, si) => (s.note.id === hero?.id ? [] : [{ key: s.note.id, note: s.note, stop: s, si }])),
+    ...(trip > 0 ? [later[trip], ...later.slice(0, trip), ...later.slice(trip + 1)] : later),
   ];
   const count = cards.length;
   const fromRuler = preview ? Math.max(0, cards.findIndex((c) => c.si === preview.index)) : 0;
