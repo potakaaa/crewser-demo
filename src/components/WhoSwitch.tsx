@@ -15,9 +15,9 @@ const SLIDE_MS = 200;
 const HINT_KEY = 'crewser-who-hint';
 
 /**
- * The Home header's who-and-where button. Tap opens the projects sheet; as shortcuts, a vertical swipe on the
- * avatar steps through the people you can act for on this project and a horizontal swipe on the project line
- * steps through your projects. Expired and removed links are never stepped onto, and every switch can be undone.
+ * The Home header's who-and-where block. Tap opens the projects sheet; as shortcuts, a vertical swipe anywhere on
+ * it steps through the people you can act for on this project (the avatar rolls) and a horizontal swipe steps
+ * through your projects (the project line slides). Expired and removed links are never stepped onto, and every switch can be undone.
  */
 export function WhoSwitch() {
   const links = useDemo((s) => s.links);
@@ -37,49 +37,41 @@ export function WhoSwitch() {
     toast(`Switched to ${label}`, { label: 'Undo', run: () => void setActiveLink(from) });
   };
 
-  // Avatar: the reel follows the finger, then slides a whole avatar before the switch lands.
+  // The whole block takes both swipes: vertical moves the avatar reel (people), horizontal the project line.
   const [ay, setAy] = useState(0);
-  const [aGlide, setAGlide] = useState(false);
-  const avatar = useAxisDrag<HTMLSpanElement>('y', {
-    onDrag: (dy) => {
-      setAGlide(false);
-      setAy(Math.max(-44, Math.min(44, people.length > 1 ? dy : dy * 0.25)));
-    },
-    onRelease: (dy, v, cancelled) => {
-      setAGlide(true);
-      const to = !cancelled && (dy < -SWITCH_PX || v < -FLICK ? nextPerson : dy > SWITCH_PX || v > FLICK ? prevPerson : null);
-      if (!to) return setAy(0);
-      setAy(dy < 0 ? -44 : 44);
-      window.setTimeout(() => {
-        setAGlide(false);
-        setAy(0);
-        switchTo(to, to.isMe ? 'your own link' : to.personName);
-      }, SLIDE_MS);
-    },
-  });
-
-  // Project line: slides sideways, the next project comes in from the side it was pulled from.
   const [lx, setLx] = useState(0);
-  const [lGlide, setLGlide] = useState(false);
+  const [glide, setGlide] = useState(false);
   const [enter, setEnter] = useState<'left' | 'right' | null>(null);
-  const line = useAxisDrag<HTMLSpanElement>('x', {
-    onDrag: (dx) => {
-      setLGlide(false);
-      setLx(projects.length > 1 ? dx : dx * 0.25);
+  const block = useAxisDrag<HTMLButtonElement>('both', {
+    onDrag: (d, axis) => {
+      setGlide(false);
+      if (axis === 'y') setAy(Math.max(-44, Math.min(44, people.length > 1 ? d : d * 0.25)));
+      else setLx(projects.length > 1 ? d : d * 0.25);
     },
-    onRelease: (dx, v, cancelled) => {
-      setLGlide(true);
-      const fwd = dx < -SWITCH_PX || v < -FLICK;
-      const back = dx > SWITCH_PX || v > FLICK;
-      const to = !cancelled && (fwd || back) ? stepTarget(projects, isHere, fwd ? 1 : -1) : null;
-      if (!to) return setLx(0);
-      setLx(fwd ? -120 : 120);
-      window.setTimeout(() => {
-        setLGlide(false);
-        setLx(0);
-        setEnter(fwd ? 'right' : 'left');
-        switchTo(to, to.projectName);
-      }, SLIDE_MS);
+    onRelease: (d, v, cancelled, axis) => {
+      setGlide(true);
+      const fwd = !cancelled && (d < -SWITCH_PX || v < -FLICK);
+      const back = !cancelled && !fwd && (d > SWITCH_PX || v > FLICK);
+      if (axis === 'y') {
+        const to = fwd ? nextPerson : back ? prevPerson : null;
+        if (!to) return setAy(0);
+        setAy(fwd ? -44 : 44);
+        window.setTimeout(() => {
+          setGlide(false);
+          setAy(0);
+          switchTo(to, to.isMe ? 'your own link' : to.personName);
+        }, SLIDE_MS);
+      } else {
+        const to = fwd || back ? stepTarget(projects, isHere, fwd ? 1 : -1) : null;
+        if (!to) return setLx(0);
+        setLx(fwd ? -120 : 120);
+        window.setTimeout(() => {
+          setGlide(false);
+          setLx(0);
+          setEnter(fwd ? 'right' : 'left');
+          switchTo(to, to.projectName);
+        }, SLIDE_MS);
+      }
     },
   });
 
@@ -103,9 +95,9 @@ export function WhoSwitch() {
   }, [canSwipe]);
 
   return (
-    <button type="button" className="dash-who" onClick={() => openSheet('project')}>
-      <span className="avatar who-avatar" aria-hidden="true" ref={avatar.ref} {...avatar.handlers} data-hint={hint && people.length > 1}>
-        <span className="who-reel" data-glide={aGlide} style={{ '--ay': `${ay}px` } as CSSProperties}>
+    <button type="button" className="dash-who who-block" onClick={() => openSheet('project')} ref={block.ref} {...block.handlers}>
+      <span className="avatar who-avatar" aria-hidden="true" data-hint={hint && people.length > 1}>
+        <span className="who-reel" data-glide={glide} style={{ '--ay': `${ay}px` } as CSSProperties}>
           {prevPerson && <span className="who-av who-av-prev">{prevPerson.initials}</span>}
           <span className="who-av">{link.initials}</span>
           {nextPerson && <span className="who-av who-av-next">{nextPerson.initials}</span>}
@@ -119,11 +111,11 @@ export function WhoSwitch() {
         ) : (
           <ForChip />
         )}
-        <span className="home-project who-line-zone" ref={line.ref} {...line.handlers}>
+        <span className="home-project who-line-zone">
           <span
             key={link.projectId}
             className="who-line"
-            data-glide={lGlide}
+            data-glide={glide}
             data-enter={enter ?? undefined}
             data-hint={hint && projects.length > 1}
             style={{ '--lx': `${lx}px`, opacity: 1 - Math.min(1, Math.abs(lx) / 160) } as CSSProperties}

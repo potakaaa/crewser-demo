@@ -797,10 +797,12 @@
   font-weight: 700;
   pointer-events: auto;
 }
+.who-block {
+  touch-action: none;
+}
 .who-avatar {
   position: relative;
   overflow: hidden;
-  touch-action: none;
 }
 .who-reel {
   position: absolute;
@@ -824,7 +826,6 @@
   transform: translateY(100%);
 }
 .who-line-zone {
-  touch-action: pan-y;
   overflow: hidden;
 }
 .who-line {
