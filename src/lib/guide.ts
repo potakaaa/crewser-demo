@@ -28,12 +28,9 @@ export interface GuideStep {
 export const GUIDE_STEPS: GuideStep[] = [
   { id: 'deck', route: 'dashboard', target: 'deck', title: "What's next", body: 'Swipe the card left or right to see what comes after.', waitFor: ['deck:swiped'], placement: 'below' },
   { id: 'ruler', route: 'dashboard', target: 'ruler', title: 'Look ahead', body: 'Drag the strip to scrub through the coming days.', waitFor: ['ruler:scrubbed'], placement: 'below' },
-  { id: 'person', route: 'dashboard', target: 'who', title: 'Switch person', body: 'Swipe up or down here to act for someone on your team.', waitFor: ['switch:person'], placement: 'below' },
-  { id: 'project', route: 'dashboard', target: 'who', title: 'Switch project', body: 'Swipe sideways to jump to your other show.', waitFor: ['switch:project'], placement: 'below' },
+  { id: 'switch', route: 'dashboard', target: 'who', title: 'Switch', body: 'Swipe up or down to switch person, sideways to switch project.', waitFor: ['switch:person', 'switch:project'], placement: 'below' },
   { id: 'timer', route: 'dashboard', target: 'timer', title: 'Your hours', body: 'Tap for manual entry. Hold to start the timer.', waitFor: ['timer:started', 'log:opened'], placement: 'below' },
-  { id: 'add', route: 'dashboard', target: 'add', title: 'Add', body: 'Track time or scan an invoice from anywhere.', waitFor: ['add:opened'], placement: 'above' },
   { id: 'pass', route: 'dashboard', target: 'pass', title: 'Your pass', body: 'Documents, contacts, settings and notifications live here.', waitFor: ['pass:opened'], placement: 'above' },
-  { id: 'calendar', route: 'calendar', target: 'calendar', title: 'Calendar', body: 'A dot means notes that day. A clock means hours not sent yet.', waitFor: null, placement: 'below' },
 ];
 
 const listeners = new Set<(e: GuideEvent) => void>();
