@@ -9,7 +9,7 @@ export function NotePrimaryAction({ note, className = 'ccard-action' }: { note: 
   if (!pa) return null;
   return (
     <button type="button" className={`btn btn-primary ${className}`} onClick={() => a.primary(note)}>
-      <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+      <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
       {pa.label}
     </button>
   );

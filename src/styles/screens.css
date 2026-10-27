@@ -337,7 +337,7 @@
   gap: var(--sp-2);
   margin: 0 calc(-1 * var(--sp-5));
   padding: var(--sp-2) var(--sp-5);
-  background: rgba(34, 43, 46, 0.92);
+  background: rgba(25, 33, 36, 0.92);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   font-size: var(--fs-xs);

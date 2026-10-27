@@ -189,7 +189,7 @@ export function NoteSheet({ id }: { id?: string }) {
       )}
       {pa && (
         <button type="button" className="btn btn-primary btn-lg" onClick={() => a.primary(note)}>
-          <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={18} color="#FFFFFF" strokeWidth={1.8} />
+          <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={18} color="currentColor" strokeWidth={1.8} />
           {pa.label}
         </button>
       )}

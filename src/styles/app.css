@@ -7,11 +7,11 @@
   /* Dark mode: "brand" tiles sit flat, one step above the card, like the production app.
      The grain + gradient look lives only on --brand-focal (the header orb, one hero per screen). */
   --brand-surface: var(--card-2);
-  --brand-surface-hover: #3b474a;
+  --brand-surface-hover: var(--soft-hover);
   --brand-focal:
     radial-gradient(160px 70px at 100% 0%, rgba(200, 224, 60, 0.18), rgba(200, 224, 60, 0)),
     radial-gradient(140% 120% at 20% 0%, #3d6650 0%, #2c4a3e 48%, #22302f 100%);
-  --shadow-card: none;
+  --shadow-card: var(--elev-1);
   /* Motion: one iOS-like curve for anything that moves, a softer one for fades. */
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -188,7 +188,7 @@
   top: 0;
   height: var(--sat);
   margin-bottom: calc(-1 * var(--sat));
-  background: rgba(34, 43, 46, 0.86);
+  background: rgba(25, 33, 36, 0.86);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   backdrop-filter: blur(18px) saturate(160%);
   opacity: 0;
@@ -3122,4 +3122,25 @@
 }
 .log-titles h2 {
   font-size: calc(18px * var(--display-scale));
+}
+
+/* ───────── Elevation (dark) ─────────
+   Base, card, raised control: one look per level so nested things never melt together.
+   Cards with a hairline border already have their rim; the rest get it as an inset ring. */
+:is(.today-card, .master, .hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
+  .duo-card, .facts-card, .note-text, .card, .crew-card, .notif-item, .dlist, .setprofile, .fontopt) {
+  box-shadow: var(--elev-1);
+}
+:is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
+}
+:is(.btn-ink, .btn-soft, .icon-btn-soft, .icon-btn-chip, .cquick, .cact, .step-btn, .bp-chip, .today-actions) {
+  background: var(--card-2);
+  box-shadow: var(--elev-2);
+}
+/* Icon tiles are not buttons: lighter than the card, no bezel. */
+:is(.chip-icon, .master-icon, .pocket-icon, .notif-icon, .todo-icon-neutral) {
+  background: var(--chip);
+  color: var(--chip-icon);
 }

@@ -149,8 +149,8 @@ export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; ope
               {withPrimary ? 'Details' : 'Open details'}
             </button>
             {withPrimary && pa && (
-              <button type="button" className="btn btn-ink btn-grow" onClick={() => a.primary(note)}>
-                <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+              <button type="button" className="btn btn-primary btn-grow" onClick={() => a.primary(note)}>
+                <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
                 {pa.short}
               </button>
             )}

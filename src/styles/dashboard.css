@@ -570,48 +570,36 @@
   outline-color: var(--lime);
   outline-offset: -3px;
 }
+/* The hero card's action is the screen's one filled lime anchor; note cards keep the outlined version. */
 .btn.btn-primary.today-action {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 2px 6px rgba(0, 0, 0, 0.25);
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--on-lime);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.btn.btn-primary.today-action:focus-visible {
+  outline-color: var(--ink);
 }
 
 /* ───────── Primary button for a note's own action (NotePrimaryAction) ─────────
-   The brand surface: dark ink to deep green with a faint lime glow and film grain, white text
-   (8:1 or better). Lime stays for the one CTA (Submit after wrap, Log). */
+   Lime outline and lime text (8:1 on the card): the one anchor per card. */
 .btn.btn-primary {
   position: relative;
   isolation: isolate;
-  border: 0;
-  background: var(--brand-surface);
-  color: #ffffff;
+  border: 1px solid rgba(200, 224, 60, 0.6);
+  background: rgba(200, 224, 60, 0.1);
+  color: var(--lime);
   font-weight: 600;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition:
     transform 180ms var(--ease-out),
-    box-shadow var(--t-fast) ease;
-}
-.btn.btn-primary::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--grain, none) 0 0 / var(--grain-card-size) var(--grain-card-size);
-  opacity: var(--grain-card-opacity);
-  mix-blend-mode: var(--grain-card-blend);
-  pointer-events: none;
+    background var(--t-fast) ease;
 }
 .btn.btn-primary:hover {
-  background: var(--brand-surface-hover);
+  background: rgba(200, 224, 60, 0.16);
 }
 .btn.btn-primary:active {
   transform: scale(0.98);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 1px 4px rgba(0, 0, 0, 0.25);
 }
 .btn.btn-primary:focus-visible {
   outline: 2px solid var(--focus);
@@ -751,7 +739,7 @@
   transition: background var(--t-fast) ease;
 }
 .hs-tile + .hs-tile {
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
 }
 .hs-tile:active {
   background: rgba(255, 255, 255, 0.08);
@@ -795,7 +783,7 @@
   border-top: 1px solid var(--hairline);
 }
 .hs-card .hs-nudge {
-  border-top-color: rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.16);
 }
 .hs-card .hs-nudge-text {
   color: #dfe6e6;
