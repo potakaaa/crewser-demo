@@ -90,6 +90,20 @@ async function guideRun(b) {
   ok(!p.errs.length, 'no console errors ' + JSON.stringify(p.errs.slice(0, 3)));
   await p.context().close();
 
+  // Timer TAP path: opens manual entry and advances the timer step.
+  {
+    const q = await open(b, { done: false });
+    const ti = STEPS.findIndex((x) => x.name.startsWith('timer'));
+    await waitStep(q, 1, 'tap-run start');
+    for (let i = 0; i < ti; i++) { await q.locator('.guide-next').click(); await sleep(400); }
+    await waitStep(q, ti + 1, 'tap-run at timer step');
+    const [x, y] = await center(q, '[data-guide="timer"]'); await tap(q, x, y);
+    await waitStep(q, ti + 2, 'timer tap');
+    ok(await q.locator('.log-sheet, [class*="log-"]').count() > 0 || /Start|End|Break|hours/i.test(await q.evaluate(() => document.body.innerText)), 'timer tap opened manual entry');
+    ok(!q.errs.length, 'no console errors (tap run) ' + JSON.stringify(q.errs.slice(0, 3)));
+    await q.context().close();
+  }
+
   // Skip and Esc restore the original link
   for (const how of ['Skip', 'Esc']) {
     const q = await open(b, { done: false });
@@ -128,7 +142,7 @@ async function regress(b) {
   // collect every deck card for "undefined"
   const [dx, dy] = await center(p, '[data-guide="deck"]');
   const seen = new Set();
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 14; i++) {
     const tt = await txt(); ok(!/undefined|NaN/.test(tt), `no undefined/NaN on deck card ${i}`);
     seen.add(await deckTxt());
     await swipe(p, [dx + 100, dy], [dx - 100, dy]); await sleep(500);
