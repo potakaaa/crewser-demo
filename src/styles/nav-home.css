@@ -401,33 +401,24 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tb-pass-day {
-  flex: none;
-  padding: 4px 8px;
-  border: 1.5px solid var(--ink);
-  border-radius: 6px;
-  font-size: calc(18px * var(--numeral-scale));
-  line-height: 1;
-  transform: rotate(-4deg);
-}
 .tb-pass-tiles {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-2);
 }
 .tb-tile {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-height: 88px;
-  padding: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 76px;
+  padding: 10px 4px;
   border: 1px solid transparent;
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
   box-shadow: var(--elev-2);
-  text-align: left;
   transition: transform 180ms var(--ease-out);
 }
 .tb-tile:active {
@@ -436,17 +427,13 @@
 .tb-tile[aria-current='page'] {
   border-color: var(--lime);
 }
-.tb-tile svg {
-  margin-bottom: auto;
-}
 .tb-tile-t {
-  margin-top: 10px;
-  font-size: var(--fs-base);
-  font-weight: 600;
-}
-.tb-tile-s {
+  max-width: 100%;
+  overflow: hidden;
   font-size: var(--fs-sm);
-  color: var(--text-2);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .tb-pass-row {
   display: flex;
@@ -469,11 +456,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.tb-pass-row > .tb-pass-row-s {
-  flex: none;
-  font-weight: 600;
-  color: var(--teal);
 }
 
 .tb-dial {

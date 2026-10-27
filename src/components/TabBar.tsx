@@ -1,19 +1,18 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
-import { contacts, today, todayLabel } from '../mock';
 import { useActiveLink, useDemo, useRoute, useUnreadCount, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 import { useAddActions } from '../lib/addActions';
 
-/** Three main routes, then the crew pass: Contacts and Settings live behind your initials. */
+/** Two main routes, then the crew pass: Documents, Contacts and Settings live behind your initials. */
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'dashboard', label: 'Home', icon: 'dashboard' },
   { name: 'calendar', label: 'Calendar', icon: 'calendar' },
-  { name: 'documents', label: 'Docs', icon: 'documents' },
 ];
 /** Routes behind the crew pass: its tiles, and the label the pass slot takes while one is open. */
-const PASS_ROUTES: { name: TabName; label: string; hint: string; icon: IconName }[] = [
-  { name: 'contacts', label: 'Contacts', hint: `${contacts.length} crew`, icon: 'contacts' },
-  { name: 'settings', label: 'Settings', hint: 'Preferences', icon: 'settings' },
+const PASS_ROUTES: { name: TabName; label: string; icon: IconName }[] = [
+  { name: 'documents', label: 'Documents', icon: 'documents' },
+  { name: 'contacts', label: 'Contacts', icon: 'contacts' },
+  { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
 const SLOTS = TABS.length + 1;
 
@@ -59,7 +58,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
   const idx = passLabel ? TABS.length : TABS.findIndex((t) => t.name === route.name);
   if (idx >= 0) lastActive.current = idx;
   const active = lastActive.current;
-  const lastPass = useRef('Contacts');
+  const lastPass = useRef('Documents');
   if (passLabel) lastPass.current = passLabel;
 
   useLayoutEffect(() => {
@@ -161,16 +160,12 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                   {link.position} · {link.department}
                 </span>
               </span>
-              <span className="tb-pass-day num" aria-label={todayLabel}>
-                {today.dayLabel ? 'TRV' : `D${today.shootDay}`}
-              </span>
             </div>
             <div className="tb-pass-tiles">
               {PASS_ROUTES.map((r) => (
                 <button type="button" key={r.name} className="tb-tile" aria-current={route.name === r.name ? 'page' : undefined} onClick={pick(() => navigate({ name: r.name }))}>
                   <Icon name={r.icon} size={22} color="currentColor" strokeWidth={1.7} />
                   <span className="tb-tile-t">{r.label}</span>
-                  <span className="tb-tile-s">{r.hint}</span>
                 </button>
               ))}
             </div>
@@ -178,12 +173,6 @@ export function TabBar({ hidden }: { hidden: boolean }) {
               <Icon name="bell" size={18} color="currentColor" strokeWidth={1.7} />
               <span>Notifications</span>
               {unread > 0 && <span className="tb-pass-count">{unread > 9 ? '9+' : unread}</span>}
-              <Icon name="right" size={16} color="currentColor" />
-            </button>
-            <button type="button" className="tb-pass-row" aria-label={`${link.projectName}. Switch project`} onClick={pick(() => openSheet('project'))}>
-              <Icon name="users" size={18} color="currentColor" strokeWidth={1.7} />
-              <span>{link.projectName}</span>
-              <span className="tb-pass-row-s">Switch</span>
               <Icon name="right" size={16} color="currentColor" />
             </button>
           </div>
@@ -217,7 +206,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
             </span>,
             {
               onClick: () => toggle('pass'),
-              ariaLabel: passLabel ? `${passLabel}. Your pass: contacts, settings, projects` : 'Your pass: contacts, settings, projects',
+              ariaLabel: passLabel ? `${passLabel}. Your pass: documents, contacts, settings` : 'Your pass: documents, contacts, settings',
               current: !!passLabel,
               menu: true,
               title: 'Your pass',
