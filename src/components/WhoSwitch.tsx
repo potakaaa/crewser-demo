@@ -22,6 +22,8 @@ export interface SwitchMotion {
   kind: 'person' | 'project';
   /** 1: swiped forward (up or left), the new content comes from below or the right. */
   dir: 1 | -1;
+  /** The link switched away from, so the confirmation can offer Undo. */
+  from: string;
 }
 
 export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }) {
@@ -29,23 +31,21 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
   const activeId = useDemo((s) => s.activeLinkId);
   const setActiveLink = useDemo((s) => s.setActiveLink);
   const openSheet = useDemo((s) => s.openSheet);
-  const toast = useDemo((s) => s.showToast);
   const link = useActiveLink();
   const { people, projects } = switchTargets(links, activeId);
   const nextPerson = stepTarget(people, (l) => l.id === activeId, 1);
   const prevPerson = stepTarget(people, (l) => l.id === activeId, -1);
   const isHere = (l: CrewLink) => l.projectId === link.projectId;
 
-  const switchTo = (to: CrewLink, label: string, motion: SwitchMotion) => {
-    const from = activeId;
-    onSwitch?.(motion);
+  // The confirmation, with Undo, is the pill over the deck (Dashboard); no toast on top of it.
+  const switchTo = (to: CrewLink, motion: Omit<SwitchMotion, 'from'>) => {
+    onSwitch?.({ ...motion, from: activeId });
     if (!setActiveLink(to.id)) return;
     try {
       navigator.vibrate?.(10); // Android only; iOS has no vibrate.
     } catch {
       /* optional */
     }
-    toast(`Switched to ${label}`, { label: 'Undo', run: () => void setActiveLink(from) });
   };
 
   // Any switch (gesture, sheet or Undo) makes the avatar roll and pulse once; not on first render.
@@ -78,7 +78,7 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
         window.setTimeout(() => {
           setGlide(false);
           setAy(0);
-          switchTo(to, to.isMe ? `${to.personName} (You)` : to.personName, { kind: 'person', dir: fwd ? 1 : -1 });
+          switchTo(to, { kind: 'person', dir: fwd ? 1 : -1 });
         }, SLIDE_MS);
       } else {
         const to = fwd || back ? stepTarget(projects, isHere, fwd ? 1 : -1) : null;
@@ -88,7 +88,7 @@ export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }
           setGlide(false);
           setLx(0);
           setEnter(fwd ? 'right' : 'left');
-          switchTo(to, to.projectName, { kind: 'project', dir: fwd ? 1 : -1 });
+          switchTo(to, { kind: 'project', dir: fwd ? 1 : -1 });
         }, SLIDE_MS);
       }
     },
