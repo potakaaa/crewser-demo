@@ -129,7 +129,7 @@ function DeckCard({ card }: { card: CardModel }) {
   if (import.meta.env.DEV) console.assert(![status.pill, status.rel, sub, where].some((t) => String(t).includes('undefined')), 'deck card text has undefined', n.id);
 
   return (
-    <div className="deck-body" data-ticket={n.route ? true : undefined}>
+    <div className="deck-body">
       {/* Always in the hero card, so a screen reader hears the change when hours are sent. */}
       {isHero && (
         <p className="sr-only" role="status">
@@ -145,51 +145,18 @@ function DeckCard({ card }: { card: CardModel }) {
           <Icon name="arrowUpRight" size={18} color="currentColor" strokeWidth={1.8} />
         </button>
       </div>
-      {n.route ? (
-        // A trip with a route reads as a ticket: the two codes large, a tear line, then the few facts that matter.
-        <>
-          <div className="deck-route" aria-label={`${n.route.from.city} to ${n.route.to.city}`}>
-            <span className="deck-port">
-              <span className="deck-code num">{n.route.from.code}</span>
-              <span className="deck-city">{n.route.from.city}</span>
-            </span>
-            <Icon name={noteIcon(n.type)} size={22} color="currentColor" strokeWidth={1.6} className="deck-plane" />
-            <span className="deck-port deck-port-to">
-              <span className="deck-code num">{n.route.to.code}</span>
-              <span className="deck-city">{n.route.to.city}</span>
-            </span>
-          </div>
-          <dl className="deck-stub">
-            {[
-              ['Departs', time],
-              ['Flight', flightNo],
-              ['Pickup', pickup],
-            ]
-              .filter((f): f is [string, string] => !!f[1])
-              .map(([k, v]) => (
-                <div key={k}>
-                  <dt>{k}</dt>
-                  <dd className="num">{v}</dd>
-                </div>
-              ))}
-          </dl>
-        </>
-      ) : (
-        <>
-          <div className="deck-main">
-            <span className={`deck-time num${n.kind === 'time' ? '' : ' deck-time-sm'}`}>{time}</span>
-            <span className="deck-titles">
-              <span className="deck-t1">{n.title}</span>
-              {sub && <span className="deck-t2">{sub}</span>}
-            </span>
-          </div>
-          {where && (
-            <p className="deck-place">
-              <Icon name={place ? 'pin' : noteIcon(n.type)} size={16} color="currentColor" strokeWidth={1.7} />
-              <span>{where}</span>
-            </p>
-          )}
-        </>
+      <div className="deck-main">
+        <span className={`deck-time num${n.kind === 'time' ? '' : ' deck-time-sm'}`}>{time}</span>
+        <span className="deck-titles">
+          <span className="deck-t1">{n.title}</span>
+          {sub && <span className="deck-t2">{sub}</span>}
+        </span>
+      </div>
+      {where && (
+        <p className="deck-place">
+          <Icon name={place ? 'pin' : noteIcon(n.type)} size={16} color="currentColor" strokeWidth={1.7} />
+          <span>{where}</span>
+        </p>
       )}
       <div className="deck-ctas">
         {sheet && (

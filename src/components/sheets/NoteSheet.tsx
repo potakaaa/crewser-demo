@@ -102,7 +102,8 @@ export function NoteSheet({ id }: { id?: string }) {
   const note = id ? noteById(id) : undefined;
   const a = useNoteActions();
   if (!note) return <p className="sheet-empty">This note is no longer available.</p>;
-  const isFlight = note.type === 'flight' && !!note.route;
+  // A note with a route (a flight today) is shown as a ticket; other notes keep the hero with call and wrap.
+  const isFlight = !!note.route;
   const pa = note.primaryAction;
   const flightNo = note.facts.find((f) => f.label === 'Flight no.')?.value;
   // The hero shows call and wrap, or the time with its note ("15:00 Check-in"); a flight's number is in the pair under it.
@@ -112,9 +113,10 @@ export function NoteSheet({ id }: { id?: string }) {
   const wrap = note.day ? note.facts.find((f) => f.label === 'Wrap') : undefined;
   // "Wed 21 Oct, 15:00": the note's own day and time, nothing the hero and subtitle don't already say.
   const atTime = (value: string) => !!note.day && !!note.time && value === `${fmtDayMonth(note.day)}, ${note.time}`;
+  const pickup = note.facts.find((f) => f.label === 'Pickup')?.value;
   const inHero = (label: string, value: string) =>
     isFlight
-      ? label === 'Flight no.'
+      ? label === 'Flight no.' || label === 'Pickup'
       : (label === 'Call' && !!call) || (label === 'Wrap' && !!wrap) || (!wrap && label === timeSub(note) && atTime(value));
   const facts = note.facts.filter((f) => !inHero(f.label, f.value));
   // With its own Directions button below, a place only needs Copy here.
@@ -122,57 +124,68 @@ export function NoteSheet({ id }: { id?: string }) {
 
   return (
     <>
-      <div className="ns-hero">
-        <div className="ns-hero-head">
-          <span className="chip-icon chip-icon-glass">
-            <Icon name={note.type} size={18} color={TYPE_COLOR[note.type].dot} />
-          </span>
-          {!isFlight && <h3 className="ns-title">{note.title}</h3>}
-        </div>
-        {isFlight ? (
-          <div className="route route-dark">
-            <div>
+      {isFlight ? (
+        <div className="nticket">
+          <div className="nticket-route" aria-label={`${note.route!.from.city} to ${note.route!.to.city}`}>
+            <span className="nticket-port">
               <span className="route-code">{note.route!.from.code}</span>
               <span className="route-city">{note.route!.from.city}</span>
-            </div>
-            <Icon name="arrowRight" size={26} color="#C4CFD0" className="route-arrow" />
-            <div className="route-end">
+            </span>
+            <Icon name={note.type} size={26} color="currentColor" strokeWidth={1.6} className="nticket-plane" />
+            <span className="nticket-port nticket-port-to">
               <span className="route-code">{note.route!.to.code}</span>
               <span className="route-city">{note.route!.to.city}</span>
+            </span>
+          </div>
+          <dl className="nticket-facts">
+            {[
+              ['Departs', note.time],
+              ['Flight', flightNo],
+              ['Pickup', pickup],
+            ]
+              .filter((f): f is [string, string] => !!f[1])
+              .map(([k, v]) => (
+                <div key={k}>
+                  <dt>{k}</dt>
+                  <dd className="num">{v}</dd>
+                </div>
+              ))}
+          </dl>
+          {/* The stub, torn off at the dashed line: the boarding pass code. */}
+          {hasScanCode(note) && (
+            <div className="nticket-stub">
+              <QrPreview note={note} />
             </div>
-          </div>
-        ) : (
-          note.day && (
-            <div className="ns-times">
-              <span className="ns-time">
-                <span className="ns-k">{call || wrap ? 'Call' : note.kind === 'time' ? 'Time' : 'When'}</span>
-                <span className="ns-big">{call?.value ?? timeText(note)}</span>
-                {!wrap && timeSub(note) && <span className="ns-sub">{timeSub(note)}</span>}
-              </span>
-              {wrap && (
-                <span className="ns-time">
-                  <span className="ns-k">Wrap</span>
-                  <span className={wrap.unconfirmed ? 'ns-tbc' : 'ns-big'}>{wrap.value}</span>
-                </span>
-              )}
-            </div>
-          )
-        )}
-      </div>
-
-      {isFlight && (
-        <div className="duo">
-          <div className="duo-card">
-            <span className="tile-k">Departs</span>
-            <strong>{note.time}</strong>
-          </div>
-          <div className="duo-card">
-            <span className="tile-k">Flight</span>
-            <strong>{flightNo}</strong>
-          </div>
+          )}
         </div>
+      ) : (
+        <>
+          <div className="ns-hero">
+            <div className="ns-hero-head">
+              <span className="chip-icon chip-icon-glass">
+                <Icon name={note.type} size={18} color={TYPE_COLOR[note.type].dot} />
+              </span>
+              <h3 className="ns-title">{note.title}</h3>
+            </div>
+            {note.day && (
+              <div className="ns-times">
+                <span className="ns-time">
+                  <span className="ns-k">{call || wrap ? 'Call' : note.kind === 'time' ? 'Time' : 'When'}</span>
+                  <span className="ns-big">{call?.value ?? timeText(note)}</span>
+                  {!wrap && timeSub(note) && <span className="ns-sub">{timeSub(note)}</span>}
+                </span>
+                {wrap && (
+                  <span className="ns-time">
+                    <span className="ns-k">Wrap</span>
+                    <span className={wrap.unconfirmed ? 'ns-tbc' : 'ns-big'}>{wrap.value}</span>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          {hasScanCode(note) && <QrPreview note={note} />}
+        </>
       )}
-      {hasScanCode(note) && <QrPreview note={note} />}
       {note.info && <InfoBlocks info={note.info} />}
       {facts.length > 0 && (
         <div className="facts-card">
