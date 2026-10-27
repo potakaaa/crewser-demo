@@ -132,8 +132,15 @@ export function SwitchPill({ n, kind, undo, origin = 'home', className = '' }: {
   const setActiveLink = useDemo((s) => s.setActiveLink);
   const [shown, setShown] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  // A guide step moving on takes the pill with it: it belongs to the step that made the switch.
+  const guideStep = useDemo((s) => s.guide);
+  const stepAtSwitch = useRef(guideStep);
+  useEffect(() => {
+    if (guideStep !== stepAtSwitch.current) setShown(0);
+  }, [guideStep]);
   useEffect(() => {
     if (!n) return;
+    stepAtSwitch.current = useDemo.getState().guide;
     setShown(n);
     const t = window.setTimeout(() => setShown(0), PILL_MS);
     const away = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setShown(0);

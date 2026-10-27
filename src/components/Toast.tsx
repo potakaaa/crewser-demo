@@ -4,6 +4,9 @@ import { useDemo } from '../store';
 export function Toast({ raised, top = false }: { raised: boolean; top?: boolean }) {
   const toast = useDemo((s) => s.toast);
   const [visible, setVisible] = useState(false);
+  // Each guide step starts clean: a toast from the step before does not linger over the next one.
+  const guideStep = useDemo((s) => s.guide);
+  useEffect(() => setVisible(false), [guideStep]);
 
   useEffect(() => {
     if (!toast) return;
