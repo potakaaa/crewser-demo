@@ -4,7 +4,7 @@ import { useDemo } from '../store';
 import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
-import { hasScanCode, quickAction, TYPE_LABEL } from '../lib/notes';
+import { quickAction, TYPE_LABEL } from '../lib/notes';
 import { callSheetFor, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { dayWord } from './docs/docs';
@@ -172,14 +172,11 @@ function DeckCard({ card }: { card: CardModel }) {
  * the ruler turns the deck the same way. The ruler's preview stays the one truth for which note is shown.
  */
 export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undefined; scrub: Scrub; preview: Preview | null; onGoTo: (stopIndex: number) => void }) {
-  // Today's call is also a stop on the ruler; it is the front card, not a second one. The next trip with a
-  // boarding pass comes right behind it, the one card you must not miss; the rest follow in time order.
-  // Each card keeps its own stop index, so the ruler still glides to the real time of whichever card is in front.
-  const later: CardModel[] = scrub.stops.flatMap((s, si) => (s.note.id === hero?.id ? [] : [{ key: s.note.id, note: s.note, stop: s, si }]));
-  const trip = later.findIndex((c) => hasScanCode(c.note!));
+  // Today's call is also a stop on the ruler; it is the front card, not a second one. The rest follow in
+  // time order, so turning the deck always moves the ruler forward.
   const cards: CardModel[] = [
     { key: hero ? `hero-${hero.id}` : 'empty', note: hero },
-    ...(trip > 0 ? [later[trip], ...later.slice(0, trip), ...later.slice(trip + 1)] : later),
+    ...scrub.stops.flatMap((s, si) => (s.note.id === hero?.id ? [] : [{ key: s.note.id, note: s.note, stop: s, si }])),
   ];
   const count = cards.length;
   const fromRuler = preview ? Math.max(0, cards.findIndex((c) => c.si === preview.index)) : 0;
