@@ -64,6 +64,7 @@ export function SettingsScreen() {
   const fontTheme = useDemo((s) => s.fontTheme);
   const setFontTheme = useDemo((s) => s.setFontTheme);
   const openSheet = useDemo((s) => s.openSheet);
+  const startGuide = useDemo((s) => s.startGuide);
   const toast = useDemo((s) => s.showToast);
   const { callSheetOut, hoursReminder, toggle } = usePrefs();
 
@@ -139,6 +140,12 @@ export function SettingsScreen() {
         <Group title="Projects">
           <div className="dlist">
             <NavRow icon="users" title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
+          </div>
+        </Group>
+
+        <Group title="Help">
+          <div className="dlist">
+            <NavRow icon="sun" title="Show the guide again" onClick={startGuide} />
           </div>
         </Group>
 

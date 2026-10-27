@@ -50,6 +50,8 @@ const audit = () => {
   let fails = 0;
   for (const [name, hash, click] of views) {
     const p = await b.newPage({ viewport: { width: w, height: 812 } });
+    // The first-visit guide would dim every view: mark it seen.
+    await p.addInitScript(() => localStorage.setItem('crewser-guide-done', '1'));
     await p.goto(base + hash); await p.waitForTimeout(2600);
     let skip = false;
     for (const c of click ? [].concat(click) : []) { const el = p.locator(c).first(); if (await el.count()) { await el.click({ timeout: 3000 }).catch(() => {}); await p.waitForTimeout(900); } else { console.log(`${name}: SKIP no ${c}`); skip = true; break; } }

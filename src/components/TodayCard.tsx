@@ -11,6 +11,7 @@ import { dayWord } from './docs/docs';
 import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
 import type { Preview, Scrub, ScrubStop } from '../lib/timeline';
 import { useAxisDrag } from '../lib/useAxisDrag';
+import { guideEmit } from '../lib/guide';
 
 /** A swipe past this share of the card's width, or a flick faster than FLICK px/ms, turns the card. */
 const SWIPE_SHARE = 0.22;
@@ -214,6 +215,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
   const go = (to: number) => {
     const t = Math.max(0, Math.min(count - 1, to));
     if (t === i) return;
+    guideEmit('deck:swiped');
     setIndex(t);
     pending.current = t;
     onGoTo(cards[t].si ?? -1);
@@ -273,7 +275,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
   };
 
   return (
-    <section className="deck" aria-roledescription="carousel" aria-label="Today and what's next. Swipe or use the arrow keys for the next card" onKeyDown={onKeyDown}>
+    <section className="deck" data-guide="deck" aria-roledescription="carousel" aria-label="Today and what's next. Swipe or use the arrow keys for the next card" onKeyDown={onKeyDown}>
       <div
         className={`deck-stack${drag ? ' is-dragging' : ''}`}
         ref={deckRef}

@@ -5,6 +5,7 @@ import { DemoPanel } from './components/DemoPanel';
 import { TabBar } from './components/TabBar';
 import { LogSheet } from './components/LogSheet';
 import { SheetHost } from './components/SheetHost';
+import { Guide } from './components/Guide';
 import { Toast } from './components/Toast';
 import { ScreenStack } from './components/ScreenStack';
 import { Splash } from './components/Brand';
@@ -64,6 +65,7 @@ function AppShell() {
       <Toast raised={tabs} top={logOpen || sheet !== null} />
       <LogSheet />
       <SheetHost />
+      <Guide />
       {splash && <Splash />}
     </div>
   );

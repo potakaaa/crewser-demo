@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { timerElapsed, useDemo, type WorkTimer } from '../store';
 import { Icon } from './Icon';
+import { guideEmit } from '../lib/guide';
 
 /** Hold this long to start the timer, like the Crewser app's "hold to start timer". */
 const HOLD_MS = 500;
@@ -54,6 +55,7 @@ export function TimerChip({ compact = false }: { compact?: boolean }) {
       firedAt.current = Date.now();
       setHolding(false);
       startTimer();
+      guideEmit('timer:started');
       try {
         navigator.vibrate?.(15);
       } catch {
@@ -70,7 +72,10 @@ export function TimerChip({ compact = false }: { compact?: boolean }) {
   const tap = () => {
     if (Date.now() - firedAt.current < 800) return;
     if (timer) openSheet('timer');
-    else setLogOpen(true);
+    else {
+      setLogOpen(true);
+      guideEmit('log:opened');
+    }
   };
   // Keyboard on the idle chip: holding Enter or Space starts the timer too; a short press is a tap.
   const isKey = (e: KeyboardEvent) => e.key === 'Enter' || e.key === ' ';
@@ -93,6 +98,7 @@ export function TimerChip({ compact = false }: { compact?: boolean }) {
       <button
         type="button"
         className="timer-chip is-on"
+        data-guide="timer"
         data-paused={!running || undefined}
         aria-label={`Timer ${running ? 'running' : 'paused'} ${spokenElapsed(ms)}, open`}
         onClick={tap}
@@ -106,6 +112,7 @@ export function TimerChip({ compact = false }: { compact?: boolean }) {
     <button
       type="button"
       className="timer-chip glass-btn"
+      data-guide="timer"
       data-holding={holding || undefined}
       aria-label="Start timer, hold. Tap for manual entry"
       onPointerDown={(e) => e.button === 0 && beginHold()}

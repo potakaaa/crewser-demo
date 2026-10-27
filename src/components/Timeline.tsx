@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type Ref, type RefObject } from 'react';
 import { today } from '../mock';
+import { guideEmit } from '../lib/guide';
 import { clusters as clusterOf, MARK_GAP, NAV_EPS, previewAt, previewSpoken, samePreview, snapTarget, stepTarget, type Preview, type Scrub } from '../lib/timeline';
 
 const DRAG_THRESHOLD = 5;
@@ -339,6 +340,7 @@ export function Timeline({
       shown.current = next;
       onPreview(next);
       if (!crossed) return;
+      guideEmit('ruler:scrubbed');
       // A tick when the playhead reaches a note: a flash on the playhead, and a buzz where supported.
       const tick = tickRef.current;
       if (tick && !reducedMotion()) {
@@ -419,7 +421,7 @@ export function Timeline({
   const clusters = clusterOf(scrub.stops);
   const fanLead = preview ? clusters[preview.index]?.lead : undefined;
   return (
-    <section className="tl" data-preview={preview ? true : undefined} aria-label="Preview what is coming up">
+    <section className="tl" data-guide="ruler" data-preview={preview ? true : undefined} aria-label="Preview what is coming up">
       <div
         className="tl-scroll"
         ref={setEl}

@@ -45,6 +45,7 @@ export function DemoPanel() {
   const setLogOpen = useDemo((s) => s.setLogOpen);
   const reset = useDemo((s) => s.reset);
   const openSheet = useDemo((s) => s.openSheet);
+  const startGuide = useDemo((s) => s.startGuide);
 
   return (
     <aside className="side">
@@ -78,6 +79,12 @@ export function DemoPanel() {
         <Toggle label="Offline" hint="Amber banner with last sync" checked={offline} onChange={(v) => setFlag('offline', v)} />
         <Toggle label="Empty" hint="Nothing on the sheet yet" checked={empty} onChange={(v) => setFlag('empty', v)} />
         <Toggle label="No code in PDF" hint="Boarding pass fallback" checked={!codeFound} onChange={(v) => setFlag('codeFound', !v)} />
+        <p className="dp-h">Guide</p>
+        <div className="dp-jumps">
+          <button type="button" className="dp-jump" onClick={startGuide}>
+            Replay the first-visit guide
+          </button>
+        </div>
         <p className="dp-h">Jump to</p>
         <div className="dp-jumps">
           {JUMPS.map((j) => (

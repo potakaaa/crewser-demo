@@ -3,6 +3,7 @@ import type { CrewLink } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { useAxisDrag } from '../lib/useAxisDrag';
 import { stepTarget, switchTargets } from '../lib/switchTargets';
+import { guideEmit } from '../lib/guide';
 
 /** A swipe this far, or a flick this fast (px/ms), switches. */
 const SWITCH_PX = 18;
@@ -49,6 +50,7 @@ export function useSwitchGesture<T extends HTMLElement>(axes: 'y' | 'both', orig
     const m: SwitchMotion = { kind, dir, from: activeId, origin };
     pending = m;
     if (!setActiveLink(to.id)) return void (pending = null);
+    guideEmit(kind === 'person' ? 'switch:person' : 'switch:project');
     onSwitched?.(m);
     try {
       navigator.vibrate?.(10); // Android only; iOS has no vibrate.
@@ -100,7 +102,7 @@ export function useSwitchGesture<T extends HTMLElement>(axes: 'y' | 'both', orig
 /** What AvatarReel reads from useSwitchGesture. */
 type ReelState = Pick<ReturnType<typeof useSwitchGesture>, 'ay' | 'glide' | 'prevPerson' | 'nextPerson' | 'link'>;
 
-export function AvatarReel({ g, className = '', hint = false }: { g: ReelState; className?: string; hint?: boolean }) {
+export function AvatarReel({ g, className = '' }: { g: ReelState; className?: string }) {
   const [turns, setTurns] = useState(0);
   const [seen, setSeen] = useState(g.link.id);
   if (seen !== g.link.id) {
@@ -108,7 +110,7 @@ export function AvatarReel({ g, className = '', hint = false }: { g: ReelState; 
     setTurns((n) => n + 1);
   }
   return (
-    <span className={`who-avatar ${className}`} aria-hidden="true" data-hint={hint || undefined}>
+    <span className={`who-avatar ${className}`} aria-hidden="true">
       <span className="who-reel" data-glide={g.glide} style={{ '--ay': `${g.ay}px` } as CSSProperties}>
         {g.prevPerson && <span className="who-av who-av-prev">{g.prevPerson.initials}</span>}
         <span className="who-av" key={turns} data-turn={turns > 0 || undefined}>

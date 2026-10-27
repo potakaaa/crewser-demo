@@ -893,31 +893,12 @@
     opacity: 0;
   }
 }
-/* The one-time hint: the avatar peeks at the next person, then the project line leans towards the next project. */
-@keyframes who-nudge-y {
-  40% {
-    transform: translateY(-14px);
-  }
-}
-@keyframes who-nudge-x {
-  40% {
-    transform: translateX(-16px);
-  }
-}
-.who-avatar[data-hint='true'] .who-reel {
-  animation: who-nudge-y 700ms var(--ease-out) 1;
-}
-.who-line[data-hint='true'] {
-  animation: who-nudge-x 700ms var(--ease-out) 900ms 1;
-}
 @media (prefers-reduced-motion: reduce) {
   .who-reel[data-glide='true'],
   .who-line[data-glide='true'] {
     transition: none;
   }
-  .who-line[data-enter],
-  .who-avatar[data-hint='true'] .who-reel,
-  .who-line[data-hint='true'] {
+  .who-line[data-enter] {
     animation: none;
   }
 }
@@ -1378,4 +1359,120 @@
   border: 0;
   padding: 0;
   background: none;
+}
+
+/* ───────── First-visit guide: dim everything but the spotlit target ───────── */
+.guide {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+/* The dim, cut into four around the hole: these catch touches outside it, the hole lets them through. */
+.guide-block {
+  position: absolute;
+  pointer-events: auto;
+}
+.guide-end {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.6);
+}
+/* The hole draws the dim for the whole screen with one big shadow, plus the lime outline. */
+.guide-hole {
+  position: absolute;
+  border-radius: var(--r-card);
+  box-shadow:
+    0 0 0 2px var(--lime),
+    0 0 0 9999px rgba(0, 0, 0, 0.6);
+  transition:
+    left 260ms var(--ease-out),
+    top 260ms var(--ease-out),
+    width 260ms var(--ease-out),
+    height 260ms var(--ease-out);
+}
+@keyframes guide-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px var(--lime),
+      0 0 0 9999px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px rgba(200, 224, 60, 0.45),
+      0 0 0 9999px rgba(0, 0, 0, 0.6);
+  }
+}
+.guide-hole {
+  animation: guide-pulse 1.8s ease-in-out infinite;
+}
+.guide-card {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  padding: 14px 14px 10px 16px;
+  border-radius: var(--r-card);
+  background: var(--card-2);
+  color: var(--ink);
+  box-shadow: var(--elev-2), 0 16px 40px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  animation: tb-pop 240ms var(--ease-out) both;
+}
+/* The card takes focus only so its text is read first; it is not a control, so no ring. */
+.guide-card:focus {
+  outline: none;
+}
+.guide-card-center {
+  top: 50%;
+  translate: 0 -50%;
+}
+.guide-t {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+.guide-b {
+  margin: 4px 0 0;
+  font-size: var(--fs-md);
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.guide-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: 8px;
+}
+.guide-count {
+  margin-right: auto;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.guide-skip,
+.guide-next {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+.guide-next {
+  background: var(--chip);
+  color: var(--ink);
+}
+.guide-next[data-primary] {
+  background: var(--lime);
+  color: var(--on-lime);
+}
+@media (prefers-reduced-motion: reduce) {
+  .guide-hole,
+  .guide-card {
+    animation: none;
+    transition: none;
+  }
 }

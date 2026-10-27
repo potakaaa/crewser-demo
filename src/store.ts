@@ -5,6 +5,7 @@ import { initialRead, notificationsFor, type AppNotification, type NotifKind } f
 import { hoursOverview, todayPlan } from './lib/stats';
 import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
+import { setGuideDone } from './lib/guide';
 import { addDays, addMonths, firstOfMonth, toMinutes } from './lib/dates';
 
 export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'settings';
@@ -218,6 +219,10 @@ interface DemoState {
   notifRead: Record<string, string[]>;
   /** The running or paused work timer; persisted, so it survives a reload. */
   timer: WorkTimer | null;
+  /** The first-visit guide: the step shown (an index into GUIDE_STEPS), 'end' for the closing card, or null when idle. */
+  guide: number | 'end' | null;
+  /** The link the guide started on, so its switch steps can hand you back. */
+  guideFrom: string | null;
 }
 
 interface Actions {
@@ -238,6 +243,11 @@ interface Actions {
   toggleTimerPause: () => void;
   /** Stops the timer and opens the Log sheet with its start and end filled in. */
   stopTimer: () => void;
+  /** Starts the tour from the first step (also the replay from Settings and Demo controls). */
+  startGuide: () => void;
+  setGuideStep: (step: number | 'end') => void;
+  /** Ends the tour (finished or skipped): it will not start by itself again, and you are back on your own link. */
+  endGuide: () => void;
   setFontTheme: (t: FontTheme) => void;
   setBreak: (min: number) => void;
   setLogTime: (k: 'logStart' | 'logEnd', v: string | null) => void;
@@ -310,6 +320,8 @@ const initialState = (): DemoState => ({
   toast: null,
   notifRead: initialRead(),
   timer: loadTimer(),
+  guide: null,
+  guideFrom: null,
 });
 
 let toastSeq = 0;
@@ -478,6 +490,18 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const timer = t.runningSince ? { ...t, runningSince: null, bankedMs: timerElapsed(t, now) } : { ...t, runningSince: now };
     saveTimer(timer);
     set({ timer });
+  },
+  startGuide: () => {
+    setGuideDone(false);
+    get().closeSheet();
+    set({ guide: 0, guideFrom: get().activeLinkId, logOpen: false });
+  },
+  setGuideStep: (step) => set({ guide: step }),
+  endGuide: () => {
+    setGuideDone(true);
+    const from = get().guideFrom;
+    set({ guide: null, guideFrom: null });
+    if (from && from !== get().activeLinkId) get().setActiveLink(from);
   },
   stopTimer: () => {
     const t = get().timer;

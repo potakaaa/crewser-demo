@@ -134,7 +134,7 @@ export function CalendarScreen() {
           <TimerChip compact />
         </div>
 
-        <div className="cal-panel">
+        <div className="cal-panel" data-guide="calendar">
           <Collapse open={!monthOpen}>
             <div className="week-strip" role="group" aria-label="Days of the week">
               <span className="wday-indicator" style={{ '--i': selIndex } as CSSProperties} aria-hidden="true" />

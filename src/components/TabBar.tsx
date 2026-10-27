@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type FocusEvent
 import { useActiveLink, useDemo, useRoute, useUnreadCount, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 import { useAddActions } from '../lib/addActions';
+import { guideEmit } from '../lib/guide';
 import { AvatarReel, SwitchPill, useSwitchGesture } from './SwitchKit';
 
 /** Two main routes, then the crew pass: Documents, Contacts and Settings live behind your initials. */
@@ -52,7 +53,10 @@ export function TabBar({ hidden }: { hidden: boolean }) {
     if (menu) document.getElementById(menuId)?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
   }, [menu, menuId]);
 
-  const toggle = (m: Exclude<Menu, null>) => setMenu((cur) => (cur === m ? null : m));
+  const toggle = (m: Exclude<Menu, null>) => {
+    if (menu !== m) guideEmit(m === 'add' ? 'add:opened' : 'pass:opened');
+    setMenu((cur) => (cur === m ? null : m));
+  };
   const close = (refocus: boolean) => {
     if (refocus) wrapRef.current?.querySelector<HTMLElement>(`[aria-controls="${menuId}"][aria-expanded="true"]`)?.focus();
     setMenu(null);
@@ -135,6 +139,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
           <button
             type="button"
             className="dock-btn"
+            data-guide="pass"
             data-on={active === TABS.length || undefined}
             aria-current={passLabel ? 'page' : undefined}
             aria-label={`${passLabel ? `${passLabel}. ` : ''}Your pass: documents, contacts, settings${unread ? `, ${unread} unread notifications` : ''}`}
@@ -147,7 +152,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
               {unread > 0 && <span className="dock-unread" aria-hidden="true" />}
             </span>
           </button>
-          <button type="button" className="dock-add" aria-label="Add time or invoice" aria-expanded={menu === 'add'} aria-controls={menuId} onClick={() => toggle('add')}>
+          <button type="button" className="dock-add" data-guide="add" aria-label="Add time or invoice" aria-expanded={menu === 'add'} aria-controls={menuId} onClick={() => toggle('add')}>
             <Icon name="plus" size={24} color="currentColor" strokeWidth={2} />
           </button>
         </nav>
