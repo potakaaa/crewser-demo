@@ -1150,7 +1150,7 @@
 }
 
 /* ───────── Hours not sent: one marker everywhere (UnsentMark) ───────── */
-/* An upload arrow: these hours are waiting to go out. Neutral, so it never competes with the lime note dot. */
+/* A small clock: these hours are still open. Neutral, so it never competes with the lime note dot. */
 .unsent-mark {
   flex: none;
   display: inline-flex;
