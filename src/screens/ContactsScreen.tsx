@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { CONTACT_DEPARTMENTS, contacts, person, type Contact } from '../mock';
 import { ForChip } from '../components/ForChip';
-import { NotifButton } from '../components/NotifButton';
+import { TimerChip } from '../components/TimerChip';
 import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
@@ -109,7 +109,7 @@ export function ContactsScreen() {
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={`${projectName} · ${contacts.length - 1} people`} title="Contacts">
           <ForChip compact />
-          <NotifButton tone="dark" />
+          <TimerChip />
         </ScreenTitle>
         <div className="searchbox">
           <Icon name="search" size={18} color="#C4CFD0" />

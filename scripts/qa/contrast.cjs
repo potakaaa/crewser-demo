@@ -8,7 +8,7 @@ const views = [
   ['contacts', '#/contacts'], ['settings', '#/settings'], ['ticket', '#/ticket'],
   ['note-sheet', '#/note/fl'], ['pdf', '#/pdf/Ticket_OS487.pdf'],
   ['log-sheet', '#/dashboard', '.quick-tile'], ['invoice', '#/dashboard', '.quick-tile:last-child'],
-  ['pass', '#/dashboard', '.tab[aria-controls]'], ['add-menu', '#/calendar', '.add-btn'], ['notifications', '#/calendar', '.notif-btn'],
+  ['pass', '#/dashboard', '.tab[aria-controls]'], ['add-menu', '#/calendar', '.add-btn'], ['notifications', '#/calendar', ['.tab[aria-controls]', '.tb-pass-row']], ['timer', '#/dashboard', '.timer-chip'],
   ['month', '#/calendar', '.gh-titlebar button, .cal-month, [aria-label*="month" i]'],
 ];
 const audit = () => {
@@ -51,7 +51,9 @@ const audit = () => {
   for (const [name, hash, click] of views) {
     const p = await b.newPage({ viewport: { width: w, height: 812 } });
     await p.goto(base + hash); await p.waitForTimeout(2600);
-    if (click) { const el = p.locator(click).first(); if (await el.count()) { await el.click({ timeout: 3000 }).catch(() => {}); await p.waitForTimeout(900); } else { console.log(`${name}: SKIP no ${click}`); await p.close(); continue; } }
+    let skip = false;
+    for (const c of click ? [].concat(click) : []) { const el = p.locator(c).first(); if (await el.count()) { await el.click({ timeout: 3000 }).catch(() => {}); await p.waitForTimeout(900); } else { console.log(`${name}: SKIP no ${c}`); skip = true; break; } }
+    if (skip) { await p.close(); continue; }
     const res = await p.evaluate(audit);
     const real = res.filter((r) => !r.image && !r.disabled);
     fails += real.length;

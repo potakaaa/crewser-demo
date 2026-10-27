@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { contacts, today } from '../mock';
-import { useActiveLink, useDemo, useRoute, type TabName } from '../store';
+import { useActiveLink, useDemo, useRoute, useUnreadCount, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 import { useAddActions } from '../lib/addActions';
 
@@ -44,6 +44,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
   const navigate = useDemo((s) => s.navigate);
   const openSheet = useDemo((s) => s.openSheet);
   const addActions = useAddActions();
+  const unread = useUnreadCount();
   const link = useActiveLink();
   const navRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -173,6 +174,12 @@ export function TabBar({ hidden }: { hidden: boolean }) {
                 </button>
               ))}
             </div>
+            <button type="button" className="tb-pass-row" aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} onClick={pick(() => openSheet('notifications'))}>
+              <Icon name="bell" size={18} color="currentColor" strokeWidth={1.7} />
+              <span>Notifications</span>
+              {unread > 0 && <span className="tb-pass-count">{unread > 9 ? '9+' : unread}</span>}
+              <Icon name="right" size={16} color="currentColor" />
+            </button>
             <button type="button" className="tb-pass-row" aria-label={`${link.projectName}. Switch project`} onClick={pick(() => openSheet('project'))}>
               <Icon name="users" size={18} color="currentColor" strokeWidth={1.7} />
               <span>{link.projectName}</span>

@@ -6,7 +6,7 @@ import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../
 import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
-import { NotifButton } from '../components/NotifButton';
+import { TimerChip } from '../components/TimerChip';
 import { WhoSwitch, type SwitchMotion } from '../components/WhoSwitch';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
@@ -57,7 +57,7 @@ export function DashboardScreen() {
       <GradientHeader className="gh-home grain-strong gh-dash">
         <div className="home-top">
           <WhoSwitch onSwitch={(m) => (motion.current = m)} />
-          <NotifButton tone="dark" />
+          <TimerChip />
         </div>
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />

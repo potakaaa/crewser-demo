@@ -1,7 +1,7 @@
 import { useId, type ReactNode } from 'react';
 import { FONT_THEMES, useActiveLink, useDemo } from '../store';
 import { Icon, type IconName } from '../components/Icon';
-import { NotifButton } from '../components/NotifButton';
+import { TimerChip } from '../components/TimerChip';
 import { GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
 import { usePrefs } from '../components/settings/prefs';
@@ -72,7 +72,7 @@ export function SettingsScreen() {
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={link.projectName} title="Settings">
-          <NotifButton tone="dark" />
+          <TimerChip />
         </ScreenTitle>
       </GradientHeader>
 

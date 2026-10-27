@@ -12,7 +12,7 @@ export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'set
 export type Route = { name: TabName } | { name: 'ticket' } | { name: 'pdf'; file: string };
 
 /** Things that open in a bottom sheet over the current tab. `id` picks the note, contact, project... */
-export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice';
+export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice' | 'timer';
 export interface SheetState {
   kind: SheetKind;
   id?: string;
@@ -120,6 +120,42 @@ export const FONT_THEMES = [
 ];
 
 const FONT_KEY = 'crewser-font-theme';
+const TIMER_KEY = 'crewser-work-timer';
+
+/** The work timer: when it first started, when the current run began (null while paused), and time banked before. */
+export interface WorkTimer {
+  startedAt: number;
+  runningSince: number | null;
+  bankedMs: number;
+}
+
+export const timerElapsed = (t: WorkTimer, now = Date.now()) => t.bankedMs + (t.runningSince ? now - t.runningSince : 0);
+
+function loadTimer(): WorkTimer | null {
+  try {
+    const t = JSON.parse(localStorage.getItem(TIMER_KEY) ?? 'null') as WorkTimer | null;
+    return t && typeof t.startedAt === 'number' && typeof t.bankedMs === 'number' ? t : null;
+  } catch {
+    return null; // Blocked or garbled storage: no timer.
+  }
+}
+
+function saveTimer(t: WorkTimer | null) {
+  try {
+    if (t) localStorage.setItem(TIMER_KEY, JSON.stringify(t));
+    else localStorage.removeItem(TIMER_KEY);
+  } catch {
+    // Not persisted; the timer still runs for this visit.
+  }
+}
+
+/** "HH:MM" of a moment, rounded to the Log sheet's 5-minute steps. */
+const hhmm5 = (ms: number, up: boolean) => {
+  const d = new Date(ms);
+  const m = d.getHours() * 60 + d.getMinutes();
+  const r = Math.min(23 * 60 + 55, (up ? Math.ceil(m / 5) : Math.floor(m / 5)) * 5);
+  return `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`;
+};
 
 function loadFontTheme(): FontTheme {
   try {
@@ -183,6 +219,8 @@ interface DemoState {
   noteAccent: NoteAccent;
   /** Ids of the notifications already read, per crew link. Read it with useNotifications(). */
   notifRead: Record<string, string[]>;
+  /** The running or paused work timer; persisted, so it survives a reload. */
+  timer: WorkTimer | null;
 }
 
 interface Actions {
@@ -198,6 +236,11 @@ interface Actions {
   /** Switch to another crew link. Returns false when refused (unknown, expired or revoked link, with a toast for the last two); true when the link is now active. */
   setActiveLink: (id: string) => boolean;
   completeMasterData: () => void;
+  startTimer: () => void;
+  /** Pauses a running timer, resumes a paused one. */
+  toggleTimerPause: () => void;
+  /** Stops the timer and opens the Log sheet with its start and end filled in. */
+  stopTimer: () => void;
   setFontTheme: (t: FontTheme) => void;
   setBreak: (min: number) => void;
   setLogTime: (k: 'logStart' | 'logEnd', v: string | null) => void;
@@ -271,6 +314,7 @@ const initialState = (): DemoState => ({
   toast: null,
   noteAccent: 'stub',
   notifRead: initialRead(),
+  timer: loadTimer(),
 });
 
 let toastSeq = 0;
@@ -426,6 +470,33 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     return true;
   },
   completeMasterData: () => set({ masterDataDone: true }),
+  startTimer: () => {
+    const now = Date.now();
+    const timer = { startedAt: now, runningSince: now, bankedMs: 0 };
+    saveTimer(timer);
+    set({ timer });
+  },
+  toggleTimerPause: () => {
+    const t = get().timer;
+    if (!t) return;
+    const now = Date.now();
+    const timer = t.runningSince ? { ...t, runningSince: null, bankedMs: timerElapsed(t, now) } : { ...t, runningSince: now };
+    saveTimer(timer);
+    set({ timer });
+  },
+  stopTimer: () => {
+    const t = get().timer;
+    if (!t) return;
+    saveTimer(null);
+    set({ timer: null });
+    const s = get();
+    s.setLogTime('logStart', hhmm5(t.startedAt, false));
+    const worked = Math.max(5 * 60000, timerElapsed(t));
+    s.setLogTime('logEnd', hhmm5(t.startedAt + worked, true));
+    // A timed stretch shorter than the default break was work only: drop the break rather than reject the entry.
+    if (worked <= s.breakMin * 60000) s.setBreak(0);
+    s.setLogOpen(true);
+  },
   setFontTheme: (t) => {
     try {
       localStorage.setItem(FONT_KEY, t);
@@ -493,6 +564,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     clearScrollPositions();
     history.replaceState(null, '', routeToHash({ name: 'dashboard' }));
     resetPrefs();
+    saveTimer(null);
     try {
       localStorage.removeItem(FONT_KEY);
     } catch {

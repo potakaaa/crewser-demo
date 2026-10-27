@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { docs, today, type Doc, type DocKind } from '../mock';
 import { ForChip } from '../components/ForChip';
-import { NotifButton } from '../components/NotifButton';
+import { TimerChip } from '../components/TimerChip';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { callSheets, dayWord, KIND_TITLE, updatedLabel, type CallSheet } from '../components/docs/docs';
@@ -116,7 +116,7 @@ export function DocumentsScreen() {
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={projectName} title="Documents">
           <ForChip compact />
-          <NotifButton tone="dark" />
+          <TimerChip />
         </ScreenTitle>
         <div className="fchips" role="group" aria-label="Filter documents">
           {FILTERS.map((f) => (
