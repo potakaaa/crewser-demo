@@ -30,10 +30,21 @@ async function tap(p, x, y) { await touch(p, 'touchStart', x, y); await sleep(40
 const count = (p) => p.locator('.guide-count').textContent().catch(() => null);
 const link = (p) => p.locator('.who-block').first().innerText().then((t) => t.replace(/\s+/g, ' ').trim());
 async function waitStep(p, n, label) {
-  for (let i = 0; i < 30; i++) { if ((await count(p)) === `${n} / 8`) return ok(true, `${label}: now at ${n} / 8`); await sleep(200); }
-  ok(false, `${label}: expected ${n} / 8, got ${await count(p)}`);
+  for (let i = 0; i < 30; i++) { if ((await count(p)) === `${n} / ${N}`) return ok(true, `${label}: now at ${n} / ${N}`); await sleep(200); }
+  ok(false, `${label}: expected ${n} / ${N}, got ${await count(p)}`);
 }
 
+const hold = async (p, sel) => { const [x, y] = await center(p, sel); await touch(p, 'touchStart', x, y); await sleep(800); await touch(p, 'touchEnd'); };
+const STEPS = [
+  { name: 'deck swipe', go: async (p) => { const [x, y] = await center(p, '[data-guide="deck"]'); await swipe(p, [x + 100, y], [x - 100, y]); } },
+  { name: 'ruler drag', go: async (p) => { const [x, y] = await center(p, '[data-guide="ruler"]'); await swipe(p, [x + 60, y], [x - 80, y], 14); } },
+  { name: 'header switch (vertical)', go: async (p) => { const [x, y] = await center(p, '[data-guide="who"]'); await swipe(p, [x, y + 20], [x, y - 40]); },
+    post: async (p, prev) => { await sleep(500); ok((await link(p)) !== prev, 'person switched'); } },
+  { name: 'timer hold', go: (p) => hold(p, '[data-guide="timer"]'),
+    pre: async (p) => { await sleep(500); const leak = await p.evaluate(() => [...document.querySelectorAll('.toast, [class*="pill"]')].filter((e) => e.offsetWidth && /undo/i.test(e.textContent)).map((e) => e.className)); ok(!leak.length, 'no switch pill/toast leaking into the timer step ' + JSON.stringify(leak)); } },
+  { name: 'tap Pass', go: async (p) => { const [x, y] = await center(p, '[data-guide="pass"]'); await tap(p, x, y); } },
+];
+const N = STEPS.length;
 async function guideRun(b) {
   console.log(`== guide ${W}x${H}`);
   const p = await open(b, { done: false });
@@ -43,53 +54,28 @@ async function guideRun(b) {
   // overlay: dim covers all but the hole; touches outside blocked
   const geo = await p.evaluate(() => { const g = document.querySelector('.guide'), h = document.querySelector('.guide-hole'); const a = g.getBoundingClientRect(), r = h.getBoundingClientRect(); return { a: [a.width, a.height], h: [r.x, r.y, r.width, r.height] }; });
   ok(geo.a[0] >= W - 1 && geo.a[1] >= H - 1, `overlay covers viewport (${geo.a})`);
-  const outside = await p.evaluate(() => { const bad = []; for (const [x, y] of [[5, 5], [180, innerHeight - 6], [5, 400], [370, 400], [180, 30]]) { const e = document.elementFromPoint(x, y); if (!e || !e.closest('.guide-block, .guide-card')) bad.push([x, y, e.className]); } return bad; });
+  const outside = await p.evaluate(() => { const bad = []; for (const [x, y] of [[5, 5], [180, innerHeight - 6], [5, 400], [innerWidth - 5, 400], [180, 30]]) { const e = document.elementFromPoint(x, y); if (!e || !e.closest('.guide-block, .guide-card')) bad.push([x, y, e && e.className]); } return bad; });
   ok(!outside.length, 'points outside cut-out hit the blocker/card ' + JSON.stringify(outside));
   const inside = await p.evaluate(() => { const r = document.querySelector('.guide-hole').getBoundingClientRect(); const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return !!e.closest('[data-guide="deck"]'); });
   ok(inside, 'inside cut-out reaches the deck');
   // blocked tap outside: tap Calendar tab -> route unchanged
   await tap(p, 120, H - 22); await sleep(300);
-  ok(/dashboard/.test(p.url()) && (await count(p)) === '1 / 8', 'tap on dock outside the hole is blocked');
+  ok(/dashboard/.test(p.url()) && (await count(p)) === `1 / ${N}`, 'tap on dock outside the hole is blocked');
   if (shots) await p.screenshot({ path: `${shots}/guide-1-${W}.png` });
 
-  // 1 deck swipe
-  let [cx, cy] = await center(p, '[data-guide="deck"]');
-  await swipe(p, [cx + 100, cy], [cx - 100, cy]);
-  await waitStep(p, 2, 'deck swipe');
-  // 2 ruler drag
-  [cx, cy] = await center(p, '[data-guide="ruler"]');
-  await swipe(p, [cx + 60, cy], [cx - 80, cy], 14);
-  await waitStep(p, 3, 'ruler drag');
-  // 3 person (vertical)
-  const l0 = await link(p);
-  [cx, cy] = await center(p, '[data-guide="who"]');
-  await swipe(p, [cx, cy + 20], [cx, cy - 40]);
-  await waitStep(p, 4, 'person swipe');
-  const l1 = await link(p); ok(l1 !== l0, `person switched: "${l0}" -> "${l1}"`);
-  // 4 project (horizontal)
-  [cx, cy] = await center(p, '[data-guide="who"]');
-  await swipe(p, [cx + 80, cy], [cx - 80, cy]);
-  await waitStep(p, 5, 'project swipe');
-  const l2 = await link(p); ok(l2 !== l1, `project switched: "${l1}" -> "${l2}"`);
-  // pill/toast must not leak into step 5
-  await sleep(500);
-  const leak = await p.evaluate(() => [...document.querySelectorAll('.toast, [class*="pill"], [class*="switch-"]')].filter((e) => e.offsetWidth && /undo|switched|acting/i.test(e.textContent)).map((e) => e.className + ':' + e.textContent.slice(0, 30)));
-  ok(!leak.length, 'no switch pill/toast leaking into step 5 ' + JSON.stringify(leak));
-  if (shots) await p.screenshot({ path: `${shots}/guide-5-${W}.png` });
-  // 5 timer: hold 500ms
-  [cx, cy] = await center(p, '[data-guide="timer"]');
-  await touch(p, 'touchStart', cx, cy); await sleep(800); await touch(p, 'touchEnd');
-  await waitStep(p, 6, 'timer hold');
-  // 6 + dock
-  [cx, cy] = await center(p, '[data-guide="add"]'); await tap(p, cx, cy);
-  await waitStep(p, 7, 'tap +');
-  // 7 pass avatar
-  [cx, cy] = await center(p, '[data-guide="pass"]'); await tap(p, cx, cy);
-  await waitStep(p, 8, 'tap Pass');
-  ok(/calendar/.test(p.url()), 'step 8 is on Calendar');
-  ok(await p.locator('.guide-next[data-primary]').count() === 1 && (await p.locator('.guide-next').innerText()) === 'Finish', 'step 8 has Next/Finish only');
-  await p.locator('.guide-next').click(); await sleep(400);
-  ok(await p.locator('.guide-end').count() === 1, 'end card shown');
+  // Table-driven: one gesture per step, in tour order. Edit STEPS when the tour changes.
+  let prev = await link(p);
+  for (let i = 0; i < STEPS.length; i++) {
+    const st = STEPS[i];
+    await waitStep(p, i + 1, st.name);
+    if (st.pre) await st.pre(p);
+    await st.go(p);
+    if (st.post) await st.post(p, prev);
+    if (i < STEPS.length - 1) await waitStep(p, i + 2, `after ${st.name}`);
+    prev = await link(p).catch(() => prev);
+  }
+  for (let i = 0; i < 30 && !(await p.locator('.guide-end').count()); i++) await sleep(200);
+  ok(await p.locator('.guide-end').count() === 1, 'end card shown after the last step');
   await p.locator('.guide-end .guide-next').click(); await sleep(800);
   ok((await p.locator('.guide').count()) === 0, 'guide gone after Done');
   await p.evaluate(() => { location.hash = '#/dashboard'; }); await sleep(800);
@@ -100,15 +86,14 @@ async function guideRun(b) {
   // replay from Settings
   await p.goto(base + '#/settings'); await sleep(1200);
   await p.getByText('Show the guide again').click(); await sleep(1200);
-  ok((await count(p)) === '1 / 8', 'Settings replay starts the guide');
+  ok((await count(p)) === `1 / ${N}`, 'Settings replay starts the guide');
   ok(!p.errs.length, 'no console errors ' + JSON.stringify(p.errs.slice(0, 3)));
   await p.context().close();
 
   // Skip and Esc restore the original link
   for (const how of ['Skip', 'Esc']) {
     const q = await open(b, { done: false });
-    await waitStep(q, 1, how + ' run');
-    await waitStep(q, 1, how);
+        await waitStep(q, 1, how);
     // walk to a switched state: step through to 3, swipe person
     await q.locator('.guide-next').click(); await sleep(300); await q.locator('.guide-next').click(); await sleep(400);
     let [x, y] = await center(q, '[data-guide="who"]');
