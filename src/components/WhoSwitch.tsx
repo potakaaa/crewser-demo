@@ -19,7 +19,14 @@ const HINT_KEY = 'crewser-who-hint';
  * it steps through the people you can act for on this project (the avatar rolls) and a horizontal swipe steps
  * through your projects (the project line slides). Expired and removed links are never stepped onto, and every switch can be undone.
  */
-export function WhoSwitch() {
+/** Which way a gesture switch went, so the screen below can turn over the same way. */
+export interface SwitchMotion {
+  kind: 'person' | 'project';
+  /** 1: swiped forward (up or left), the new content comes from below or the right. */
+  dir: 1 | -1;
+}
+
+export function WhoSwitch({ onSwitch }: { onSwitch?: (m: SwitchMotion) => void }) {
   const links = useDemo((s) => s.links);
   const activeId = useDemo((s) => s.activeLinkId);
   const setActiveLink = useDemo((s) => s.setActiveLink);
@@ -31,11 +38,25 @@ export function WhoSwitch() {
   const prevPerson = stepTarget(people, (l) => l.id === activeId, -1);
   const isHere = (l: CrewLink) => l.projectId === link.projectId;
 
-  const switchTo = (to: CrewLink, label: string) => {
+  const switchTo = (to: CrewLink, label: string, motion: SwitchMotion) => {
     const from = activeId;
+    onSwitch?.(motion);
     if (!setActiveLink(to.id)) return;
+    try {
+      navigator.vibrate?.(10); // Android only; iOS has no vibrate.
+    } catch {
+      /* optional */
+    }
     toast(`Switched to ${label}`, { label: 'Undo', run: () => void setActiveLink(from) });
   };
+
+  // Any switch (gesture, sheet or Undo) makes the avatar roll and pulse once; not on first render.
+  const [turns, setTurns] = useState(0);
+  const [seen, setSeen] = useState(activeId);
+  if (seen !== activeId) {
+    setSeen(activeId);
+    setTurns((n) => n + 1);
+  }
 
   // The whole block takes both swipes: vertical moves the avatar reel (people), horizontal the project line.
   const [ay, setAy] = useState(0);
@@ -59,7 +80,7 @@ export function WhoSwitch() {
         window.setTimeout(() => {
           setGlide(false);
           setAy(0);
-          switchTo(to, to.isMe ? 'your own link' : to.personName);
+          switchTo(to, to.isMe ? 'your own link' : to.personName, { kind: 'person', dir: fwd ? 1 : -1 });
         }, SLIDE_MS);
       } else {
         const to = fwd || back ? stepTarget(projects, isHere, fwd ? 1 : -1) : null;
@@ -69,7 +90,7 @@ export function WhoSwitch() {
           setGlide(false);
           setLx(0);
           setEnter(fwd ? 'right' : 'left');
-          switchTo(to, to.projectName);
+          switchTo(to, to.projectName, { kind: 'project', dir: fwd ? 1 : -1 });
         }, SLIDE_MS);
       }
     },
@@ -99,9 +120,12 @@ export function WhoSwitch() {
       <span className="avatar who-avatar" aria-hidden="true" data-hint={hint && people.length > 1}>
         <span className="who-reel" data-glide={glide} style={{ '--ay': `${ay}px` } as CSSProperties}>
           {prevPerson && <span className="who-av who-av-prev">{prevPerson.initials}</span>}
-          <span className="who-av">{link.initials}</span>
+          <span className="who-av" key={turns} data-turn={turns > 0 || undefined}>
+            {link.initials}
+          </span>
           {nextPerson && <span className="who-av who-av-next">{nextPerson.initials}</span>}
         </span>
+        {turns > 0 && <span className="who-ring" key={turns} />}
       </span>
       <span className="home-greet">
         {link.isMe ? (

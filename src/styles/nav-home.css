@@ -853,12 +853,6 @@
     opacity: 0;
   }
 }
-.who-line[data-enter='right'] {
-  animation: who-in-right 260ms var(--ease-out) both;
-}
-.who-line[data-enter='left'] {
-  animation: who-in-left 260ms var(--ease-out) both;
-}
 /* The one-time hint: the avatar peeks at the next person, then the project line leans towards the next project. */
 @keyframes who-nudge-y {
   40% {
@@ -885,5 +879,179 @@
   .who-avatar[data-hint='true'] .who-reel,
   .who-line[data-hint='true'] {
     animation: none;
+  }
+}
+
+/* ───────── Switch turn-over: the screen visibly changes hands, even when the notes are the same ───────── */
+.fx-deck {
+  position: relative;
+}
+@keyframes fx-x {
+  from {
+    translate: calc(var(--fx-dir, 1) * 56px) 0;
+    scale: 0.97;
+    opacity: 0;
+  }
+}
+@keyframes fx-y {
+  from {
+    translate: 0 calc(var(--fx-dir, 1) * 32px);
+    scale: 0.97;
+    opacity: 0;
+  }
+}
+@keyframes fx-fade {
+  from {
+    opacity: 0;
+  }
+}
+.fx-in {
+  --fx-dir: 1;
+}
+.fx-in.fx-rev {
+  --fx-dir: -1;
+}
+.sheet.fx-project {
+  animation: fx-x 420ms var(--ease-out) both;
+}
+.sheet.fx-person {
+  animation: fx-y 420ms var(--ease-out) both;
+}
+.sheet.fx-fade {
+  animation: fx-fade 300ms ease both;
+}
+/* The deck re-deals: each card drops in after the one in front of it. */
+@keyframes fx-deal {
+  from {
+    translate: 0 -28px;
+    opacity: 0;
+  }
+}
+.fx-deck.fx-in .deck-card {
+  animation: fx-deal 380ms var(--ease-out) both;
+  animation-delay: calc(var(--slot, 0) * 70ms);
+}
+.fx-deck.fx-project .deck-stack {
+  animation: fx-x 420ms var(--ease-out) both;
+}
+.fx-deck.fx-person .deck-stack {
+  animation: fx-y 420ms var(--ease-out) both;
+}
+/* Who you are now, for a moment, over the deck. */
+@keyframes fx-flash {
+  0% {
+    opacity: 0;
+    scale: 0.92;
+  }
+  15%,
+  80% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.fx-flash {
+  position: absolute;
+  z-index: 20;
+  top: 86px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+  padding: 6px 16px 6px 6px;
+  border-radius: 24px;
+  background: var(--dark-tile);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--rim), 0 12px 32px rgba(0, 0, 0, 0.5);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: fx-flash 1200ms var(--ease-out) both;
+}
+.fx-flash-av {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--lime);
+  color: var(--on-lime);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+/* Header: the avatar rolls in with a lime ring, the new project name lights up. */
+@keyframes who-roll {
+  from {
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+}
+@keyframes who-ring {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.who-av[data-turn] {
+  animation: who-roll 360ms var(--ease-out) both;
+}
+.who-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--lime);
+  pointer-events: none;
+  animation: who-ring 700ms ease-out both;
+}
+@keyframes who-hl {
+  from {
+    color: var(--lime);
+  }
+}
+.who-line[data-enter] {
+  animation:
+    who-in-right 260ms var(--ease-out) both,
+    who-hl 900ms ease-out both;
+}
+.who-line[data-enter='left'] {
+  animation:
+    who-in-left 260ms var(--ease-out) both,
+    who-hl 900ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet.fx-in,
+  .fx-deck.fx-in .deck-stack,
+  .fx-deck.fx-in .deck-card {
+    animation: fx-fade 300ms ease both;
+  }
+  .fx-flash {
+    animation-name: fx-fade-out;
+  }
+  .who-av[data-turn],
+  .who-line[data-enter] {
+    animation: who-hl 900ms ease-out both;
+  }
+  .who-av[data-turn] {
+    animation: none;
+  }
+}
+@keyframes fx-fade-out {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }

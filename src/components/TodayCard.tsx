@@ -282,7 +282,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
             <article
               key={c.key}
               className="deck-card"
-              style={{ ...style, zIndex: 10 - slot }}
+              style={{ ...style, zIndex: 10 - slot, '--slot': Math.max(0, slot) } as CSSProperties}
               aria-roledescription="slide"
               aria-label={`${k + 1} of ${count}`}
               aria-hidden={slot !== 0}

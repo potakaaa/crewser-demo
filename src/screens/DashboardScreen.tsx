@@ -7,7 +7,7 @@ import { ContentCard, NoteRow } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { NotifButton } from '../components/NotifButton';
-import { WhoSwitch } from '../components/WhoSwitch';
+import { WhoSwitch, type SwitchMotion } from '../components/WhoSwitch';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { QuickActions } from '../components/QuickActions';
@@ -37,20 +37,42 @@ export function DashboardScreen() {
   const goTo = useCallback((i: number) => ruler.current?.goTo(i), []);
   useEffect(() => setPreview(null), [scrub]);
 
+  // A switch to another person or project turns the screen over, even when the notes look the same: the deck
+  // re-deals and the sheet slides in from the swipe's side, with a short flash of who you are now.
+  // Switches from the sheet or Undo have no direction and just fade.
+  const motion = useRef<SwitchMotion | null>(null);
+  const [turn, setTurn] = useState<{ n: number; kind: SwitchMotion['kind'] | 'fade'; dir: 1 | -1 } | null>(null);
+  const [shownLink, setShownLink] = useState(link.id);
+  if (shownLink !== link.id) {
+    setShownLink(link.id);
+    const m = motion.current;
+    motion.current = null;
+    setTurn({ n: (turn?.n ?? 0) + 1, kind: m?.kind ?? 'fade', dir: m?.dir ?? 1 });
+  }
+  const turnClass = turn ? ` fx-in fx-${turn.kind}${turn.dir < 0 ? ' fx-rev' : ''}` : '';
+
   return (
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-home grain-strong gh-dash">
         <div className="home-top">
-          <WhoSwitch />
+          <WhoSwitch onSwitch={(m) => (motion.current = m)} />
           <NotifButton tone="dark" />
         </div>
         {offline && <OfflineBanner tone="dark" />}
         <Timeline scrub={scrub} preview={preview} onPreview={setPreview} handle={ruler} />
-        <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onGoTo={goTo} />
+        <div className={`fx-deck${turnClass}`} key={turn?.n ?? 0}>
+          <TodayCard hero={sn.hero} scrub={scrub} preview={preview} onGoTo={goTo} />
+          {turn && (
+            <div className="fx-flash" aria-hidden="true">
+              <span className="fx-flash-av">{link.initials}</span>
+              {turn.kind === 'project' ? link.projectName : link.isMe ? 'You' : link.personName} · {link.position}
+            </div>
+          )}
+        </div>
       </GradientHeader>
 
-      <Sheet className="sheet-dash">
+      <Sheet className={`sheet-dash${turnClass}`} key={turn?.n ?? 0}>
         <QuickActions />
         {link.isMe && !masterDataDone && (
           <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
