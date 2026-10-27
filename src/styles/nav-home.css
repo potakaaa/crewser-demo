@@ -9,6 +9,7 @@
 .deck-stack {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   padding-bottom: 26px;
   touch-action: pan-y;
 }
@@ -20,7 +21,7 @@
   --focus: #2c6b72;
   position: relative;
   grid-area: 1 / 1;
-  height: 252px;
+  height: 232px;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
@@ -63,13 +64,14 @@
 .deck-back {
   margin-left: auto;
 }
+/* One hero fact (the time), one line of context under it. */
 .deck-main {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   width: 100%;
-  min-height: 76px;
-  margin-top: 2px;
+  margin-top: 4px;
   padding: 0;
   border: 0;
   border-radius: var(--r-control);
@@ -78,36 +80,37 @@
   text-align: left;
 }
 .deck-time {
-  flex: none;
-  font-size: calc(46px * var(--numeral-scale));
+  font-size: calc(60px * var(--numeral-scale));
   line-height: 1;
 }
 .deck-time-sm {
-  font-size: calc(26px * var(--numeral-scale));
+  font-size: calc(40px * var(--numeral-scale));
 }
 .deck-titles {
-  flex: 1;
-  min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.deck-t1,
-.deck-t2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
+  font-size: var(--fs-base);
+  line-height: 1.35;
+  white-space: nowrap;
 }
 .deck-t1 {
-  font-size: var(--fs-lg);
+  flex: none;
+  max-width: 100%;
+  overflow: hidden;
   font-weight: 600;
-  line-height: 1.25;
+  text-overflow: ellipsis;
 }
 .deck-t2 {
-  font-size: var(--fs-md);
-  line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
   color: var(--text-2);
+  text-overflow: ellipsis;
+}
+.deck-t2::before {
+  content: '·' / '';
+  margin: 0 6px;
 }
 .deck-empty {
   display: flex;
@@ -115,64 +118,10 @@
   gap: 6px;
   margin-top: var(--sp-3);
 }
-/* Call, wrap and the call sheet: one hairline strip, three equal cells. */
-.deck-facts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: auto 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--hairline);
-}
-.deck-fact {
-  min-width: 0;
-}
-.deck-fact + .deck-fact {
-  padding-left: 12px;
-  border-left: 1px solid var(--hairline);
-}
-.deck-fact dt {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  color: var(--text-3);
-}
-.deck-fact dd {
-  margin: 2px 0 0;
-  overflow: hidden;
-  font-size: var(--fs-base);
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.deck-fact dd.is-muted {
-  color: var(--text-3);
-}
-.deck-text {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  margin: auto 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--hairline);
-  font-size: var(--fs-md);
-  line-height: 1.4;
-  color: var(--text-2);
-}
-.deck-sent {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  margin: auto 0 0;
-  padding: 10px 12px;
-  border-radius: var(--r-control);
-  background: rgba(219, 242, 39, 0.32);
-  font-size: var(--fs-md);
-  font-weight: 600;
-}
 .deck-ctas {
   display: flex;
   gap: var(--sp-2);
-  margin-top: var(--sp-3);
+  margin-top: auto;
 }
 .deck-cta {
   min-height: 48px;
@@ -182,79 +131,43 @@
   outline-color: var(--lime);
   outline-offset: -3px;
 }
-.deck-cta-2 {
+.deck-sheet {
   position: relative;
-  flex: 0 0 auto;
+  flex: none;
+  width: 52px;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
   border: 1px solid var(--hairline);
-  background: var(--soft);
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  transition: transform 180ms var(--ease-out);
+}
+.deck-sheet:active {
+  transform: scale(0.95);
+}
+.deck-cta-quiet {
+  border: 1px solid var(--hairline);
+  background: none;
   color: var(--ink);
   font-weight: 600;
 }
-.deck-cta-2:only-child {
-  flex: 1;
-}
 .deck-new {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   width: 8px;
   height: 8px;
   border-radius: 4px;
   background: var(--lime);
   box-shadow: 0 0 0 1.5px var(--ink);
-}
-
-.deck-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: -6px -10px -8px;
-}
-.deck-arrow {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: 22px;
-  background: none;
-  color: var(--on-dark-2);
-  transition: opacity var(--t-fast) ease;
-}
-.deck-arrow:disabled {
-  opacity: 0.3;
-}
-.deck-arrow:active:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-}
-.deck-arrow:focus-visible {
-  outline-color: var(--lime);
-}
-.deck-dots {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  color: var(--on-dark-2);
-}
-.deck-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.28);
-  transition:
-    width 300ms var(--ease-ios),
-    background var(--t-fast) ease;
-}
-.deck-dot[data-more] {
-  transform: scale(0.6);
-}
-.deck-dot[data-on='true'] {
-  width: 18px;
-  background: var(--lime);
 }
 
 /* Home's one-tap row: quieter than the deck's CTAs, icon tiles on the sheet. */
@@ -267,7 +180,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 60px;
+  min-height: 56px;
   padding: 8px 10px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
@@ -289,22 +202,9 @@
   border-radius: var(--r-control);
   background: var(--lime);
 }
-.quick-text {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
 .quick-t {
   font-size: var(--fs-base);
   font-weight: 600;
-}
-.quick-s {
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ───────── Tab bar: crew pass slot and the + ───────── */

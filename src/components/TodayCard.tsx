@@ -5,11 +5,11 @@ import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
 import { quickAction } from '../lib/notes';
-import { callSheetFor, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
+import { callSheetFor, phaseOf, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { NotePrimaryAction } from './NotePrimaryAction';
 import { dayWord } from './docs/docs';
-import { diffDays, fmtCountdown, fmtDayMonth, toMinutes } from '../lib/dates';
+import { fmtCountdown, toMinutes } from '../lib/dates';
 import type { Preview, Scrub, ScrubStop } from '../lib/timeline';
 
 /** A swipe past this share of the card's width, or a flick faster than FLICK px/ms, turns the card. */
@@ -17,36 +17,16 @@ const SWIPE_SHARE = 0.22;
 const FLICK = 0.45;
 /** How long the deck waits for the ruler to arrive before trusting the ruler again. */
 const SETTLE_MS = 1200;
-const MAX_DOTS = 5;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** The line next to the TODAY tag: where the shift stands. */
+/** The line next to the TODAY tag: only where the shift stands, nothing the card already says. */
 function heroMeta(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): string {
-  const wrap = wrapOf(n);
-  const wrapMin = wrapMinutes(n);
   const now = toMinutes(today.time);
   if (sent) return sent === 'saved' ? 'Saved on this phone' : 'Hours sent';
-  if (phase === 'before') {
-    const countdown = fmtCountdown(toMinutes(n.time!) - now);
-    return wrap ? `${countdown} · wrap ${wrap}` : `${countdown} · wrap to be confirmed`;
-  }
-  if (phase === 'during') return wrapMin !== null ? `On set · wrap ${fmtCountdown(wrapMin - now)}` : 'On set · wrap to be confirmed';
-  return `Wrapped at ${wrap}`;
-}
-
-/** Up to three short facts for the strip; places are already the subtitle, long values belong in the note sheet. */
-function factCells(n: Note, sheetCell: { label: string; value: string } | null) {
-  const cells = n.facts
-    .filter((f) => f.action !== 'map' && (f.unconfirmed || f.value.length <= 14))
-    .map((f) => ({ label: f.label, value: f.unconfirmed ? 'TBC' : f.value, muted: !!f.unconfirmed }));
-  return [...cells.slice(0, sheetCell ? 2 : 3), ...(sheetCell ? [{ ...sheetCell, muted: false }] : [])];
-}
-
-/** "07:55" for today, else "Yesterday" or "Fri 16 Oct": short enough for a third of the card. */
-function sheetUpdated(iso: string): string {
-  const n = diffDays(iso.slice(0, 10), today.date);
-  return n === 0 ? iso.slice(11, 16) : n === -1 ? 'Yesterday' : fmtDayMonth(iso.slice(0, 10));
+  if (phase === 'before') return fmtCountdown(toMinutes(n.time!) - now);
+  if (phase === 'during') return 'On set';
+  return `Wrapped at ${wrapOf(n)}`;
 }
 
 interface CardModel {
@@ -85,7 +65,6 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
   const isHero = !card.stop;
   const phase = phaseOf(n);
   const sheet = n.type === 'appointment' && n.day ? callSheetFor(n.day) : undefined;
-  const cells = factCells(n, sheet ? { label: 'Call sheet', value: sheet.isNew ? 'New' : sheetUpdated(sheet.updated) } : null);
   const attachment = !n.primaryAction && quickAction(n);
   const time = n.kind === 'time' ? n.time : 'All day';
   // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
@@ -108,24 +87,9 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
         Open
       </button>
     );
-  }
-  let secondary: ReactNode = null;
-  if (sheet) {
-    secondary = (
-      <button
-        type="button"
-        className="btn deck-cta deck-cta-2"
-        aria-label={`Open call sheet, ${sheet.title.replace('Call sheet · ', '')}${sheet.isNew ? ', new' : ''}`}
-        onClick={() => a.openPdf(sheet.file)}
-      >
-        <Icon name="file" size={18} color="#111A1B" strokeWidth={1.8} />
-        Call sheet
-        {sheet.isNew && <span className="deck-new" aria-hidden="true" />}
-      </button>
-    );
-  } else if (!primary) {
-    secondary = (
-      <button type="button" className="btn deck-cta deck-cta-2" onClick={() => a.openNote(n.id)}>
+  } else {
+    primary = (
+      <button type="button" className="btn deck-cta deck-cta-quiet" onClick={() => a.openNote(n.id)}>
         Details
       </button>
     );
@@ -165,31 +129,21 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
           <span className="deck-t1">{n.title}</span>
           {n.subtitle && <span className="deck-t2">{n.subtitle}</span>}
         </span>
-        <Icon name="right" size={18} color="#54686C" />
       </button>
-      {sent || (isHero && submitted) ? (
-        <p className="deck-sent">
-          <Icon name="check" size={16} color="#2B3300" strokeWidth={2.4} />
-          {offline ? 'Saved on this phone, sends when online' : sent ? `Sent · ${shiftLabel(sent)}` : 'Hours sent'}
-        </p>
-      ) : cells.length === 0 ? (
-        // No facts: the first line of the note's own text fills the strip instead.
-        n.text && <p className="deck-text">{n.text.split('\n')[0]}</p>
-      ) : (
-        cells.length > 0 && (
-          <dl className="deck-facts">
-            {cells.map((c) => (
-              <div key={c.label} className="deck-fact">
-                <dt>{c.label}</dt>
-                <dd className={c.muted ? 'is-muted' : undefined}>{c.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )
-      )}
       <div className="deck-ctas">
         {primary}
-        {secondary}
+        {sheet && (
+          <button
+            type="button"
+            className="deck-sheet"
+            aria-label={`Open call sheet, ${sheet.title.replace('Call sheet · ', '')}${sheet.isNew ? ', updated' : ''}`}
+            onClick={() => a.openPdf(sheet.file)}
+          >
+            <Icon name="file" size={20} color="#111A1B" strokeWidth={1.7} />
+            <span className="deck-sheet-l">Sheet</span>
+            {sheet.isNew && <span className="deck-new" aria-hidden="true" />}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -197,7 +151,7 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
 
 /**
  * The top of Home: a deck of cards. Today's call, with its call sheet, is in front and the coming notes peek
- * behind it. Swiping, the arrows or the arrow keys turn the deck and the ruler above glides along; scrubbing
+ * behind it. Swiping or the arrow keys turn the deck and the ruler above glides along; scrubbing
  * the ruler turns the deck the same way. The ruler's preview stays the one truth for which note is shown.
  */
 export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undefined; scrub: Scrub; preview: Preview | null; onGoTo: (stopIndex: number) => void }) {
@@ -297,15 +251,13 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
       '--shade': Math.min(pos, 2) * 0.1,
     }) as CSSProperties;
 
-  // A window of dots that follows the current card, so a long deck never reads as a row of noise.
-  const dotFrom = Math.max(0, Math.min(i - Math.floor(MAX_DOTS / 2), count - MAX_DOTS));
   const label = (k: number) => {
     const c = cards[k];
     return c.note ? `${c.stop ? c.stop.when : 'Today'}, ${c.note.title}` : 'Today';
   };
 
   return (
-    <section className="deck" aria-roledescription="carousel" aria-label="Today and what's next" onKeyDown={onKeyDown}>
+    <section className="deck" aria-roledescription="carousel" aria-label="Today and what's next. Swipe or use the arrow keys for the next card" onKeyDown={onKeyDown}>
       <div
         className={`deck-stack${drag ? ' is-dragging' : ''}`}
         ref={deckRef}
@@ -349,27 +301,9 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
           );
         })}
       </div>
-      {count > 1 && (
-        <div className="deck-nav">
-          <button type="button" className="deck-arrow" disabled={i === 0} onClick={() => go(i - 1)} aria-label={i > 0 ? `Previous: ${label(i - 1)}` : 'Previous'}>
-            <Icon name="left" size={18} color="currentColor" strokeWidth={2} />
-          </button>
-          <span className="deck-dots" aria-hidden="true">
-            {cards.slice(dotFrom, dotFrom + MAX_DOTS).map((c, d) => {
-              const k = dotFrom + d;
-              // An end dot shrinks when more cards lie past it.
-              const more = (d === 0 && k > 0) || (d === MAX_DOTS - 1 && k < count - 1);
-              return <span key={c.key} className="deck-dot" data-on={k === i} data-more={more || undefined} />;
-            })}
-          </span>
-          <button type="button" className="deck-arrow" disabled={i === count - 1} onClick={() => go(i + 1)} aria-label={i < count - 1 ? `Next: ${label(i + 1)}` : 'Next'}>
-            <Icon name="right" size={18} color="currentColor" strokeWidth={2} />
-          </button>
-          <p className="sr-only" aria-live="polite">
-            {i > 0 ? `Card ${i + 1} of ${count}: ${label(i)}` : ''}
-          </p>
-        </div>
-      )}
+      <p className="sr-only" aria-live="polite">
+        {i > 0 ? `Card ${i + 1} of ${count}: ${label(i)}` : ''}
+      </p>
     </section>
   );
 }

@@ -11,10 +11,7 @@ export function QuickActions() {
           <span className="quick-icon">
             <Icon name={a.icon} size={20} color="#111A1B" strokeWidth={1.8} />
           </span>
-          <span className="quick-text">
-            <span className="quick-t">{a.label}</span>
-            <span className="quick-s">{a.hint}</span>
-          </span>
+          <span className="quick-t">{a.label}</span>
         </button>
       ))}
     </div>
