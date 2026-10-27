@@ -167,17 +167,17 @@ export function TabBar({ hidden }: { hidden: boolean }) {
             <div className="tb-pass-tiles">
               {PASS_ROUTES.map((r) => (
                 <button type="button" key={r.name} className="tb-tile" aria-current={route.name === r.name ? 'page' : undefined} onClick={pick(() => navigate({ name: r.name }))}>
-                  <Icon name={r.icon} size={22} color="#111A1B" strokeWidth={1.7} />
+                  <Icon name={r.icon} size={22} color="currentColor" strokeWidth={1.7} />
                   <span className="tb-tile-t">{r.label}</span>
                   <span className="tb-tile-s">{r.hint}</span>
                 </button>
               ))}
             </div>
             <button type="button" className="tb-pass-row" aria-label={`${link.projectName}. Switch project`} onClick={pick(() => openSheet('project'))}>
-              <Icon name="users" size={18} color="#3F5155" strokeWidth={1.7} />
+              <Icon name="users" size={18} color="currentColor" strokeWidth={1.7} />
               <span>{link.projectName}</span>
               <span className="tb-pass-row-s">Switch</span>
-              <Icon name="right" size={16} color="#54686C" />
+              <Icon name="right" size={16} color="currentColor" />
             </button>
           </div>
         )}
@@ -187,7 +187,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
               <button type="button" key={a.id} className="tb-dial-item" style={{ '--i': k } as CSSProperties} onClick={pick(a.run)}>
                 <span className="tb-dial-t">{a.label}</span>
                 <span className="tb-dial-icon">
-                  <Icon name={a.icon} size={20} color="#111A1B" strokeWidth={1.8} />
+                  <Icon name={a.icon} size={20} color="currentColor" strokeWidth={1.8} />
                 </span>
               </button>
             ))}
@@ -196,7 +196,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
         <nav className={`tabbar${layout ? ' is-measured' : ''}`} aria-label="Tabs" ref={navRef}>
           {layout && <span className="tab-pill" aria-hidden="true" style={{ width: layout.w[active], transform: `translateX(${layout.x[active]}px)` }} />}
           {TABS.map((t, i) =>
-            slot(i, t.label, <Icon name={t.icon} size={ICON} color={i === active ? '#111A1B' : '#3F5155'} strokeWidth={i === active ? 1.8 : 1.6} />, {
+            slot(i, t.label, <Icon name={t.icon} size={ICON} color={i === active ? 'currentColor' : '#9AAAAC'} strokeWidth={i === active ? 1.8 : 1.6} />, {
               onClick: () => navigate({ name: t.name }),
               ariaLabel: t.label,
               current: i === active && idx >= 0,
@@ -225,7 +225,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
           aria-controls={menuId}
           onClick={() => toggle('add')}
         >
-          <Icon name="plus" size={26} color="#111A1B" strokeWidth={2} />
+          <Icon name="plus" size={26} color="currentColor" strokeWidth={2} />
         </button>
       </div>
     </>

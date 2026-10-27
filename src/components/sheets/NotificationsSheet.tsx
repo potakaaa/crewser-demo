@@ -34,7 +34,7 @@ export function NotificationsSheet() {
   if (items.length === 0) {
     return (
       <div className="notif-empty">
-        <Icon name="bell" size={28} color="#54686C" />
+        <Icon name="bell" size={28} color="#9AAAAC" />
         <strong>Nothing new</strong>
         <p>Important updates from production, like a new call sheet, show up here.</p>
       </div>

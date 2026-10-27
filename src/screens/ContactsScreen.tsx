@@ -13,7 +13,7 @@ import { useScrollRestore } from '../lib/scroll';
 /** Round quick action next to a row; sits beside (not inside) the row button. */
 function QuickButtons({ c, onDark = false }: { c: Contact; onDark?: boolean }) {
   const act = useContactActions();
-  const color = onDark ? '#FFFFFF' : '#2A3B3F';
+  const color = onDark ? '#FFFFFF' : 'currentColor';
   const cls = onDark ? 'cquick cquick-dark' : 'cquick';
   return (
     <span className="cquicks">
@@ -61,7 +61,7 @@ function Office({ office, others }: { office: Contact; others: Contact[] }) {
       </button>
       <div className="btn-row">
         <button type="button" className="btn btn-lime btn-sm" onClick={() => act.call(office)}>
-          <Icon name="call" size={18} color="#111A1B" />
+          <Icon name="call" size={18} color="currentColor" />
           Call
         </button>
         <button type="button" className="btn btn-glass btn-sm" onClick={() => act.mail(office)}>

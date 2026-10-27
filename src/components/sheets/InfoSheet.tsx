@@ -40,7 +40,7 @@ function MasterData() {
         {MASTER_DATA.map((label) => (
           <li key={label}>
             <span className="info-check" data-done={done} aria-hidden="true">
-              {done && <Icon name="check" size={14} color="#2B3300" strokeWidth={2.2} />}
+              {done && <Icon name="check" size={14} color="#172022" strokeWidth={2.2} />}
             </span>
             {label}
             <span className="sr-only">{done ? ', done' : ', not done yet'}</span>
@@ -79,7 +79,7 @@ export function InfoSheet({ id }: { id?: string }) {
                 {TYPE_LABEL[n.type]} · {n.subtitle}
               </span>
             </span>
-            <Icon name="right" size={18} color="#54686C" />
+            <Icon name="right" size={18} color="#9AAAAC" />
           </button>
         </li>
       ))}

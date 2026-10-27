@@ -30,11 +30,11 @@ export function ContactSheet({ id }: { id?: string }) {
           Call
         </button>
         <button type="button" className="cact" onClick={() => act.message(c)}>
-          <Icon name="message" size={22} color="#111A1B" />
+          <Icon name="message" size={22} color="currentColor" />
           Message
         </button>
         <button type="button" className="cact" onClick={() => act.mail(c)}>
-          <Icon name="mail" size={22} color="#111A1B" />
+          <Icon name="mail" size={22} color="currentColor" />
           Email
         </button>
       </div>
@@ -44,14 +44,14 @@ export function ContactSheet({ id }: { id?: string }) {
           <span className="cdetail-k">Phone</span>
           <span className="cdetail-v cdetail-nowrap">{c.phone}</span>
           <button type="button" className="cdetail-copy" aria-label={`Copy number ${c.phone}`} onClick={() => act.copy(c.phone, 'Number')}>
-            <Icon name="copy" size={18} color="#2C6B72" />
+            <Icon name="copy" size={18} color="#8FD0C6" />
           </button>
         </div>
         <div className="cdetail">
           <span className="cdetail-k">Email</span>
           <span className="cdetail-v">{c.email}</span>
           <button type="button" className="cdetail-copy" aria-label={`Copy email ${c.email}`} onClick={() => act.copy(c.email, 'Email address')}>
-            <Icon name="copy" size={18} color="#2C6B72" />
+            <Icon name="copy" size={18} color="#8FD0C6" />
           </button>
         </div>
       </div>

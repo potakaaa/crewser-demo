@@ -57,7 +57,7 @@
 .fchip[aria-pressed='true'] {
   border-color: #ffffff;
   background: #ffffff;
-  color: var(--ink);
+  color: var(--on-lime);
   font-weight: 600;
 }
 
@@ -71,7 +71,9 @@
   gap: 4px;
   padding: var(--sp-4);
   border-radius: var(--r-card);
-  background: var(--brand-surface);
+  /* Documents' one focal card: the grainy green gradient, everything else on the screen is flat. */
+  --grain-card-opacity: 0.15;
+  background: var(--brand-focal);
   color: #ffffff;
   text-align: left;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -137,7 +139,7 @@
   gap: var(--sp-2);
   border-radius: var(--r-control);
   background: var(--lime);
-  color: var(--ink);
+  color: var(--on-lime);
   font-size: var(--fs-md);
   font-weight: 600;
 }
@@ -263,7 +265,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: var(--ink);
+  color: var(--on-lime);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -335,7 +337,7 @@
   gap: var(--sp-2);
   margin: 0 calc(-1 * var(--sp-5));
   padding: var(--sp-2) var(--sp-5);
-  background: rgba(242, 245, 244, 0.9);
+  background: rgba(25, 33, 36, 0.92);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   font-size: var(--fs-xs);
@@ -418,7 +420,7 @@
     transform 180ms var(--ease-out);
 }
 .cquick:hover {
-  background: #dbe5e4;
+  background: var(--soft-hover);
 }
 .cquick:active {
   transform: scale(0.94);
@@ -609,7 +611,7 @@
   width: 48px;
   height: 28px;
   border-radius: 14px;
-  background: #c3cfce;
+  background: #4a5759;
   transition: background var(--t-fast) ease;
 }
 .switch i {
@@ -620,11 +622,11 @@
   height: 22px;
   border-radius: 11px;
   background: #ffffff;
-  box-shadow: 0 1px 3px rgba(17, 26, 27, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   transition: transform var(--t-fast) var(--ease-out);
 }
 .setrow[role='switch'][aria-checked='true'] > .switch {
-  background: var(--teal);
+  background: var(--lime);
 }
 .setrow[role='switch'][aria-checked='true'] > .switch i {
   transform: translateX(20px);
@@ -654,7 +656,7 @@
   transform: scale(0.985);
 }
 .fontopt[aria-pressed='true'] {
-  border-color: var(--ink);
+  border-color: var(--lime);
 }
 .fontopt-sample {
   flex: none;
@@ -690,11 +692,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  border: 1.5px solid rgba(17, 26, 27, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
 }
 .fontopt[aria-pressed='true'] .fontopt-check {
-  border-color: var(--ink);
-  background: var(--ink);
+  border-color: var(--lime);
+  background: var(--lime);
 }
 /* Each option shows its own typeface, whichever font theme is active. */
 :is(.fontopt-sample, .fontopt-label)[data-font='inter'] {
@@ -778,7 +780,7 @@
   background: var(--sheet);
 }
 .lrow.is-active {
-  background: #f7faea;
+  background: rgba(200, 224, 60, 0.08);
 }
 .lrow-av {
   flex: none;
@@ -840,7 +842,7 @@
 }
 .lchip-active {
   background: var(--lime);
-  color: var(--ink);
+  color: var(--on-lime);
 }
 .lchip-warn {
   background: var(--amber-surface);
@@ -854,7 +856,7 @@
   flex: none;
   width: 22px;
   height: 22px;
-  border: 1.5px solid rgba(17, 26, 27, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
   border-radius: 11px;
 }
 .btn-add {

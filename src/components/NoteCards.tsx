@@ -19,12 +19,12 @@ export function FactActions({ fact, size = 'md' }: { fact: Fact; size?: 'sm' | '
     <span className="fact-actions">
       {isCopyable(fact) && (
         <button type="button" className={`icon-btn icon-btn-chip copy-btn copy-btn-${size}`} aria-label={`Copy ${fact.label}: ${fact.value}`} onClick={() => a.copy(fact.value)}>
-          <Icon name="copy" size={17} color="#111A1B" />
+          <Icon name="copy" size={17} color="currentColor" />
         </button>
       )}
       {fact.action === 'map' && (
         <button type="button" className={`icon-btn icon-btn-chip copy-btn copy-btn-${size}`} aria-label={`Open in maps: ${fact.value}`} onClick={() => a.map(fact.value)}>
-          <Icon name="nav" size={17} color="#111A1B" />
+          <Icon name="nav" size={17} color="currentColor" />
         </button>
       )}
     </span>
@@ -52,7 +52,7 @@ export function ContentCard({ note }: { note: Note }) {
           <span className="row-t1 row-t1-lg">{note.title}</span>
           <span className="row-t2">{cardSubtitle(note)}</span>
         </span>
-        <Icon name="right" size={18} color="#54686C" />
+        <Icon name="right" size={18} color="#9AAAAC" />
       </button>
       {(tiles.length > 0 || note.primaryAction) && (
         <div className="ccard-body">
@@ -73,7 +73,7 @@ export function ContentCard({ note }: { note: Note }) {
                       }}
                     >
                       <span className="ccard-fact-v">{t.value}</span>
-                      <Icon name="copy" size={13} color="#54686C" strokeWidth={1.8} />
+                      <Icon name="copy" size={13} color="#9AAAAC" strokeWidth={1.8} />
                     </button>
                   ) : (
                     <span className={`ccard-fact-v${t.unconfirmed ? ' muted' : ''}`}>{t.value}</span>
@@ -115,7 +115,7 @@ export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; ope
             </span>
           </span>
           <span className="chev" data-open={open}>
-            <Icon name="down" size={18} color="#54686C" />
+            <Icon name="down" size={18} color="#9AAAAC" />
           </span>
         </button>
         {q && (
@@ -125,7 +125,7 @@ export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; ope
             aria-label={q === 'ticket' ? 'Show boarding pass' : `Open attachment ${note.attachments[0].file}`}
             onClick={() => a.quick(note)}
           >
-            <Icon name={q === 'ticket' ? 'ticket' : 'clip'} size={20} color="#111A1B" />
+            <Icon name={q === 'ticket' ? 'ticket' : 'clip'} size={20} color="currentColor" />
             <span>{q === 'ticket' ? 'Ticket' : 'PDF'}</span>
           </button>
         )}
@@ -149,8 +149,8 @@ export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; ope
               {withPrimary ? 'Details' : 'Open details'}
             </button>
             {withPrimary && pa && (
-              <button type="button" className="btn btn-ink btn-grow" onClick={() => a.primary(note)}>
-                <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+              <button type="button" className="btn btn-primary btn-grow" onClick={() => a.primary(note)}>
+                <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
                 {pa.short}
               </button>
             )}

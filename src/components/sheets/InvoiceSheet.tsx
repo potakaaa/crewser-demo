@@ -51,7 +51,7 @@ export function InvoiceSheet() {
         {stage === 'reading' && <span className="inv-scanline" />}
         {stage === 'done' && (
           <span className="inv-found">
-            <Icon name="check" size={16} color="#111A1B" strokeWidth={2.4} />
+            <Icon name="check" size={16} color="currentColor" strokeWidth={2.4} />
             Receipt read
           </span>
         )}

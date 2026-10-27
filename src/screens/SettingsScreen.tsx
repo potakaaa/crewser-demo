@@ -14,11 +14,11 @@ function NavRow({ icon, title, value, onClick }: { icon: IconName; title: string
   return (
     <button type="button" className="setrow" onClick={onClick}>
       <span className="chip-icon">
-        <Icon name={icon} size={20} color="#2A3B3F" />
+        <Icon name={icon} size={20} color="currentColor" />
       </span>
       <span className="setrow-main">{title}</span>
       {value && <span className="setrow-value">{value}</span>}
-      <Icon name="right" size={18} color="#54686C" />
+      <Icon name="right" size={18} color="#9AAAAC" />
     </button>
   );
 }
@@ -28,7 +28,7 @@ function SwitchRow({ icon, title, hint, on, onToggle }: { icon: IconName; title:
   return (
     <button type="button" className="setrow" role="switch" aria-checked={on} aria-labelledby={`${id}-t`} aria-describedby={`${id}-h`} onClick={onToggle}>
       <span className="chip-icon">
-        <Icon name={icon} size={20} color="#2A3B3F" />
+        <Icon name={icon} size={20} color="currentColor" />
       </span>
       <span className="setrow-main">
         <span id={`${id}-t`}>{title}</span>
@@ -112,7 +112,7 @@ export function SettingsScreen() {
           </div>
           {masterDataDone ? (
             <div className="setstatus setstatus-done">
-              <Icon name="check" size={18} color="#2C6B72" strokeWidth={2} />
+              <Icon name="check" size={18} color="#8FD0C6" strokeWidth={2} />
               Master data complete
             </div>
           ) : (
@@ -125,13 +125,13 @@ export function SettingsScreen() {
               }}
             >
               <span className="todo-icon">
-                <Icon name="idCard" size={20} color="#6B4A00" />
+                <Icon name="idCard" size={20} color="#F4C35A" />
               </span>
               <span className="todo-titles">
                 <span className="todo-t1">Complete master data</span>
                 <span className="todo-t2">Needed before your first payout</span>
               </span>
-              <Icon name="right" size={18} color="#54686C" />
+              <Icon name="right" size={18} color="#9AAAAC" />
             </button>
           )}
         </section>
@@ -158,7 +158,7 @@ export function SettingsScreen() {
                     <span className="fontopt-hint">{f.hint}</span>
                   </span>
                   <span className="fontopt-check" aria-hidden="true">
-                    {on && <Icon name="check" size={14} color="#DBF227" strokeWidth={2.4} />}
+                    {on && <Icon name="check" size={14} color="#172022" strokeWidth={2.4} />}
                   </span>
                 </button>
               );
@@ -180,7 +180,7 @@ export function SettingsScreen() {
             <NavRow icon="file" title="Imprint" onClick={() => toast('The imprint is not part of this demo')} />
           </div>
           <p className="setfoot">
-            <Icon name="shield" size={16} color="#54686C" />
+            <Icon name="shield" size={16} color="#9AAAAC" />
             <span>Data hosted in Germany</span>
           </p>
           <p className="setfoot setfoot-version">Crewser crew app · version {VERSION} (demo)</p>

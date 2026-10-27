@@ -83,7 +83,7 @@ function DeckCard({ card }: { card: CardModel }) {
   if (isHero && phase === 'after' && !submitted) {
     primary = (
       <button type="button" className="btn btn-lime deck-cta" onClick={() => setLogOpen(true)}>
-        <Icon name="logTime" size={18} color="#111A1B" strokeWidth={1.8} />
+        <Icon name="logTime" size={18} color="currentColor" strokeWidth={1.8} />
         Submit hours
       </button>
     );
@@ -91,14 +91,14 @@ function DeckCard({ card }: { card: CardModel }) {
     const boarding = n.primaryAction.kind === 'boardingPass';
     primary = (
       <button type="button" className="btn btn-primary deck-cta" onClick={() => a.primary(n)}>
-        <Icon name={boarding ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+        <Icon name={boarding ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
         {boarding ? n.primaryAction.label : n.primaryAction.short}
       </button>
     );
   } else if (attachment) {
     primary = (
       <button type="button" className="btn btn-primary deck-cta" onClick={() => a.quick(n)}>
-        <Icon name="clip" size={16} color="#FFFFFF" strokeWidth={1.8} />
+        <Icon name="clip" size={16} color="currentColor" strokeWidth={1.8} />
         Open
       </button>
     );
@@ -118,7 +118,7 @@ function DeckCard({ card }: { card: CardModel }) {
         </span>
         <span className="deck-rel">{status.rel}</span>
         <button type="button" className="deck-open" onClick={() => a.openNote(n.id)} aria-label={`${n.title}. Open details`}>
-          <Icon name="arrowUpRight" size={18} color="#111A1B" strokeWidth={1.8} />
+          <Icon name="arrowUpRight" size={18} color="currentColor" strokeWidth={1.8} />
         </button>
       </div>
       <div className="deck-main">
@@ -130,7 +130,7 @@ function DeckCard({ card }: { card: CardModel }) {
       </div>
       {where && (
         <p className="deck-place">
-          <Icon name={place ? 'pin' : noteIcon(n.type)} size={16} color="#54686C" strokeWidth={1.7} />
+          <Icon name={place ? 'pin' : noteIcon(n.type)} size={16} color="currentColor" strokeWidth={1.7} />
           <span>{where}</span>
         </p>
       )}

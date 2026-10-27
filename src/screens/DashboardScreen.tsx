@@ -27,7 +27,6 @@ export function DashboardScreen() {
   const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const masterDataDone = useDemo((s) => s.masterDataDone);
   const openSheet = useDemo((s) => s.openSheet);
-  const navigate = useDemo((s) => s.navigate);
   const toast = useDemo((s) => s.showToast);
   const link = useActiveLink();
   const sn = smartNotes(empty ? [] : notes);
@@ -75,13 +74,13 @@ export function DashboardScreen() {
         {link.isMe && !masterDataDone && (
           <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
             <span className="master-icon">
-              <Icon name="idCard" size={18} color="#111A1B" />
+              <Icon name="idCard" size={18} color="currentColor" />
             </span>
             <span className="master-text">
               <span className="master-t1">Submit your master data</span>
               <span className="master-t2">Needed once, before your first payout.</span>
             </span>
-            <Icon name="right" size={18} color="#111A1B" />
+            <Icon name="right" size={18} color="currentColor" />
           </button>
         )}
 
@@ -91,7 +90,7 @@ export function DashboardScreen() {
 
         {hasNotes ? (
           <section className="stack" aria-label="Smart notes">
-            <SectionHead title="Smart notes" link="Calendar" onLink={() => navigate({ name: 'calendar' })} />
+            <SectionHead title="Smart notes" />
             {sn.top.map((n) => (
               <ContentCard key={n.id} note={n} />
             ))}
@@ -114,7 +113,7 @@ export function DashboardScreen() {
                 <button type="button" className="btn btn-outline btn-md" aria-expanded={allOpen} aria-controls="more-notes" onClick={toggleAll}>
                   {allOpen ? 'Show fewer notes' : `Show ${sn.restCount} more notes`}
                   <span className="chev" data-open={allOpen}>
-                    <Icon name="down" size={16} color="#111A1B" strokeWidth={1.8} />
+                    <Icon name="down" size={16} color="currentColor" strokeWidth={1.8} />
                   </span>
                 </button>
               </>
@@ -128,7 +127,7 @@ export function DashboardScreen() {
         )}
 
         <footer className="brand-footer">
-          <Wordmark tone="dark" />
+          <Wordmark />
           <span className="brand-footer-line">Time tracking for film crews · Data hosted in Germany</span>
           <div className="footer-links">
             <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Privacy policy is not part of this demo')}>

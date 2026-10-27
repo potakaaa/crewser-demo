@@ -167,13 +167,13 @@ export function LogSheet() {
           <span className="stepper-sub">unpaid</span>
         </span>
         <button type="button" className="step-btn" aria-label="Less break, 5 minutes" disabled={breakMin <= 0} onClick={() => setBreak(breakMin - 5)}>
-          <Icon name="minus" size={20} color="#111A1B" />
+          <Icon name="minus" size={20} color="currentColor" />
         </button>
         <output className="step-val" aria-live="polite">
           {breakMin} min
         </output>
         <button type="button" className="step-btn" aria-label="More break, 5 minutes" disabled={breakMin >= 120} onClick={() => setBreak(breakMin + 5)}>
-          <Icon name="plus" size={20} color="#111A1B" />
+          <Icon name="plus" size={20} color="currentColor" />
         </button>
       </div>
 

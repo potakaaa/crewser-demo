@@ -43,7 +43,7 @@ function DocRow({ doc }: { doc: Doc }) {
   return (
     <button type="button" className="drow" onClick={() => navigate({ name: 'pdf', file: doc.file })}>
       <span className="chip-icon">
-        <Icon name="file" size={20} color="#2A3B3F" />
+        <Icon name="file" size={20} color="currentColor" />
       </span>
       <span className="drow-main">
         <span className="drow-title">
@@ -60,7 +60,7 @@ function DocRow({ doc }: { doc: Doc }) {
           <VersionMeta text={meta} version={doc.version} />
         </span>
       </span>
-      <Icon name="right" size={18} color="#54686C" />
+      <Icon name="right" size={18} color="#9AAAAC" />
     </button>
   );
 }
@@ -85,7 +85,7 @@ function PinnedCallSheet({ doc }: { doc: CallSheet }) {
       </span>
       <span className="dpin-cta">
         Open call sheet
-        <Icon name="arrowRight" size={18} color="#111A1B" />
+        <Icon name="arrowRight" size={18} color="currentColor" />
       </span>
     </button>
   );
@@ -114,7 +114,7 @@ function CallSheetSection({ filtered }: { filtered: CallSheet[] }) {
             <button type="button" className="dmore" aria-expanded={older} aria-controls="older-callsheets" onClick={() => setOlder((v) => !v)}>
               {older ? 'Hide earlier days' : `Earlier days (${rest.length})`}
               <span className="chev" data-open={older}>
-                <Icon name="down" size={16} color="#2C6B72" strokeWidth={1.8} />
+                <Icon name="down" size={16} color="#8FD0C6" strokeWidth={1.8} />
               </span>
             </button>
           </>

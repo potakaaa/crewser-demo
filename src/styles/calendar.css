@@ -97,7 +97,7 @@ button.day-action:active {
   color: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 3px 8px rgba(17, 33, 35, 0.2);
+    0 3px 8px rgba(0, 0, 0, 0.3);
 }
 .day-action-sheet::after {
   content: '';
@@ -112,7 +112,7 @@ button.day-action:active {
 }
 /* Not sent: the same quiet line as the hours card, a hairline chip with the same amber "!" badge as the day marks. */
 .day-action-unsent {
-  border: 1px solid rgba(17, 26, 27, 0.12);
+  border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
   font-weight: 500;
@@ -161,8 +161,7 @@ button.day-action:active {
 /* Narrow phones (360 px): give the note titles the width the ticket stub was taking. */
 @media (max-width: 400px) {
   .app[data-accent] .sheet-cal .nrow:not(.nrow-dashed) .nrow-toggle {
-    --stub-solid: 66px;
-    --stub-edge: 20px;
+    --stub-solid: 80px;
     grid-template-columns: 74px 36px minmax(0, 1fr) 16px;
     gap: var(--sp-2);
     padding-left: var(--sp-3);
