@@ -20,7 +20,7 @@
 .deck-card {
   position: relative;
   grid-area: 1 / 1;
-  height: 212px;
+  height: 224px;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
@@ -1205,4 +1205,79 @@
   flex: none;
   font-weight: 500;
   color: var(--text-3);
+}
+
+/* ───────── Ticket variant of the deck card: any note with a route (a flight today) ───────── */
+/* A faint lift at the top and two notches where the stub tears off; the notch radius matches the tear line's position. */
+.deck-card:has(> [data-ticket]) {
+  --notch-y: 114px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 55%),
+    var(--card);
+  -webkit-mask:
+    radial-gradient(circle 9px at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle 9px at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle 9px at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle 9px at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
+}
+.deck-route {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-top: 2px;
+}
+.deck-port {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.deck-port-to {
+  align-items: flex-end;
+  text-align: right;
+}
+.deck-code {
+  font-size: calc(32px * var(--numeral-scale));
+  line-height: 1;
+}
+.deck-city {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  line-height: 14px;
+  color: var(--text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.deck-plane {
+  flex: none;
+  margin-top: 5px;
+  color: var(--lime);
+}
+/* The tear line sits exactly between the notches (top of the stub = --notch-y). */
+.deck-stub {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 8px -16px 0;
+  padding: 6px 16px 0;
+  border-top: 1.5px dashed var(--line);
+}
+.deck-stub div {
+  min-width: 0;
+}
+.deck-stub dt {
+  font-size: var(--fs-xs);
+  line-height: 13px;
+  color: var(--text-3);
+}
+.deck-stub dd {
+  margin: 1px 0 0;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 17px;
+}
+[data-ticket] .deck-ctas {
+  padding-top: 10px;
 }
