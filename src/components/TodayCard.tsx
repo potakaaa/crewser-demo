@@ -5,7 +5,7 @@ import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
 import { quickAction, TYPE_LABEL } from '../lib/notes';
-import { callSheetFor, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
+import { callSheetNear, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { dayWord } from './docs/docs';
 import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
@@ -76,8 +76,8 @@ function DeckCard({ card }: { card: CardModel }) {
 
   const isHero = !card.stop;
   const phase = phaseOf(n);
-  // Shoot days and travel days both have a call sheet (the travel one is the movement order).
-  const sheet = (n.type === 'appointment' || n.type === 'flight') && n.day ? callSheetFor(n.day) : undefined;
+  // Every card offers the call sheet for its day; a day without one gets the next issued (else the latest), so it never dead-ends.
+  const sheet = callSheetNear(n.day ?? today.date);
   const attachment = !n.primaryAction && quickAction(n);
   const time = n.kind === 'time' ? n.time : 'All day';
   // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
@@ -169,12 +169,6 @@ function DeckCard({ card }: { card: CardModel }) {
           >
             Call sheet
             {sheet.isNew && <span className="deck-new" aria-hidden="true" />}
-          </button>
-        )}
-        {/* Without a call sheet, Details takes the grey slot, so every card offers two actions. */}
-        {!sheet && (
-          <button type="button" className="btn deck-cta deck-sheet" onClick={() => a.openNote(n.id)}>
-            Details
           </button>
         )}
         {primary}

@@ -3,6 +3,12 @@ import { toMinutes } from './dates';
 
 export const callSheetFor = (day: string) => docs.find((d) => d.kind === 'callsheet' && d.day === day);
 
+/** The call sheet that applies to a day: its own, else the next one issued after it, else the latest. Undefined only with no call sheets at all. */
+export function callSheetNear(day: string) {
+  const sheets = docs.filter((d) => d.kind === 'callsheet' && d.day).sort((a, b) => a.day!.localeCompare(b.day!));
+  return callSheetFor(day) ?? sheets.find((d) => d.day! > day) ?? sheets[sheets.length - 1];
+}
+
 /** Where today's shift stands, by the app's clock: before the call, on set, or after wrap. */
 export type Phase = 'before' | 'during' | 'after';
 
