@@ -1,19 +1,17 @@
 import { useRef, type CSSProperties } from 'react';
 import '../styles/calendar.css';
 import { useActiveLink, useDemo } from '../store';
-import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type NoteType, type WorkDay } from '../mock';
+import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type WorkDay } from '../mock';
 import { ForChip } from '../components/ForChip';
 import { NotifButton } from '../components/NotifButton';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { NoteRow } from '../components/NoteCards';
 import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
-import { sortNotes, TYPE_LABEL } from '../lib/notes';
-import { TYPE_COLOR } from '../lib/noteStyle';
+import { sortNotes } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
 
-const LEGEND: NoteType[] = ['appointment', 'flight', 'hotel', 'rental', 'plain'];
 const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
 
 /** The call sheet for each shoot day; a day with one is a shoot day. */
@@ -41,15 +39,9 @@ function DayMarks({ call, unsent }: { call: boolean; unsent: boolean }) {
   );
 }
 
-/** Up to three dots per day, coloured by note type. */
-function Dots({ notes, onLight }: { notes: Note[]; onLight: boolean }) {
-  return (
-    <span className="wday-dots">
-      {notes.slice(0, 3).map((n) => (
-        <i key={n.id} style={{ background: onLight ? TYPE_COLOR[n.type].fg : TYPE_COLOR[n.type].dot }} />
-      ))}
-    </span>
-  );
+/** One dot when the day has any note: it only says there is something inside. */
+function Dots({ notes }: { notes: Note[] }) {
+  return <span className="wday-dots">{notes.length > 0 && <i />}</span>;
 }
 
 /** Which way the last prev/next went, so the new week or month slides in from that side. */
@@ -160,7 +152,7 @@ export function CalendarScreen() {
                     >
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayOfMonth(iso)}</span>
-                      <Dots notes={dn} onLight={isSel} />
+                      <Dots notes={dn} />
                       <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
@@ -190,19 +182,11 @@ export function CalendarScreen() {
                       onClick={() => setCalDate(iso)}
                     >
                       <span className="mday-d">{dayOfMonth(iso)}</span>
-                      <Dots notes={dn} onLight={isSel} />
+                      <Dots notes={dn} />
                       <DayMarks call={callSheetByDay.has(iso)} unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
-              </div>
-              <div className="type-legend">
-                {LEGEND.map((t) => (
-                  <span key={t}>
-                    <i style={{ background: TYPE_COLOR[t].dot }} />
-                    {TYPE_LABEL[t]}
-                  </span>
-                ))}
               </div>
             </div>
           </Collapse>

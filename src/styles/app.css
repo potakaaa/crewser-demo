@@ -1183,25 +1183,6 @@
 .mday .wday-dots {
   height: 4px;
 }
-.type-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 14px;
-  padding: var(--sp-3) var(--sp-1) 0;
-  font-size: var(--fs-xs);
-  color: var(--on-dark-2);
-}
-.type-legend span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.type-legend i {
-  width: 6px;
-  height: 6px;
-  border-radius: 3px;
-}
 .day-list {
   display: flex;
   flex-direction: column;
@@ -1268,7 +1249,12 @@
   width: 5px;
   height: 5px;
   border-radius: 3px;
+  background: var(--lime);
   transition: background var(--t-med) ease;
+}
+/* The selected day is a light tile: the dot turns dark to stay visible. */
+:is(.wday, .mday).is-sel .wday-dots i {
+  background: var(--on-lime);
 }
 .sheet-cal {
   gap: var(--sp-4);
