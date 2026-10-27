@@ -1172,7 +1172,7 @@
   line-height: 1;
 }
 .mday.is-out {
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.58);
 }
 .mday.is-today {
   border-color: rgba(255, 255, 255, 0.4);
@@ -1416,7 +1416,7 @@
   color: var(--on-dark-2);
 }
 /* Production's note, labelled the way crews label gear on set: a short strip of lime camera
-   tape over the card's top-left edge, torn ends, matte grain, marker capitals in ink (15:1).
+   tape over the card's top-left edge, torn ends, matte grain, marker capitals in near-black on lime.
    The tape is the label itself, real text; the card stays the plain white of the rest. */
 .ns-note {
   position: relative;
@@ -1440,7 +1440,7 @@
   );
   transform: rotate(-2deg);
   transform-origin: left center;
-  color: var(--ink);
+  color: var(--on-lime);
   font-family: var(--ff-poster);
   font-size: 17px;
   font-weight: 400;
