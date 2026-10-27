@@ -255,26 +255,115 @@
   font-weight: 600;
 }
 
-/* ───────── Tab bar: crew pass slot and the + ───────── */
-.tab-avatar {
-  width: 22px;
-  height: 22px;
+/* ───────── The dock: Home, Calendar, the Pass and the + in one capsule ───────── */
+.dock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 30px;
+  background: rgba(40, 50, 53, 0.86);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 30px rgba(0, 0, 0, 0.4);
+}
+/* Inactive icons: on-dark-2 on the dock, 7:1. The active one is lime with a dot under it. */
+.dock-btn {
+  position: relative;
+  width: 52px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 11px;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: none;
+  color: var(--on-dark-2);
+  transition: color var(--t-fast) ease;
+}
+.dock-btn[data-on]:not(:has(.dock-avatar)) {
+  color: var(--lime);
+}
+.dock-btn[data-on]::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--lime);
+}
+.dock-btn:active > * {
+  transform: scale(0.9);
+}
+.dock-btn > * {
+  transition: transform 180ms var(--ease-out);
+}
+.dock-avatar {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
   background: var(--chip);
-  color: var(--chip-icon);
-  font-size: 9px;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.28);
+  color: var(--ink);
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  transition:
-    background var(--t-fast) ease,
-    color var(--t-fast) ease;
 }
-.tab-avatar[data-on='true'] {
-  background: var(--ink);
-  color: var(--card);
+.dock-btn[data-on] .dock-avatar {
+  box-shadow: 0 0 0 2px var(--lime);
+}
+/* Unread notifications: a small lime dot on the avatar; the count is in the Pass. */
+.dock-unread {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 0 2px rgba(40, 50, 53, 1);
+}
+.dock-add {
+  width: 48px;
+  height: 48px;
+  margin-left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: var(--lime);
+  color: var(--on-lime);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition:
+    transform 200ms var(--ease-spring),
+    background 150ms ease;
+}
+@media (hover: hover) {
+  .dock-add:hover {
+    background: var(--lime-hover);
+  }
+}
+.dock-add:active {
+  transform: scale(0.94);
+}
+.dock-add svg {
+  transition: transform 300ms var(--ease-spring);
+}
+.dock-add[aria-expanded='true'] svg {
+  transform: rotate(45deg);
 }
 .tb-scrim {
   position: absolute;
@@ -286,47 +375,6 @@
 .tabbar-wrap.is-open {
   z-index: 12;
 }
-.add-btn {
-  flex: none;
-  width: 56px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--lime);
-  color: var(--on-lime);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transition:
-    transform 200ms var(--ease-spring),
-    background 150ms ease;
-}
-@media (hover: hover) {
-  .add-btn:hover {
-    background: var(--lime-hover);
-  }
-}
-.add-btn:active {
-  transform: scale(0.94);
-}
-.add-btn svg {
-  transition: transform 300ms var(--ease-spring);
-}
-.add-btn[aria-expanded='true'] svg {
-  transform: rotate(45deg);
-}
-@container app (max-width: 400px) {
-  .add-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-  }
-}
-
 /* The menus rise from the bar: the pass over the tabs, the + actions over the + button. */
 @keyframes tb-pop {
   from {
@@ -336,22 +384,18 @@
 }
 .tb-pass {
   position: absolute;
-  left: 0;
-  right: 64px;
+  left: 50%;
   bottom: calc(100% + 10px);
+  width: min(320px, calc(100cqw - 32px));
+  translate: -50% 0;
   padding: 18px 12px 12px;
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
   box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1), 0 18px 48px rgba(0, 0, 0, 0.45);
-  transform-origin: 88% 100%;
+  transform-origin: 72% 100%;
   animation: tb-pop 280ms var(--ease-out) both;
-}
-@container app (max-width: 400px) {
-  .tb-pass {
-    right: 56px;
-  }
 }
 /* The punched slot of a lanyard pass. */
 .tb-pass::before {
@@ -518,7 +562,8 @@
   .tb-scrim {
     animation: none;
   }
-  .add-btn svg {
+  .dock-add svg,
+  .dock-btn > * {
     transition: none;
   }
 }

@@ -8,7 +8,7 @@ const views = [
   ['contacts', '#/contacts'], ['settings', '#/settings'], ['ticket', '#/ticket'],
   ['note-sheet', '#/note/fl'], ['pdf', '#/pdf/Ticket_OS487.pdf'],
   ['log-sheet', '#/dashboard', '.quick-tile'], ['invoice', '#/dashboard', '.quick-tile:last-child'],
-  ['pass', '#/dashboard', '.tab[aria-controls]'], ['add-menu', '#/calendar', '.add-btn'], ['notifications', '#/calendar', ['.tab[aria-controls]', '.tb-pass-row']], ['timer', '#/dashboard', '.timer-chip'],
+  ['pass', '#/dashboard', '.dock-btn[aria-controls]'], ['add-menu', '#/calendar', '.dock-add'], ['notifications', '#/calendar', ['.dock-btn[aria-controls]', '.tb-pass-row']], ['timer', '#/dashboard', '.timer-chip'],
   ['month', '#/calendar', '.gh-titlebar button, .cal-month, [aria-label*="month" i]'],
 ];
 const audit = () => {

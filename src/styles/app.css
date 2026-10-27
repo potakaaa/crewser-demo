@@ -2021,12 +2021,9 @@
 .tabbar-wrap {
   position: absolute;
   z-index: 11;
-  left: var(--sp-4);
-  right: var(--sp-4);
-  bottom: max(22px, calc(var(--sab) + 6px));
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  left: 50%;
+  bottom: max(22px, calc(var(--sab) + 10px));
+  translate: -50% 0;
   transition:
     transform var(--t-nav) var(--ease-ios),
     opacity var(--t-med) ease;
@@ -2034,91 +2031,6 @@
 .tabbar-wrap.is-hidden {
   transform: translateY(calc(100% + 40px));
   opacity: 0;
-}
-.tabbar {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  height: 64px;
-  display: flex;
-  gap: 2px;
-  padding: 9px 6px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-card);
-  background: rgba(40, 50, 53, 0.82);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  backdrop-filter: blur(22px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 10px 30px rgba(0, 0, 0, 0.35);
-}
-.tab {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 0;
-  min-width: 36px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--r-control);
-  background: transparent;
-  color: var(--ink);
-  overflow: hidden;
-}
-.tabbar.is-measured .tab {
-  flex: none;
-  justify-content: flex-start;
-  transition:
-    width var(--t-nav) var(--ease-ios),
-    padding-left var(--t-nav) var(--ease-ios);
-}
-.tab-icon {
-  flex: none;
-  display: flex;
-  transition: transform 180ms var(--ease-out);
-}
-.tab:active .tab-icon {
-  transform: scale(0.88);
-}
-/* The one white pill that slides under the active tab. */
-.tab-pill {
-  position: absolute;
-  z-index: 0;
-  top: 9px;
-  left: 0;
-  height: 44px;
-  border-radius: var(--r-control);
-  background: var(--chip);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06);
-  transition:
-    transform var(--t-nav) var(--ease-ios),
-    width var(--t-nav) var(--ease-ios);
-}
-.tab-label {
-  flex: none;
-  margin-left: 6px; /* = LABEL_GAP in TabBar.tsx */
-  white-space: nowrap;
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  opacity: 0;
-  transform: translateX(-6px);
-  transition:
-    opacity var(--t-fast) ease,
-    transform var(--t-nav) var(--ease-ios);
-}
-.tab-label[data-on='true'] {
-  opacity: 1;
-  transform: none;
-  transition-delay: 120ms, 0ms;
-}
-/* Hidden but still laid out, so the first measure can read each label's width. */
-.tabbar:not(.is-measured) .tab-label {
-  position: absolute;
-  visibility: hidden;
 }
 /* ───────── Log sheet ───────── */
 .scrim {

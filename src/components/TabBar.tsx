@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent } from 'react';
 import { useActiveLink, useDemo, useRoute, useUnreadCount, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
 import { useAddActions } from '../lib/addActions';
@@ -15,29 +15,11 @@ const PASS_ROUTES: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'contacts', label: 'Contacts', icon: 'contacts' },
   { name: 'settings', label: 'Settings', icon: 'settings' },
 ];
-const SLOTS = TABS.length + 1;
-
-const ICON = 22;
-const PAD_L = 8;
-const PAD_R = 8;
-/** Matches `margin-left` on `.tab-label` in app.css; change them together. */
-const LABEL_GAP = 6;
-/** Inactive tabs never get narrower than this; if the label would squeeze them, the active tab goes icon-only. */
-const MIN_TAB = 40;
-
-interface Layout {
-  w: number[];
-  x: number[];
-  /** False on narrow phones: all tabs are equal, icon-only. */
-  label: boolean;
-}
-
 type Menu = 'pass' | 'add' | null;
 
 /**
- * Floating tab bar. One white pill slides to the active tab while that tab widens to show its label;
- * widths are computed up front so pill, icons and label move on the same curve. The last slot is your
- * crew pass, which opens Contacts and Settings; the lime + beside the bar adds time or an invoice.
+ * The dock: one compact floating capsule with Home, Calendar, your crew pass (it opens Documents, Contacts and
+ * Settings) and the lime + (track time or scan an invoice). Icons only; the active one is lime with a dot.
  */
 export function TabBar({ hidden }: { hidden: boolean }) {
   const route = useRoute();
@@ -52,10 +34,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
     setPassTurn((n) => n + 1);
   });
   const link = useActiveLink();
-  const navRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const [layout, setLayout] = useState<Layout | null>(null);
   const [menu, setMenu] = useState<Menu>(null);
   const menuId = useId();
 
@@ -65,38 +44,6 @@ export function TabBar({ hidden }: { hidden: boolean }) {
   const idx = passLabel ? TABS.length : TABS.findIndex((t) => t.name === route.name);
   if (idx >= 0) lastActive.current = idx;
   const active = lastActive.current;
-  const lastPass = useRef('Documents');
-  if (passLabel) lastPass.current = passLabel;
-
-  useLayoutEffect(() => {
-    const nav = navRef.current;
-    if (!nav) return;
-    const measure = () => {
-      const cs = getComputedStyle(nav);
-      const padL = parseFloat(cs.paddingLeft);
-      const inner = nav.clientWidth - padL - parseFloat(cs.paddingRight);
-      const gap = parseFloat(cs.columnGap) || 0;
-      const widths = labelRefs.current.map((el) => el?.scrollWidth ?? 0);
-      // Labels not laid out yet (fonts, first paint): a max of 0 would wrongly switch the label mode on. The font and resize hooks measure again.
-      if (Math.max(...widths) <= 0) return;
-      const room = inner - gap * (SLOTS - 1);
-      const pill = (labelW: number) => PAD_L + ICON + LABEL_GAP + labelW + PAD_R;
-      // The label mode is decided by the longest label, so every tab behaves the same on a given phone.
-      const label = (room - pill(Math.max(...widths))) / (SLOTS - 1) >= MIN_TAB;
-      let activeW = pill(widths[active]);
-      let otherW = (room - activeW) / (SLOTS - 1);
-      if (!label) activeW = otherW = room / SLOTS;
-      const w = Array.from({ length: SLOTS }, (_, i) => (i === active ? activeW : otherW));
-      const x: number[] = [];
-      w.reduce((acc, v) => (x.push(acc), acc + v + gap), padL);
-      setLayout({ w, x, label });
-    };
-    measure();
-    void document.fonts?.ready.then(measure);
-    const ro = new ResizeObserver(measure);
-    ro.observe(nav);
-    return () => ro.disconnect();
-  }, [active, passLabel]);
 
   // A menu never outlives the screen it was opened on.
   useEffect(() => setMenu(null), [route, hidden]);
@@ -123,31 +70,6 @@ export function TabBar({ hidden }: { hidden: boolean }) {
   const pick = (run: () => void) => () => {
     setMenu(null);
     run();
-  };
-
-  const slotStyle = (i: number): CSSProperties | undefined =>
-    layout ? { width: layout.w[i], paddingLeft: i === active && layout.label ? PAD_L : (layout.w[i] - ICON) / 2 } : undefined;
-  const slot = (i: number, label: string, icon: ReactNode, props: { onClick: () => void; ariaLabel: string; current: boolean; menu?: boolean; title?: string }) => {
-    const on = i === active;
-    return (
-      <button
-        type="button"
-        key={i}
-        className="tab"
-        style={slotStyle(i)}
-        aria-current={props.current ? 'page' : undefined}
-        aria-label={props.ariaLabel}
-        aria-expanded={props.menu ? menu === 'pass' : undefined}
-        aria-controls={props.menu ? menuId : undefined}
-        title={on ? undefined : (props.title ?? label)}
-        onClick={props.onClick}
-      >
-        <span className="tab-icon">{icon}</span>
-        <span className="tab-label" aria-hidden="true" ref={(el) => void (labelRefs.current[i] = el)} data-on={on && (layout?.label ?? true)}>
-          {label}
-        </span>
-      </button>
-    );
   };
 
   return (
@@ -196,40 +118,39 @@ export function TabBar({ hidden }: { hidden: boolean }) {
             ))}
           </div>
         )}
-        <nav className={`tabbar${layout ? ' is-measured' : ''}`} aria-label="Tabs" ref={navRef}>
-          {layout && <span className="tab-pill" aria-hidden="true" style={{ width: layout.w[active], transform: `translateX(${layout.x[active]}px)` }} />}
-          {TABS.map((t, i) =>
-            slot(i, t.label, <Icon name={t.icon} size={ICON} color={i === active ? 'currentColor' : '#9AAAAC'} strokeWidth={i === active ? 1.8 : 1.6} />, {
-              onClick: () => navigate({ name: t.name }),
-              ariaLabel: t.label,
-              current: i === active && idx >= 0,
-            }),
-          )}
-          {slot(
-            TABS.length,
-            lastPass.current,
-            <span className="tab-avatar" data-on={active === TABS.length}>
+        <nav className="dock" aria-label="Tabs">
+          {TABS.map((t, i) => (
+            <button
+              type="button"
+              key={t.name}
+              className="dock-btn"
+              data-on={i === active || undefined}
+              aria-current={i === active && idx >= 0 ? 'page' : undefined}
+              aria-label={t.label}
+              onClick={() => navigate({ name: t.name })}
+            >
+              <Icon name={t.icon} size={22} color="currentColor" strokeWidth={i === active ? 1.9 : 1.6} />
+            </button>
+          ))}
+          <button
+            type="button"
+            className="dock-btn"
+            data-on={active === TABS.length || undefined}
+            aria-current={passLabel ? 'page' : undefined}
+            aria-label={`${passLabel ? `${passLabel}. ` : ''}Your pass: documents, contacts, settings${unread ? `, ${unread} unread notifications` : ''}`}
+            aria-expanded={menu === 'pass'}
+            aria-controls={menuId}
+            onClick={() => toggle('pass')}
+          >
+            <span className="dock-avatar">
               {link.initials}
-            </span>,
-            {
-              onClick: () => toggle('pass'),
-              ariaLabel: passLabel ? `${passLabel}. Your pass: documents, contacts, settings` : 'Your pass: documents, contacts, settings',
-              current: !!passLabel,
-              menu: true,
-              title: 'Your pass',
-            },
-          )}
+              {unread > 0 && <span className="dock-unread" aria-hidden="true" />}
+            </span>
+          </button>
+          <button type="button" className="dock-add" aria-label="Add time or invoice" aria-expanded={menu === 'add'} aria-controls={menuId} onClick={() => toggle('add')}>
+            <Icon name="plus" size={24} color="currentColor" strokeWidth={2} />
+          </button>
         </nav>
-        <button
-          type="button"
-          className="add-btn"
-          aria-label="Add time or invoice"
-          aria-expanded={menu === 'add'}
-          aria-controls={menuId}
-          onClick={() => toggle('add')}
-        >
-          <Icon name="plus" size={26} color="currentColor" strokeWidth={2} />
-        </button>
       </div>
     </>
   );
