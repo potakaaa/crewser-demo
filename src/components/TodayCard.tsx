@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { today, type Note } from '../mock';
 import { useDemo } from '../store';
-import { Icon } from './Icon';
+import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
-import { quickAction } from '../lib/notes';
-import { callSheetFor, phaseOf, wrapOf, type Phase } from '../lib/todayPhase';
+import { quickAction, TYPE_LABEL } from '../lib/notes';
+import { callSheetFor, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
-import { NotePrimaryAction } from './NotePrimaryAction';
 import { dayWord } from './docs/docs';
 import { fmtCountdown, toMinutes } from '../lib/dates';
 import type { Preview, Scrub, ScrubStop } from '../lib/timeline';
@@ -20,14 +19,17 @@ const SETTLE_MS = 1200;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** The line next to the TODAY tag: only where the shift stands, nothing the card already says. */
-function heroMeta(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): string {
+/** The pill and the line beside it on today's card: where the shift stands. */
+function heroStatus(n: Note, phase: Phase, sent: 'sent' | 'saved' | null): { pill: string; tone: Tone; rel: string } {
   const now = toMinutes(today.time);
-  if (sent) return sent === 'saved' ? 'Saved on this phone' : 'Hours sent';
-  if (phase === 'before') return fmtCountdown(toMinutes(n.time!) - now);
-  if (phase === 'during') return 'On set';
-  return `Wrapped at ${wrapOf(n)}`;
+  const wrapMin = wrapMinutes(n);
+  if (sent) return { pill: sent === 'saved' ? 'SAVED' : 'HOURS SENT', tone: 'neutral', rel: sent === 'saved' ? 'Sends when online' : `Wrapped at ${wrapOf(n)}` };
+  if (phase === 'before') return { pill: 'UP NEXT', tone: 'lime', rel: fmtCountdown(toMinutes(n.time!) - now) };
+  if (phase === 'during') return { pill: 'ON SET', tone: 'teal', rel: wrapMin !== null ? `wrap ${fmtCountdown(wrapMin - now)}` : 'wrap to be confirmed' };
+  return { pill: 'WRAPPED', tone: 'neutral', rel: `at ${wrapOf(n)}` };
 }
+
+type Tone = 'lime' | 'teal' | 'neutral';
 
 interface CardModel {
   key: string;
@@ -37,7 +39,7 @@ interface CardModel {
   si?: number;
 }
 
-function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; onBack: () => void }) {
+function DeckCard({ card }: { card: CardModel }) {
   const a = useNoteActions();
   const setLogOpen = useDemo((s) => s.setLogOpen);
   const offline = useDemo((s) => s.offline);
@@ -69,6 +71,13 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
   const time = n.kind === 'time' ? n.time : 'All day';
   // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
   const sent = isHero && submitted && end ? dayStat(today.date, { date: today.date, kind: 'shoot', start, end, breakMin, status: 'submitted' }) : null;
+  const status = isHero
+    ? heroStatus(n, phase, submitted ? (offline ? 'saved' : 'sent') : null)
+    : { pill: n.day && dayWord(n.day) === 'Tomorrow' ? 'TOMORROW' : TYPE_LABEL[n.type].toUpperCase(), tone: 'neutral' as Tone, rel: card.stop!.rel };
+  const wrap = n.facts.find((f) => f.label === 'Wrap');
+  const sub = n.type === 'appointment' ? `Call · wrap ${!wrap || wrap.unconfirmed ? 'TBC' : wrap.value}` : card.stop?.when;
+  const place = n.facts.find((f) => f.action === 'map')?.value;
+  const where = place ?? n.subtitle;
 
   let primary: ReactNode = null;
   if (isHero && phase === 'after' && !submitted) {
@@ -79,18 +88,18 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
       </button>
     );
   } else if (n.primaryAction) {
-    primary = <NotePrimaryAction note={n} className="deck-cta" />;
+    const boarding = n.primaryAction.kind === 'boardingPass';
+    primary = (
+      <button type="button" className="btn btn-primary deck-cta" onClick={() => a.primary(n)}>
+        <Icon name={boarding ? 'ticket' : 'nav'} size={16} color="#FFFFFF" strokeWidth={1.8} />
+        {boarding ? n.primaryAction.label : n.primaryAction.short}
+      </button>
+    );
   } else if (attachment) {
     primary = (
       <button type="button" className="btn btn-primary deck-cta" onClick={() => a.quick(n)}>
         <Icon name="clip" size={16} color="#FFFFFF" strokeWidth={1.8} />
         Open
-      </button>
-    );
-  } else {
-    primary = (
-      <button type="button" className="btn deck-cta deck-cta-quiet" onClick={() => a.openNote(n.id)}>
-        Details
       </button>
     );
   }
@@ -103,47 +112,46 @@ function DeckCard({ card, front, onBack }: { card: CardModel; front: boolean; on
           {submitted ? (offline ? "Saved on this phone, sends when you're online." : sent ? `Hours sent: ${shiftLabel(sent).replace(' · ', ', ')}.` : 'Hours sent.') : ''}
         </p>
       )}
-      <div className="today-top">
-        {isHero ? (
-          <>
-            <span className="today-tag" data-tone="lime">
-              TODAY
-            </span>
-            <span className="today-meta">{heroMeta(n, phase, submitted ? (offline ? 'saved' : 'sent') : null)}</span>
-          </>
-        ) : (
-          <>
-            <span className="today-tag">{n.day ? dayWord(n.day).toUpperCase() : 'LATER'}</span>
-            <span className="today-meta">{card.stop!.rel}</span>
-            {front && (
-              <button type="button" className="pill-btn deck-back" onClick={onBack}>
-                Back to now
-              </button>
-            )}
-          </>
-        )}
+      <div className="deck-head">
+        <span className="deck-pill" data-tone={status.tone}>
+          {status.pill}
+        </span>
+        <span className="deck-rel">{status.rel}</span>
+        <button type="button" className="deck-open" onClick={() => a.openNote(n.id)} aria-label={`${n.title}. Open details`}>
+          <Icon name="arrowUpRight" size={18} color="#111A1B" strokeWidth={1.8} />
+        </button>
       </div>
-      <button type="button" className="deck-main" onClick={() => a.openNote(n.id)} aria-label={`${time}, ${n.title}. Open details`}>
+      <div className="deck-main">
         <span className={`deck-time num${n.kind === 'time' ? '' : ' deck-time-sm'}`}>{time}</span>
         <span className="deck-titles">
           <span className="deck-t1">{n.title}</span>
-          {n.subtitle && <span className="deck-t2">{n.subtitle}</span>}
+          {sub && <span className="deck-t2">{sub}</span>}
         </span>
-      </button>
+      </div>
+      {where && (
+        <p className="deck-place">
+          <Icon name={place ? 'pin' : noteIcon(n.type)} size={16} color="#54686C" strokeWidth={1.7} />
+          <span>{where}</span>
+        </p>
+      )}
       <div className="deck-ctas">
-        {primary}
         {sheet && (
           <button
             type="button"
-            className="deck-sheet"
+            className="btn deck-cta deck-sheet"
             aria-label={`Open call sheet, ${sheet.title.replace('Call sheet · ', '')}${sheet.isNew ? ', updated' : ''}`}
             onClick={() => a.openPdf(sheet.file)}
           >
-            <Icon name="file" size={20} color="#111A1B" strokeWidth={1.7} />
-            <span className="deck-sheet-l">Sheet</span>
+            Call sheet
             {sheet.isNew && <span className="deck-new" aria-hidden="true" />}
           </button>
         )}
+        {primary ??
+          (!sheet && (
+            <button type="button" className="btn deck-cta deck-sheet" onClick={() => a.openNote(n.id)}>
+              Details
+            </button>
+          ))}
       </div>
     </div>
   );
@@ -233,10 +241,19 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
     else if (e.type === 'pointerup' && (dx > w * SWIPE_SHARE || s.v > FLICK)) go(i - 1);
     setDrag(0);
   };
+  // A key turn leaves focus in the card that just went inert; hand it to the new front card.
+  const keyTurn = useRef(false);
+  useEffect(() => {
+    if (!keyTurn.current) return;
+    keyTurn.current = false;
+    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) .deck-open')?.focus({ preventScroll: true });
+  }, [i]);
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    keyTurn.current = true;
     if (e.key === 'ArrowRight') go(i + 1);
     else if (e.key === 'ArrowLeft') go(i - 1);
-    else return;
+    else if (e.key === 'Home') go(0);
+    else return void (keyTurn.current = false);
     e.preventDefault();
   };
 
@@ -296,7 +313,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
               aria-hidden={slot !== 0}
               inert={slot !== 0}
             >
-              <DeckCard card={c} front={slot === 0} onBack={() => go(0)} />
+              <DeckCard card={c} />
             </article>
           );
         })}
