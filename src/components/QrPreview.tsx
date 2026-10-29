@@ -61,7 +61,7 @@ export function QrPreview({ note }: { note: Note }) {
   );
 }
 
-function PassTool({ label, on, onChange, icon }: { label: string; on: boolean; onChange: (v: boolean) => void; icon: 'sun' | 'check' }) {
+function PassTool({ label, on, onChange, icon }: { label: string; on: boolean; onChange: (v: boolean) => void; icon: 'sun' }) {
   return (
     <button type="button" className="pass-tool" aria-pressed={on} onClick={() => onChange(!on)}>
       <Icon name={icon} size={15} color="currentColor" strokeWidth={1.8} />
@@ -70,12 +70,11 @@ function PassTool({ label, on, onChange, icon }: { label: string; on: boolean; o
   );
 }
 
-/** The boarding pass inside the flight note: the code at scanning size, the passenger, brightness and keep-on switches. Without a readable code, the PDF is the pass. */
+/** The boarding pass inside the flight note: the code at scanning size, the passenger, and the brightness switch. Without a readable code, the PDF is the pass. */
 export function BoardingPassCode({ note }: { note: Note }) {
   const codeFound = useDemo((s) => s.codeFound);
   const a = useNoteActions();
   const [bright, setBright] = useState(true);
-  const [awake, setAwake] = useState(true);
   const file = note.attachments[0]?.file ?? '';
 
   if (!codeFound) {
@@ -91,7 +90,7 @@ export function BoardingPassCode({ note }: { note: Note }) {
     );
   }
 
-  // A web page cannot change the phone's brightness or wake lock, so the demo confirms with a toast.
+  // A web page cannot change the phone's brightness, so the demo confirms with a toast.
   const toggle = (what: string, set: (v: boolean) => void) => (v: boolean) => {
     set(v);
     a.toast(`${what} ${v ? 'on' : 'off'} (demo)`);
@@ -106,7 +105,6 @@ export function BoardingPassCode({ note }: { note: Note }) {
       </p>
       <div className="pass-tools">
         <PassTool icon="sun" label="Turn brightness up" on={bright} onChange={toggle('Full brightness', setBright)} />
-        <PassTool icon="check" label="Screen stays on" on={awake} onChange={toggle('Screen stays on', setAwake)} />
       </div>
     </div>
   );
