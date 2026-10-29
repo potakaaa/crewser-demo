@@ -1,6 +1,6 @@
 import { timerElapsed, timerStartMin, useDemo } from '../../store';
 import { Icon } from '../Icon';
-import { fmtElapsed, useTimerNow } from '../TimerChip';
+import { fmtElapsed, useTimerNow } from '../../lib/timer';
 
 /** "08:12" from minutes since midnight. */
 const clock = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
