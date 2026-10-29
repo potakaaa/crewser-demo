@@ -65,10 +65,6 @@
 .screen-scroll::-webkit-scrollbar {
   display: none;
 }
-.screen-white {
-  background: var(--dark-tile);
-  color: var(--ink);
-}
 /* ───────── Screen transitions ───────── */
 .layer {
   position: absolute;
@@ -386,22 +382,12 @@
 .btn-outline:hover {
   background: rgba(255, 255, 255, 0.04);
 }
-.btn-outline-ink {
-  background: transparent;
-  border: 0;
-  color: var(--ink);
-}
 .btn-md {
   min-height: 48px;
 }
 .btn-lg {
   min-height: 50px;
   font-size: var(--fs-base);
-}
-.btn-xl {
-  min-height: 54px;
-  font-size: var(--fs-base);
-  flex: none;
 }
 .btn-grow {
   flex: 1.3;
@@ -1274,41 +1260,15 @@
   color: var(--text-2);
 }
 /* ───────── Note detail ───────── */
-.route {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: end;
-  gap: var(--sp-2);
-}
-.route > div {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-}
-.route-end {
-  align-items: flex-end;
-}
 .route-code {
   font-size: var(--fs-5xl);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.02em;
 }
-.route-code-md {
-  font-size: var(--fs-4xl);
-}
-.route-code-sm {
-  font-size: 30px;
-}
 .route-city {
   font-size: var(--fs-md);
   color: var(--text-2);
-}
-.route-dark .route-city {
-  color: var(--on-dark-2);
-}
-.route-arrow {
-  margin-bottom: 26px;
 }
 /* ───────── Note sheet hero: icon and title, then call and wrap as a numeral pair ───────── */
 .ns-hero {
@@ -1669,7 +1629,7 @@
   font-size: var(--fs-md);
   color: var(--text-2);
 }
-/* ───────── Top bars (ticket, pdf) ───────── */
+/* ───────── Top bars (pdf) ───────── */
 .topbar {
   flex: none;
   display: grid;
@@ -1696,7 +1656,7 @@
   background: #0e1314;
   color: #f1f4f3;
 }
-/* The PDF and boarding pass bars get the same static grain as the dark cards. */
+/* The PDF bar gets the same static grain as the dark cards. */
 .topbar-dark::after {
   content: '';
   position: absolute;
@@ -1710,215 +1670,6 @@
 }
 .topbar-dark .topbar-title {
   font-size: var(--fs-base);
-}
-/* ───────── Boarding pass ───────── */
-.bp-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-  padding: var(--sp-2) var(--sp-5) var(--sp-4);
-}
-.bp-flight {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.bp-meta {
-  font-size: var(--fs-md);
-  color: #394c50;
-}
-.bp-meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: -8px 0;
-}
-.fallback-card .bp-meta {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-}
-.bp-passenger {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-}
-.bp-passenger span {
-  font-size: var(--fs-xs);
-  color: #394c50;
-}
-.bp-passenger strong {
-  font-size: 15px;
-  font-weight: 600;
-}
-.qr-wrap {
-  align-self: center;
-  padding: var(--sp-4);
-  border: 1px solid #e1e1df;
-  border-radius: var(--r-card);
-  background: #ffffff;
-  line-height: 0;
-}
-.qr-wrap svg {
-  width: 232px;
-  height: 232px;
-}
-.bp-source {
-  margin-top: calc(-1 * var(--sp-2));
-  text-align: center;
-  font-size: var(--fs-sm);
-  color: #394c50;
-}
-/* The pass as a real ticket: flight details on the brand gradient with grain,
-   a perforated tear line, and the code on plain white so scanners read it. */
-.bp-ticket {
-  flex: none;
-  overflow: hidden;
-  border: 0;
-  border-radius: var(--r-card);
-  background: #ffffff;
-}
-.bp-ticket-top {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding: 18px 18px 20px;
-  background:
-    radial-gradient(220px 140px at 100% 0%, rgba(219, 242, 39, 0.22), rgba(219, 242, 39, 0)),
-    radial-gradient(180px 120px at 0% 100%, rgba(111, 208, 200, 0.14), rgba(111, 208, 200, 0)),
-    var(--header-gradient);
-  color: #ffffff;
-}
-/* Static card grain (the shared tokens), like every other dark surface. */
-.bp-ticket-top::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--grain, none) 0 0 / var(--grain-card-size) var(--grain-card-size);
-  opacity: var(--grain-card-opacity);
-  mix-blend-mode: var(--grain-card-blend);
-  pointer-events: none;
-}
-.bp-ticket-top .bp-meta,
-.bp-ticket-top .bp-passenger span {
-  color: var(--on-dark-2);
-}
-.bp-ticket-top .copy-btn {
-  margin-right: -6px;
-}
-/* Tear line with a punched notch on each side */
-.bp-perf {
-  position: relative;
-  height: 0;
-  margin: 0 18px;
-  border-top: 2px dashed rgba(17, 26, 27, 0.16);
-}
-.bp-perf::before,
-.bp-perf::after {
-  content: '';
-  position: absolute;
-  top: -12px;
-  width: 22px;
-  height: 22px;
-  border: 0;
-  border-radius: 50%;
-  background: #ffffff;
-}
-.bp-perf::before {
-  left: -30px;
-}
-.bp-perf::after {
-  right: -30px;
-}
-.bp-ticket-bottom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: 14px 18px 16px;
-}
-.bp-ticket .qr-wrap {
-  padding: 4px;
-  border: 0;
-}
-.bp-ticket .bp-source {
-  margin-top: 0;
-}
-.bp-chips {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-.bp-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--r-control);
-  background: var(--card-2);
-  font-size: var(--fs-sm);
-  font-weight: 500;
-}
-.foot-pad {
-  flex: none;
-  display: flex;
-  gap: 10px;
-  padding: 14px var(--sp-5) max(var(--sp-6), calc(var(--sab) + var(--sp-3)));
-}
-.fallback-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding: var(--sp-3) var(--sp-5) max(var(--sp-6), calc(var(--sab) + var(--sp-3)));
-}
-.fallback-body > .btn {
-  flex: none;
-}
-.notice-amber {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-5);
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--amber-surface);
-}
-.notice-amber strong {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--amber-text);
-}
-.notice-amber span {
-  font-size: var(--fs-md);
-  line-height: 1.55;
-  color: var(--text-2);
-}
-.card {
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card);
-}
-.fallback-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding: var(--sp-5);
-}
-.fallback-card .route-city {
-  color: var(--text-2);
-}
-.fallback-text {
-  font-size: var(--fs-md);
-  line-height: 1.55;
-  color: var(--text-2);
 }
 /* ───────── PDF viewer ───────── */
 .screen-pdf {
@@ -2812,12 +2563,6 @@
 .ns-big {
   font-size: calc(var(--fs-4xl) * var(--numeral-scale));
 }
-.route-code-md {
-  font-size: calc(var(--fs-4xl) * var(--numeral-scale));
-}
-.route-code-sm {
-  font-size: calc(30px * var(--numeral-scale));
-}
 .duo-card strong {
   font-size: calc(22px * var(--numeral-scale));
 }
@@ -2866,12 +2611,12 @@
    Base, card, raised control: one look per level so nested things never melt together.
    Cards with a hairline border already have their rim; the rest get it as an inset ring. */
 :is(.master, .hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
-  .duo-card, .facts-card, .note-text, .card, .crew-card, .notif-item, .dlist, .setprofile, .fontopt) {
+  .duo-card, .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile, .fontopt) {
 }
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
   background: var(--card);
 }
-:is(.btn-ink, .btn-soft, .icon-btn-soft, .icon-btn-chip, .cquick, .cact, .step-btn, .bp-chip) {
+:is(.btn-ink, .btn-soft, .icon-btn-soft, .icon-btn-chip, .cquick, .cact, .step-btn) {
   background: var(--card-2);
 }
 /* Icon tiles are not buttons: lighter than the card, no bezel. */

@@ -4,9 +4,10 @@ import { TYPE_COLOR } from '../../lib/noteStyle';
 import { useNoteActions } from '../../lib/actions';
 import { fmtDayMonth } from '../../lib/dates';
 import { FactActions } from '../NoteCards';
-import { QrPreview } from '../QrPreview';
+import { BoardingPassCode } from '../QrPreview';
 import { CrewSection } from '../CrewStack';
-import { hasScanCode, timeSub, timeText, TYPE_LABEL, whenLabel } from '../../lib/notes';
+import { hasScanCode, primaryIcon, timeSub, timeText, TYPE_LABEL, whenLabel } from '../../lib/notes';
+import { useDemo } from '../../store';
 
 /** Sheet title and subtitle for a note, used by SheetHost. A note without a date is General info and says nothing about dates. */
 export function noteSheetMeta(id?: string) {
@@ -101,6 +102,7 @@ function InfoBlocks({ info }: { info: NoteInfo }) {
 export function NoteSheet({ id }: { id?: string }) {
   const note = id ? noteById(id) : undefined;
   const a = useNoteActions();
+  const masterDataDone = useDemo((s) => s.masterDataDone);
   if (!note) return <p className="sheet-empty">This note is no longer available.</p>;
   // A note with a route (a flight today) is shown as a ticket; other notes keep the hero with call and wrap.
   const isFlight = !!note.route;
@@ -120,7 +122,10 @@ export function NoteSheet({ id }: { id?: string }) {
       : (label === 'Call' && !!call) || (label === 'Wrap' && !!wrap) || (!wrap && label === timeSub(note) && atTime(value));
   const facts = note.facts.filter((f) => !inHero(f.label, f.value));
   // With its own Directions button below, a place only needs Copy here.
-  const directionsBelow = !!pa && pa.kind !== 'boardingPass';
+  const directionsBelow = pa?.kind === 'directions';
+  // A boarding pass is the code in the note itself, so its kind has no button here.
+  const showButton = !!pa && pa.kind !== 'boardingPass';
+  const formSent = pa?.kind === 'masterData' && masterDataDone;
 
   return (
     <>
@@ -151,10 +156,10 @@ export function NoteSheet({ id }: { id?: string }) {
                 </div>
               ))}
           </dl>
-          {/* The stub, torn off at the dashed line: the boarding pass code. */}
+          {/* The stub, torn off at the dashed line: the boarding pass, ready to scan. */}
           {hasScanCode(note) && (
             <div className="nticket-stub">
-              <QrPreview note={note} />
+              <BoardingPassCode note={note} />
             </div>
           )}
         </div>
@@ -170,7 +175,7 @@ export function NoteSheet({ id }: { id?: string }) {
             {note.day && (
               <div className="ns-times">
                 <span className="ns-time">
-                  <span className="ns-k">{call || wrap ? 'Call' : note.kind === 'time' ? 'Time' : 'When'}</span>
+                  <span className="ns-k">{call || wrap ? 'Call' : note.type === 'task' ? 'Due' : note.kind === 'time' ? 'Time' : 'When'}</span>
                   <span className="ns-big">{call?.value ?? timeText(note)}</span>
                   {!wrap && timeSub(note) && <span className="ns-sub">{timeSub(note)}</span>}
                 </span>
@@ -183,7 +188,6 @@ export function NoteSheet({ id }: { id?: string }) {
               </div>
             )}
           </div>
-          {hasScanCode(note) && <QrPreview note={note} />}
         </>
       )}
       {note.info && <InfoBlocks info={note.info} />}
@@ -200,13 +204,13 @@ export function NoteSheet({ id }: { id?: string }) {
           ))}
         </div>
       )}
-      {/* On a ticket the stub already opens the boarding pass: no second button for it. */}
-      {pa && !(isFlight && hasScanCode(note)) && (
-        <button type="button" className="btn btn-primary btn-lg" onClick={() => a.primary(note)}>
-          <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={18} color="currentColor" strokeWidth={1.8} />
+      {showButton && !formSent && (
+        <button type="button" className="btn btn-primary btn-lg" onClick={() => a.primary(note, { kind: 'note', id: note.id })}>
+          <Icon name={primaryIcon(pa.kind)} size={18} color="currentColor" strokeWidth={1.8} />
           {pa.label}
         </button>
       )}
+      {formSent && <p className="sheet-empty">Master data is complete. Thank you!</p>}
       {note.text && (
         // Production's note, labelled like gear on set: a strip of lime camera tape with marker writing.
         <div className="ns-note">
@@ -228,10 +232,12 @@ export function NoteSheet({ id }: { id?: string }) {
           <span className="att-open">Open</span>
         </button>
       ))}
-      <div className="crew-card">
-        <span className="crew-card-k">Shared with</span>
-        <CrewSection note={note} />
-      </div>
+      {note.type !== 'task' && (
+        <div className="crew-card">
+          <span className="crew-card-k">Shared with</span>
+          <CrewSection note={note} />
+        </div>
+      )}
       {note.source && (
         <div className="crew-line">
           <Icon name="calendar" size={16} color="#9AAAAC" />

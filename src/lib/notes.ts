@@ -1,5 +1,5 @@
 import { notes as allNotes, project, today } from '../mock';
-import type { Fact, Note, NoteType } from '../mock';
+import type { Fact, Note, NoteType, PrimaryActionKind } from '../mock';
 import { fmtCountdown, fmtDayMonth, fmtDayShort, relativeDay, toMinutes, diffDays } from './dates';
 
 export const TYPE_LABEL: Record<NoteType, string> = {
@@ -8,7 +8,13 @@ export const TYPE_LABEL: Record<NoteType, string> = {
   rental: 'Rental',
   appointment: 'Appointment',
   plain: 'Note',
+  task: 'To do',
 };
+
+/** The master data to-do: it leaves the deck once the form is sent, and is only yours. */
+export const MASTER_NOTE_ID = 'md';
+export const visibleNotes = (list: Note[], opts: { masterDataDone: boolean; isMe: boolean }) =>
+  opts.masterDataDone || !opts.isMe ? list.filter((n) => n.id !== MASTER_NOTE_ID) : list;
 
 const sortKey = (n: Note) => (n.day ? n.day + ' ' + (n.kind === 'time' ? n.time : '00:00') : '9999');
 export const sortNotes = (list: Note[]) => [...list].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
@@ -32,17 +38,17 @@ export function whenLabel(n: Note): string {
 export const timeText = (n: Note) => (n.kind === 'time' ? n.time! : n.kind === 'allday' ? 'All day' : '—');
 export const timeSub = (n: Note) => n.timeNote ?? (n.kind === 'undated' ? 'no date' : '');
 
-/** Notes that have a ticket get the "Ticket" quick button; other attachments get "PDF". */
+/** Notes that have a ticket get the "Ticket" quick button (opens the note, where the code is); other attachments get "PDF". */
 export function quickAction(n: Note): 'ticket' | 'pdf' | null {
   if (!n.attachments.length) return null;
   return n.type === 'flight' ? 'ticket' : 'pdf';
 }
 
-/** Notes whose ticket carries a scannable code (shown as a QR preview). */
+/** Notes whose ticket carries a scannable code (shown large in the note). */
 export const hasScanCode = (n: Note) => quickAction(n) === 'ticket';
 
 /** Call times and travel come first. */
-const PRIORITY_TYPES: NoteType[] = ['appointment', 'flight', 'hotel'];
+const PRIORITY_TYPES: NoteType[] = ['appointment', 'flight', 'hotel', 'task'];
 
 export interface SmartNotes {
   /** Today's call: the note the top card is about. */
@@ -116,3 +122,6 @@ export function cardTiles(n: Note): CardTile[] {
 }
 
 export const dayStub = (n: Note) => (n.day ? fmtDayShort(n.day) : '');
+
+/** Icon of a note's primary button: ticket for a boarding pass, ID card for master data, arrow for directions. */
+export const primaryIcon = (kind: PrimaryActionKind) => (kind === 'boardingPass' ? 'ticket' : kind === 'masterData' ? 'idCard' : 'nav');
