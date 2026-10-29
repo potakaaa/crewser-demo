@@ -8,7 +8,7 @@ import { fmtDayMonth } from '../lib/dates';
 /** package.json is 0.N.0 while this is a prototype: N is the crew app generation (v4). */
 const GENERATION = `v${version.split('.')[1]}`;
 
-const JUMPS: { label: string; route?: Route; note?: string; log?: boolean; sheet?: 'invoice' | 'timer' }[] = [
+const JUMPS: { label: string; route?: Route; note?: string; log?: boolean; sheet?: 'invoice' }[] = [
   { label: 'Home', route: { name: 'dashboard' } },
   { label: 'Calendar', route: { name: 'calendar' } },
   { label: 'Documents', route: { name: 'documents' } },

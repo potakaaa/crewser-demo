@@ -530,12 +530,6 @@
 .hs-send:active {
   background: var(--soft);
 }
-/* On its own (the hours sheet), the line gets the same card edge. */
-.hs-nudge-solo {
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card);
-}
 
 /* ───────── Info pocket ───────── */
 .pocket {
@@ -684,12 +678,6 @@
   background: var(--dark-tile);
   color: #ffffff;
 }
-.hsheet-hero p {
-  margin: 0;
-  font-size: var(--fs-md);
-  line-height: 1.45;
-  color: var(--on-dark-2);
-}
 .hsheet-k {
   font-size: var(--fs-sm);
   color: var(--on-dark-3);
@@ -705,12 +693,6 @@
   letter-spacing: 0;
   color: var(--on-dark-3);
 }
-.hsheet-h3 {
-  margin: var(--sp-1) 0 calc(-1 * var(--sp-2));
-  font-size: var(--fs-md);
-  font-weight: 600;
-  color: var(--text-2);
-}
 .hsheet-list {
   margin: 0;
   padding: 0;
@@ -720,53 +702,19 @@
   background: var(--card);
 }
 .hsheet-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4);
 }
 .hsheet-row + .hsheet-row {
   border-top: 1px solid var(--hairline);
 }
-.hsheet-day {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.hsheet-day strong {
-  font-size: var(--fs-base);
-  font-weight: 600;
-}
-.hsheet-day span {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-}
 .hsheet-h {
   font-size: calc(var(--fs-xl) * var(--numeral-scale));
   font-variant-numeric: tabular-nums;
 }
-.hsheet-status {
-  min-width: 82px;
-  padding: 3px 8px;
-  border-radius: var(--r-control);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  text-align: center;
-}
-.hsheet-approved {
-  background: rgba(143, 208, 198, 0.14);
-  color: var(--teal);
-}
-.hsheet-submitted {
-  background: rgba(141, 184, 245, 0.14);
-  color: #a9c8f7;
-}
-.hsheet-draft {
-  background: var(--chip);
-  color: var(--ink);
-}
-
 /* ───────── Info sheet ───────── */
 .info-list,
 .info-checks {

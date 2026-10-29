@@ -5,7 +5,6 @@ export type GuideEvent =
   | 'deck:swiped'
   | 'ruler:scrubbed'
   | 'switch:opened'
-  | 'timer:started'
   | 'profile:opened';
 
 export interface GuideStep {
@@ -26,7 +25,6 @@ export const GUIDE_STEPS: GuideStep[] = [
   { id: 'deck', route: 'dashboard', target: 'deck', title: "What's next", body: 'Swipe the card or tap the arrows to see what comes after.', waitFor: ['deck:swiped'], placement: 'below' },
   { id: 'ruler', route: 'dashboard', target: 'ruler', title: 'Look ahead', body: 'Drag the strip to scrub through the coming days.', waitFor: ['ruler:scrubbed'], placement: 'below' },
   { id: 'switch', route: 'dashboard', target: 'switch', title: 'Switch', body: 'Tap the arrow to switch project or person.', waitFor: ['switch:opened'], placement: 'below' },
-  { id: 'timer', route: 'dashboard', target: 'timer', title: 'Your hours', body: 'Tap Start to run the timer. Track time adds hours by hand.', waitFor: ['timer:started'], placement: 'above' },
   { id: 'profile', route: 'dashboard', target: 'profile', title: 'Your profile', body: 'Tap your initials for settings, or to replay this tour.', waitFor: ['profile:opened'], placement: 'above' },
 ];
 

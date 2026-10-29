@@ -5,7 +5,6 @@ import { useActiveLink, useDemo } from '../store';
 import { useSubmitted } from '../lib/useSubmitted';
 import { fmtH, hoursOverview, type HoursOverview } from '../lib/stats';
 import { firstNameOf } from '../lib/greeting';
-import { TimerChip } from './TimerChip';
 import { SectionHead } from './Layout';
 import { Icon } from './Icon';
 
@@ -22,42 +21,11 @@ export const useHoursOverview = () => {
   return useMemo(() => hoursOverview(submitted, { start, end, breakMin }, empty ? [] : workdaysFor(linkId)), [submitted, start, end, breakMin, linkId, empty]);
 };
 
-/** The number, unit and one plain sentence behind each tile; the hours sheet reuses them. */
-export function metricCopy(o: HoursOverview, metric: HoursMetric) {
-  const n = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
-  switch (metric) {
-    case 'week':
-      return {
-        label: 'Last 7 days',
-        short: 'Last 7 days',
-        value: fmtH(o.weekTotal),
-        unit: 'h',
-        sentence: `${n(o.weekDays.length, 'day', 'days')} worked, ${o.rangeLabel}.`,
-      };
-    case 'overtime':
-      return {
-        label: 'Overtime',
-        short: 'Overtime',
-        value: `+${fmtH(o.overtime)}`,
-        unit: 'h',
-        sentence: `Hours past your ${project.dailyTargetHours} h day, on ${n(o.overtimeDays.length, 'day', 'days')} in the last 7 days.`,
-      };
-    case 'days':
-      return {
-        label: 'Shoot days after today',
-        short: 'Days left',
-        value: String(o.shootLeft),
-        unit: '',
-        sentence: today.dayLabel ? `${today.shootDay} of ${project.totalShootDays} shoot days done. Today is a ${today.dayLabel.toLowerCase()}.` : `Today is day ${today.shootDay} of ${project.totalShootDays}.`,
-      };
-  }
-}
-
 /**
  * A quiet line (amber dot, "Sun 18 not sent", Send) when logged days have not been sent yet.
  * On a colleague's link it names them, and Send asks once more, like the Log sheet does.
  */
-export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
+export function UnsentNudge({ o }: { o: HoursOverview }) {
   const submitDay = useDemo((s) => s.submitDay);
   const toast = useDemo((s) => s.showToast);
   const offline = useDemo((s) => s.offline);
@@ -84,7 +52,7 @@ export function UnsentNudge({ o, solo }: { o: HoursOverview; solo?: boolean }) {
     toast(offline ? `${what} saved on this phone${forName}, sends when you're online` : link.isMe ? `${what} sent to production` : `${what} sent${forName}`);
   };
   return (
-    <div className={`hs-nudge${solo ? ' hs-nudge-solo' : ''}`}>
+    <div className="hs-nudge">
       <UnsentMark />
       <span className="hs-nudge-text" role={confirming ? 'status' : undefined}>
         {confirming ? `Sending hours for ${link.personName}, not for you` : `${what}${forName} not sent`}
@@ -116,7 +84,7 @@ function TargetRing({ avg }: { avg: number }) {
 
 /**
  * Home's statistics, after the original app's big numbers: the daily average against the target (with the
- * work timer and the not-sent line), then total hours, overtime and shoot days, each opening the hours sheet,
+ * not-sent line), then total hours, overtime and shoot days, each opening the hours sheet,
  * then Export to PDF. Before anything is logged it says how to start instead of showing zeros.
  */
 export function HoursStrip() {
@@ -160,10 +128,9 @@ export function HoursStrip() {
         ) : (
           <div className="st-empty">
             <strong>No hours logged yet</strong>
-            <span>Start the timer when work starts, or log a shift with Track time. Your totals build up here.</span>
+            <span>Log a shift with Track time and your totals build up here.</span>
           </div>
         )}
-        <TimerChip />
         <UnsentNudge o={o} />
       </div>
       {logged && row('week', fmtH(o.weekTotal), 'h', 'Total hours', `${o.rangeLabel}, ${o.weekDays.length} ${o.weekDays.length === 1 ? 'day' : 'days'}`)}

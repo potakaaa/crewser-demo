@@ -941,6 +941,7 @@
 /* Week and month sit straight on the header, as in the live app: no panel behind them. */
 .week-strip {
   position: relative;
+  padding-top: 4px; /* the day badge sits above the disc; the Collapse around the strip clips overflow */
 }
 .week-days {
   display: grid;
@@ -2464,7 +2465,7 @@
 /* ───────── Elevation (dark) ─────────
    Base, card, raised control: one look per level so nested things never melt together.
    Cards with a hairline border already have their rim; the rest get it as an inset ring. */
-:is(.hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
+:is(.pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
   .duo-card, .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile) {
 }
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {

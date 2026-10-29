@@ -40,10 +40,6 @@ const STEPS = [
   { name: 'ruler drag', go: async (p) => { const [x, y] = await center(p, '[data-guide="ruler"]'); await swipe(p, [x + 60, y], [x - 80, y], 14); } },
   { name: 'switch arrow tap', go: (p) => tapOn(p, '[data-guide="switch"]'),
     post: async (p) => { await sleep(300); ok((await p.locator('.switcher').count()) === 1, 'arrow opened the project switcher'); } },
-  { name: 'timer start tap',
-    pre: async (p) => { await sleep(600); const r = await p.locator('[data-guide="timer"]').boundingBox(); ok(r && r.y > 0 && r.y + r.height < H - 56, `timer scrolled into view above the dock (y ${r && Math.round(r.y)})`); },
-    go: (p) => tapOn(p, '[data-guide="timer"]'),
-    post: async (p) => { await sleep(300); ok((await p.locator('.hs-timer-on').count()) === 1, 'timer is running'); } },
   { name: 'tap Profile', go: (p) => tapOn(p, '[data-guide="profile"]') },
 ];
 const N = STEPS.length;
