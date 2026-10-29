@@ -7,7 +7,7 @@ import { UnsentMark } from '../components/UnsentMark';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { ContentCard } from '../components/NoteCards';
-import { addDays, dayOfMonth, diffDays, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, monthShort, mondayOf, relativeDay, weekday } from '../lib/dates';
+import { addDays, dayOfMonth, diffDays, fmtDayMonth, fmtMonthYear, isSameMonth, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
 import { sortNotes, visibleNotes } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
@@ -15,7 +15,6 @@ import { useSubmitted } from '../lib/useSubmitted';
 const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
 /** "21.10.", as under the live app's week strip. */
 const dayDotMonth = (iso: string) => `${iso.slice(8)}.${iso.slice(5, 7)}.`;
-const longWeekday = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' });
 
 /** The call sheet for each shoot day; a day with one is a shoot day. */
 const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
@@ -115,10 +114,6 @@ export function CalendarScreen() {
           <button type="button" className="cal-arrow" aria-label={`Previous ${unit}`} onClick={() => shiftCal(-1)}>
             <Icon name="left" size={16} color="currentColor" strokeWidth={1.8} />
           </button>
-          <span className="cal-cw">{monthOpen ? monthShort(calMonth) : `CW${isoWeek(monday)}`}</span>
-          <button type="button" className="cal-arrow" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
-            <Icon name="right" size={16} color="currentColor" strokeWidth={1.8} />
-          </button>
           <button type="button" className="cal-label" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
             {label}
             <ForChip compact bare />
@@ -126,6 +121,9 @@ export function CalendarScreen() {
               <Icon name="down" size={14} color="currentColor" strokeWidth={1.8} />
             </span>
             <span className="sr-only">{monthOpen ? 'Show week' : 'Show whole month'}</span>
+          </button>
+          <button type="button" className="cal-arrow" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
+            <Icon name="right" size={16} color="currentColor" strokeWidth={1.8} />
           </button>
           <button type="button" className="cal-today" onClick={() => setCalDate(today.date)}>
             Today
@@ -194,18 +192,10 @@ export function CalendarScreen() {
       <Sheet className="sheet-cal">
         {offline && <OfflineBanner tone="dark" />}
         <div key={calDate} className="day-list">
-          <div className="day-heading">
-            <span className="day-heading-wd">
-              {longWeekday(calDate)}
-              {(relWord || dayNotes.length > 0) && <span> {[relWord, dayNotes.length > 0 && count(dayNotes.length)].filter(Boolean).join(' · ')}</span>}
-            </span>
-            <h2>
-              <span className="sr-only">{fmtDayMonth(calDate)}</span>
-              <span aria-hidden="true">
-                {dayOfMonth(calDate)}. {monthShort(calDate)}
-              </span>
-            </h2>
-          </div>
+          <h2 className="day-heading">
+            {fmtDayMonth(calDate)}
+            {(relWord || dayNotes.length > 0) && <span> · {[relWord, dayNotes.length > 0 && count(dayNotes.length)].filter(Boolean).join(' · ')}</span>}
+          </h2>
           {(callSheet || unsent) && (
             <div className="day-actions">
               {callSheet && (
