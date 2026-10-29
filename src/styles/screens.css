@@ -886,7 +886,7 @@
 .for-chip-role::before {
   content: '· ' / '';
 }
-/* In a title row: level with the bell's centre. */
+/* In a title row: level with the first title line. */
 .gh-titlebar > .for-chip {
   align-self: flex-start;
   margin-top: 11px;

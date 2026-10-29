@@ -6,7 +6,7 @@ import { hoursOverview, todayPlan } from './lib/stats';
 import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { setGuideDone } from './lib/guide';
-import { addDays, addMonths, firstOfMonth, toMinutes } from './lib/dates';
+import { addDays, addMonths, firstOfMonth, fmtHHMM, toMinutes } from './lib/dates';
 
 export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'settings';
 
@@ -152,7 +152,7 @@ function saveTimer(t: WorkTimer | null) {
 /** "HH:MM" for minutes since midnight, rounded down to the Log sheet's 5-minute steps (clamped to the day). */
 const hhmm5 = (min: number) => {
   const r = Math.max(0, Math.min(23 * 60 + 55, Math.floor(min / 5) * 5));
-  return `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`;
+  return fmtHHMM(r);
 };
 
 /** When a timer of `elapsedMs` started on the demo clock: the demo's "now" is frozen, the elapsed time is real. */
@@ -625,5 +625,5 @@ export function useNotifications(): NotificationItem[] {
   );
 }
 
-/** Unread notifications of the active link, for the bell's badge. */
+/** Unread notifications of the active link, for the Settings Notifications row. */
 export const useUnreadCount = () => useNotifications().filter((n) => n.unread).length;

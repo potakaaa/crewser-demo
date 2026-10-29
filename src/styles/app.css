@@ -377,9 +377,6 @@
   min-height: 50px;
   font-size: var(--fs-base);
 }
-.btn-grow {
-  flex: 1.3;
-}
 .btn-row {
   display: flex;
   gap: var(--sp-2);
@@ -583,10 +580,6 @@
   flex-direction: column;
   gap: 2px;
 }
-.home-hello {
-  font-size: var(--fs-sm);
-  color: var(--on-dark-2);
-}
 .home-project {
   font-size: var(--fs-md);
   font-weight: 500;
@@ -712,9 +705,6 @@
   line-height: 1.15;
   letter-spacing: -0.01em;
 }
-.stub-muted {
-  color: var(--text-3);
-}
 .stub-sub {
   font-size: var(--fs-xs);
   line-height: 1.25;
@@ -735,10 +725,6 @@
 }
 .row-t1-lg {
   font-size: 15px;
-}
-.row-t1-route {
-  font-size: 15px;
-  letter-spacing: 0.01em;
 }
 /* Never cut off: routes, places and codes wrap instead of trailing off. */
 .row-t2 {
@@ -1406,26 +1392,6 @@
   .ns-sos-btn:active {
     transform: none;
   }
-}
-.duo {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-.duo-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: var(--sp-4) 18px;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card);
-}
-.duo-card strong {
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
 }
 .facts-card {
   overflow: hidden;
@@ -2374,7 +2340,6 @@
 .num,
 .route-code,
 .ns-big,
-.duo-card strong,
 .tt-v {
   font-family: var(--font-numeral);
   font-weight: var(--numeral-weight);
@@ -2385,9 +2350,6 @@
 }
 .ns-big {
   font-size: calc(var(--fs-4xl) * var(--numeral-scale));
-}
-.duo-card strong {
-  font-size: calc(22px * var(--numeral-scale));
 }
 .tt-v {
   font-size: calc(var(--fs-3xl) * var(--numeral-scale));
@@ -2434,7 +2396,7 @@
    Base, card, raised control: one look per level so nested things never melt together.
    Cards with a hairline border already have their rim; the rest get it as an inset ring. */
 :is(.pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
-  .duo-card, .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile) {
+  .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile) {
 }
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
   background: var(--card);

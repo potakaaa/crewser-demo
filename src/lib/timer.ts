@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { WorkTimer } from '../store';
+import { pad2 } from './dates';
 
 /** "14:05" under an hour (minutes:seconds), "2:14" (hours:minutes) after. */
 export function fmtElapsed(ms: number) {
   const s = Math.floor(ms / 1000);
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
-  return h > 0 ? `${h}:${String(m).padStart(2, '0')}` : `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  return h > 0 ? `${h}:${pad2(m)}` : `${pad2(m)}:${pad2(s % 60)}`;
 }
 
 export function spokenElapsed(ms: number) {

@@ -1,9 +1,9 @@
 import { useEffect, useRef, type KeyboardEvent } from 'react';
+import { pad2 } from '../lib/dates';
 
 const ITEM_H = 36;
 const SETTLE_MS = 90;
 
-const pad = (n: number) => String(n).padStart(2, '0');
 
 interface ColumnProps {
   label: string;
@@ -63,13 +63,13 @@ function WheelColumn({ label, values, value, onChange }: ColumnProps) {
       tabIndex={0}
       aria-label={label}
       aria-valuenow={value}
-      aria-valuetext={pad(value)}
+      aria-valuetext={pad2(value)}
       onScroll={onScroll}
       onKeyDown={onKeyDown}
     >
       {values.map((v) => (
         <button type="button" tabIndex={-1} key={v} className="wheel-item" data-on={v === value} onClick={() => onChange(v)}>
-          {pad(v)}
+          {pad2(v)}
         </button>
       ))}
     </div>
@@ -86,11 +86,11 @@ export function TimeWheel({ value, onChange, label }: { value: string; onChange:
   return (
     <div className="time-wheel" role="group" aria-label={label}>
       <span className="wheel-band" aria-hidden="true" />
-      <WheelColumn label={`${label} hour`} values={HOURS} value={h} onChange={(v) => onChange(`${pad(v)}:${pad(min)}`)} />
+      <WheelColumn label={`${label} hour`} values={HOURS} value={h} onChange={(v) => onChange(`${pad2(v)}:${pad2(min)}`)} />
       <span className="wheel-colon" aria-hidden="true">
         :
       </span>
-      <WheelColumn label={`${label} minutes`} values={MINUTES} value={min} onChange={(v) => onChange(`${pad(h)}:${pad(v)}`)} />
+      <WheelColumn label={`${label} minutes`} values={MINUTES} value={min} onChange={(v) => onChange(`${pad2(h)}:${pad2(v)}`)} />
     </div>
   );
 }

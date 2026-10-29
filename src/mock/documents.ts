@@ -1,5 +1,5 @@
 import type { Doc, PdfDoc } from './types';
-import { fmtDayMonth } from '../lib/dates';
+import { fmtDayMonth, pad2 } from '../lib/dates';
 
 /** Shoot days in Vienna. Sat 17 Oct was the day off, so there is no call sheet for it. */
 const SHOOT_DAYS: { n: number; day: string; updated: string; size: string; version: number; isNew?: boolean }[] = [
@@ -13,11 +13,10 @@ const SHOOT_DAYS: { n: number; day: string; updated: string; size: string; versi
   { n: 8, day: '2026-10-20', updated: '2026-10-19T07:55', size: '226 KB', version: 1 },
 ];
 
-const pad = (n: number) => String(n).padStart(2, '0');
 
 const callsheets: Doc[] = SHOOT_DAYS.map((d) => ({
   id: `cs${d.n}`,
-  file: `Callsheet_D${pad(d.n)}_${d.day.slice(5)}.pdf`,
+  file: `Callsheet_D${pad2(d.n)}_${d.day.slice(5)}.pdf`,
   title: `Call sheet · Shoot day ${d.n}`,
   kind: 'callsheet',
   day: d.day,

@@ -12,14 +12,9 @@
   --dark-tile: #1e282a;
   --lime: #dbf227;
 
-  --data-regular: #7fa1a8;
-  --data-night-dark: #8a93e8;
   --teal: #2c6b72;
-  --night: #5a63d6;
-  --night-text: #4a53c0;
 
   --amber-surface: #fbefd0;
-  --amber-border: #e3c36a;
   --amber-text: #6b4a00;
   --amber-dark: #f4c35a;
 
@@ -112,18 +107,12 @@
   --dark-tile: #151c1e;
   --lime: #d7e336;
   --on-lime: #172022;
-  --forest: #4a6b55;
 
-  --data-regular: #7fa1a8;
-  --data-night-dark: #a6adff;
   --teal: #8fd0c6;
-  --night: #8a93e8;
-  --night-text: #a6adff;
   --danger-text: #ff9a8f;
   --danger-surface: rgba(255, 120, 105, 0.12);
 
   --amber-surface: rgba(244, 195, 90, 0.12);
-  --amber-border: rgba(244, 195, 90, 0.42);
   --amber-text: #f4c35a;
   --amber-dark: #f4c35a;
 
