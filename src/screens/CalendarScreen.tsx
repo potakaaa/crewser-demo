@@ -32,27 +32,16 @@ function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): bo
   return !submitted.includes(iso);
 }
 
-/** The corner mark of a day: hours still open. Call sheets are reached from the day's chip below the grid. */
-function DayMarks({ unsent }: { unsent: boolean }) {
-  if (!unsent) return null;
-  return (
-    <span className="day-marks" aria-hidden="true">
-      <UnsentMark />
-    </span>
-  );
-}
-
 /** One dot when the day has any note: it only says there is something inside. */
 function Dots({ notes }: { notes: Note[] }) {
   return <span className="wday-dots">{notes.length > 0 && <i />}</span>;
 }
 
 /** The week strip's disc, as in the live app: how many notes the day holds, or a dash for none. */
-function Disc({ notes, unsent }: { notes: Note[]; unsent: boolean }) {
+function Disc({ notes }: { notes: Note[] }) {
   return (
     <span className={`wday-disc${notes.length ? ' has-notes' : ''}`}>
       {notes.length || '–'}
-      <DayMarks unsent={unsent} />
     </span>
   );
 }
@@ -158,9 +147,10 @@ export function CalendarScreen() {
                       aria-label={dayAria(iso, dn.length)}
                       onClick={() => setCalDate(iso)}
                     >
-                      <Disc notes={dn} unsent={hoursNotSent(iso, submitted, workdays)} />
+                      <Disc notes={dn} />
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayDotMonth(iso)}</span>
+                      <Dots notes={dn} />
                     </button>
                   );
                 })}
@@ -190,7 +180,6 @@ export function CalendarScreen() {
                     >
                       <span className="mday-d">{dayOfMonth(iso)}</span>
                       <Dots notes={dn} />
-                      <DayMarks unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
