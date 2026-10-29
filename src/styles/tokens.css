@@ -1,4 +1,4 @@
-/* Crewser crew app v4 design tokens. Flat: no shadows. Radii: 4 px controls, 6 px cards/bars/sheets (sheets top corners only), 50% true circles. Nothing else. */
+/* Crewser crew app v4 design tokens. Flat: no shadows. Radii: 4 px controls, 8 px cards/bars/sheets (sheets top corners only; 8 px matches the live app), 50% true circles. Nothing else. */
 :root {
   --ink: #111a1b;
   --text-2: #3f5155;
@@ -28,7 +28,7 @@
 
   --dashed: 1.5px dashed rgba(17, 26, 27, 0.28);
   --r-control: 4px;
-  --r-card: 6px;
+  --r-card: 8px;
 
   --header-gradient: linear-gradient(180deg, #141d1e 0%, #1f3a3d 55%, #2d5559 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(219, 242, 39, 0.16), rgba(219, 242, 39, 0) 45%);
