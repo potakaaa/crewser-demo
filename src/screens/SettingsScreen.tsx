@@ -62,6 +62,7 @@ function FontSelect({ value, onChange }: { value: FontTheme; onChange: (v: FontT
   useEffect(() => {
     if (!open) return;
     root.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus();
+    root.current?.querySelector('.fontsel-list')?.scrollIntoView({ block: 'nearest' });
     const away = (e: PointerEvent) => {
       if (!root.current?.contains(e.target as Node)) setOpen(false);
     };

@@ -640,6 +640,7 @@
   border-color: var(--lime);
 }
 .fontsel-list {
+  scroll-margin-bottom: calc(56px + env(safe-area-inset-bottom) + var(--sp-3));
   display: flex;
   flex-direction: column;
   gap: 2px;
