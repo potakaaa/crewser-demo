@@ -71,7 +71,7 @@ function CallSheetSection({ filtered }: { filtered: CallSheet[] }) {
   const rest = filtered.slice(RECENT);
   return (
     <section className="stack" aria-label={KIND_TITLE.callsheet}>
-      <SectionHead title={KIND_TITLE.callsheet} />
+      <SectionHead title={KIND_TITLE.callsheet} bar />
       <div className="dlist">
         {recent.map((d) => (
           <DocRow key={d.id} doc={d} />

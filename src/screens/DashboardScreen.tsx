@@ -77,7 +77,7 @@ export function DashboardScreen() {
           </div>
         ) : more.top.length + more.restCount > 0 && (
           <section className="stack" aria-label="Smart notes">
-            <SectionHead title="Smart notes" bar />
+            <SectionHead title="Smart notes" />
             {more.top.map((n) => (
               <ContentCard key={n.id} note={n} />
             ))}
