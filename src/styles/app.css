@@ -952,7 +952,7 @@
     transform: translateY(10px);
   }
 }
-/* Week day, top to bottom as in the live app: a status disc, the weekday, the date. */
+/* Week day, top to bottom as in the live app: the date in a disc, then the weekday. */
 .wday {
   position: relative;
   min-width: 0;
@@ -1005,12 +1005,6 @@
 .wday.is-sel .wday-wd {
   background: rgba(255, 255, 255, 0.3);
   color: var(--ink);
-}
-.wday-d {
-  font-size: var(--fs-1);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-3);
 }
 .sheet-cal {
   gap: var(--sp-4);

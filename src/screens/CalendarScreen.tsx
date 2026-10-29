@@ -13,8 +13,6 @@ import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
 
 const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
-/** "21.10.", as under the live app's week strip. */
-const dayDotMonth = (iso: string) => `${iso.slice(8)}.${iso.slice(5, 7)}.`;
 
 /** The call sheet for each shoot day; a day with one is a shoot day. */
 const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
@@ -36,11 +34,11 @@ function Badge({ notes }: { notes: Note[] }) {
   return notes.length > 0 ? <i className="day-badge" /> : null;
 }
 
-/** The week strip's disc, as in the live app: how many notes the day holds, or a dash for none. */
-function Disc({ notes }: { notes: Note[] }) {
+/** The week strip's disc: the date, dimmer when the day holds no notes. */
+function Disc({ iso, notes }: { iso: string; notes: Note[] }) {
   return (
     <span className={`wday-disc${notes.length ? ' has-notes' : ''}`}>
-      {notes.length || '–'}
+      {dayOfMonth(iso)}
       <Badge notes={notes} />
     </span>
   );
@@ -146,9 +144,8 @@ export function CalendarScreen() {
                       aria-label={dayAria(iso, dn.length)}
                       onClick={() => setCalDate(iso)}
                     >
-                      <Disc notes={dn} />
+                      <Disc iso={iso} notes={dn} />
                       <span className="wday-wd">{weekday(iso)}</span>
-                      <span className="wday-d">{dayDotMonth(iso)}</span>
                     </button>
                   );
                 })}
