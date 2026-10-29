@@ -20,7 +20,7 @@
 .pass-line {
   margin: 0;
   text-align: center;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
   overflow-wrap: anywhere;
 }
@@ -44,7 +44,7 @@
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 500;
 }
 .pass-tool[aria-pressed='true'] {
@@ -52,7 +52,7 @@
   color: var(--on-lime);
 }
 .pass-warn {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   color: var(--amber-text);
 }

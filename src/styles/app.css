@@ -26,7 +26,7 @@
   color: var(--ink);
   font-family: var(--font);
   font-variant-numeric: tabular-nums;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   line-height: 1.4;
 }
 .phone-root .app {
@@ -204,9 +204,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-6);
-  padding: max(var(--sp-5), calc(var(--sat) + var(--sp-3))) var(--sp-5) 52px;
+  padding: max(var(--sp-4), calc(var(--sat) + var(--sp-3))) var(--sp-4) 52px;
   background: var(--header-gradient);
-  color: #ffffff;
+  color: var(--ink);
 }
 .gh::before {
   content: '';
@@ -275,13 +275,13 @@
   }
 }
 .gh-compact {
-  gap: var(--sp-5);
+  gap: var(--sp-4);
   padding-bottom: 48px;
 }
 .sheet {
   position: relative;
   margin-top: -20px;
-  padding: var(--sp-6) var(--sp-5) calc(var(--sab) + 88px);
+  padding: var(--sp-6) var(--sp-4) calc(var(--sab) + 88px);
   border-radius: var(--r-card) var(--r-card) 0 0;
   background: var(--sheet);
   display: flex;
@@ -291,7 +291,7 @@
 .display {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-size: calc(var(--fs-2xl) * var(--display-scale));
+  font-size: calc(var(--fs-5) * var(--display-scale));
   line-height: 1.2;
   letter-spacing: var(--display-track);
   text-wrap: balance;
@@ -312,8 +312,8 @@
   gap: var(--sp-1);
 }
 .gh-eyebrow {
-  font-size: var(--fs-sm);
-  color: var(--on-dark-2);
+  font-size: var(--fs-1);
+  color: var(--text-2);
 }
 /* ───────── Buttons ───────── */
 .btn {
@@ -326,8 +326,8 @@
   padding: 0 var(--sp-4);
   border: 0;
   border-radius: var(--r-control);
-  font-size: var(--fs-md);
-  font-weight: 500;
+  font-size: var(--fs-2);
+  font-weight: 600;
   text-align: center;
   transition:
     background var(--t-fast) ease,
@@ -336,46 +336,24 @@
 .btn:active {
   transform: scale(0.97);
 }
-.btn-soft {
+/* Four button styles only: primary (.btn-lime), secondary (.btn-soft), text (.text-btn), icon (.icon-btn).
+   .btn-ink and .btn-outline are older names for secondary. */
+.btn-soft,
+.btn-ink,
+.btn-outline {
   background: var(--soft);
   color: var(--ink);
-}
-.btn-ink {
-  background: var(--brand-surface);
-  color: #ffffff;
-  font-weight: 600;
-}
-.btn-ink {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-.btn-ink::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--grain, none) 0 0 / var(--grain-card-size) var(--grain-card-size);
-  opacity: var(--grain-card-opacity);
-  mix-blend-mode: var(--grain-card-blend);
-  pointer-events: none;
 }
 .btn-lime {
   background: var(--lime);
   color: var(--on-lime);
-  font-weight: 600;
-}
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink);
 }
 .btn-md {
   min-height: 48px;
 }
 .btn-lg {
   min-height: 50px;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
 }
 .btn-row {
   display: flex;
@@ -407,10 +385,10 @@
   gap: var(--sp-2);
   border: 0;
   border-radius: var(--r-control);
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  font-size: var(--fs-md);
-  font-weight: 500;
+  background: none;
+  color: var(--ink);
+  font-size: var(--fs-2);
+  font-weight: 600;
   transition: background 150ms ease;
 }
 .link-btn {
@@ -419,9 +397,9 @@
   padding: 0 var(--sp-1);
   border: 0;
   background: none;
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  color: var(--teal);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  color: var(--ink);
 }
 .link-btn-plain {
   min-width: 44px;
@@ -432,17 +410,17 @@
   min-height: 44px;
   border: 0;
   background: none;
-  font-size: var(--fs-md);
-  font-weight: 500;
-  color: var(--teal);
+  font-size: var(--fs-2);
+  font-weight: 600;
+  color: var(--ink);
 }
 .chip-lime {
   flex: none;
-  padding: 5px 9px;
+  padding: var(--sp-1) var(--sp-2);
   border-radius: var(--r-control);
   background: var(--lime);
   color: var(--on-lime);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -515,12 +493,12 @@
   gap: var(--sp-1);
 }
 .offline-copy strong {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
   color: var(--amber-dark);
 }
 .offline-copy span {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   line-height: 1.5;
   color: #e1e8e8;
 }
@@ -530,7 +508,7 @@
   padding: var(--sp-3) var(--sp-4);
   background: var(--amber-surface);
   border: 0;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 500;
   color: var(--amber-text);
 }
@@ -550,7 +528,7 @@
 }
 .empty-light span {
   max-width: 260px;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   line-height: 1.5;
   color: var(--text-2);
 }
@@ -570,7 +548,7 @@
   border-radius: 50%;
   border: 0;
   background: rgba(255, 255, 255, 0.12);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .home-greet {
@@ -581,7 +559,7 @@
   gap: 2px;
 }
 .home-project {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
 }
 /* ───────── To-do / attachment rows ───────── */
@@ -620,24 +598,24 @@
   gap: 3px;
 }
 .todo-t1 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .todo-t2 {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .att-name {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 .att-sub {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .att-open {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 500;
   color: var(--teal);
 }
@@ -655,12 +633,12 @@
   gap: var(--sp-1);
 }
 .section-titles h2 {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 .section-titles span {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 /* ───────── Content cards ───────── */
@@ -696,17 +674,17 @@
 .stub {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
   min-width: 0;
 }
 .stub-time {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.01em;
 }
 .stub-sub {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   line-height: 1.25;
   white-space: nowrap;
   color: var(--text-3);
@@ -715,20 +693,20 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--sp-1);
 }
 .row-t1 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   line-height: 1.35;
   overflow-wrap: break-word;
 }
 .row-t1-lg {
-  font-size: 15px;
+  font-size: var(--fs-3);
 }
 /* Never cut off: routes, places and codes wrap instead of trailing off. */
 .row-t2 {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   line-height: 1.5;
   color: var(--text-2);
   overflow-wrap: break-word;
@@ -738,14 +716,14 @@
   transform: scale(0.985);
 }
 .tile-k {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 /* Home smart cards: tighter than the detail screen, so more of the day fits. */
 .ccard-head {
   min-height: 64px;
   grid-template-columns: 52px 36px minmax(0, 1fr) 18px;
-  padding: var(--sp-3) var(--sp-4) 10px;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3);
 }
 .ccard-head .chip-icon {
   width: 36px;
@@ -762,11 +740,11 @@
 .day-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-3);
 }
 .day-group-h {
-  padding: var(--sp-2) 2px 0;
-  font-size: var(--fs-sm);
+  padding: var(--sp-2) var(--sp-1) 0;
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .day-group-h strong {
@@ -820,11 +798,11 @@
   gap: 3px;
 }
 .qr-copy strong {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .qr-copy > span {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
   overflow-wrap: anywhere;
 }
@@ -849,7 +827,7 @@
   line-height: 1;
 }
 .qr-thumb-empty span {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 500;
   color: var(--text-3);
 }
@@ -882,7 +860,7 @@
 /* Week and month sit straight on the header, as in the live app: no panel behind them. */
 .week-strip {
   position: relative;
-  padding-top: 4px; /* the day badge sits above the disc; the Collapse around the strip clips overflow */
+  padding-top: var(--sp-1); /* the day badge sits above the disc; the Collapse around the strip clips overflow */
 }
 .week-days {
   display: grid;
@@ -912,14 +890,14 @@
   grid-template-columns: repeat(7, minmax(0, 1fr));
   padding: 0 0 var(--sp-2);
   text-align: center;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
-  color: var(--on-dark-3);
+  color: var(--text-3);
 }
 .month-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px 0;
+  gap: var(--sp-1) 0;
 }
 /* Month day: the date in a circle, the note dot under it. Today a quiet disc, the selected day a raised one. */
 .mday {
@@ -929,11 +907,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: var(--sp-1);
   padding: 0;
   border: 0;
   background: transparent;
-  color: #ffffff;
+  color: var(--ink);
   transition: transform 180ms var(--ease-out);
 }
 .mday-d {
@@ -942,8 +920,8 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  font-size: var(--fs-base);
-  font-weight: 500;
+  font-size: var(--fs-2);
+  font-weight: 400;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   transition: background var(--t-fast) ease;
@@ -952,7 +930,7 @@
   transform: scale(0.94);
 }
 .mday.is-out {
-  color: var(--on-dark-3);
+  color: var(--text-3);
 }
 .mday.is-today .mday-d {
   background: rgba(255, 255, 255, 0.1);
@@ -960,7 +938,7 @@
 }
 .mday.is-sel .mday-d {
   background: rgba(255, 255, 255, 0.3);
-  font-weight: 700;
+  font-weight: 600;
 }
 .day-list {
   display: flex;
@@ -981,11 +959,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 0 0 2px;
+  gap: var(--sp-2);
+  padding: 0 0 var(--sp-1);
   border: 0;
   background: transparent;
-  color: #ffffff;
+  color: var(--ink);
   transition: transform 180ms var(--ease-out);
 }
 .wday:active {
@@ -999,24 +977,24 @@
   place-items: center;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
-  font-size: var(--fs-md);
-  font-weight: 500;
+  font-size: var(--fs-2);
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  color: var(--on-dark-3);
+  color: var(--text-3);
   transition: background var(--t-fast) ease;
 }
 .wday-disc.has-notes {
   font-weight: 600;
-  color: #ffffff;
+  color: var(--ink);
 }
 /* The weekday carries the markers: a quiet pill for today, a raised one for the selected day. */
 .wday-wd {
-  padding: 2px 6px;
+  padding: var(--sp-1) var(--sp-2);
   border-radius: var(--r-control);
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   line-height: 1.25;
-  color: var(--on-dark-2);
+  color: var(--text-2);
   transition:
     background var(--t-fast) ease,
     color var(--t-fast) ease;
@@ -1026,27 +1004,27 @@
 }
 .wday.is-sel .wday-wd {
   background: rgba(255, 255, 255, 0.3);
-  color: #ffffff;
+  color: var(--ink);
 }
 .wday-d {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: var(--on-dark-3);
+  color: var(--text-3);
 }
 .sheet-cal {
   gap: var(--sp-4);
 }
 /* One line: "Wed 21 Oct · Today". */
 .day-heading {
-  padding: 0 2px;
-  font-size: var(--fs-xl);
+  padding: 0 var(--sp-1);
+  font-size: var(--fs-4);
   font-weight: 600;
   letter-spacing: var(--track-tight);
 }
 .day-heading span {
-  font-size: var(--fs-sm);
-  font-weight: 500;
+  font-size: var(--fs-1);
+  font-weight: 400;
   color: var(--text-3);
 }
 .empty-day {
@@ -1054,18 +1032,18 @@
   border-radius: var(--r-card);
   background: var(--card);
   text-align: center;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 /* ───────── Note detail ───────── */
 .route-code {
-  font-size: var(--fs-5xl);
+  font-size: var(--fs-6);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.02em;
 }
 .route-city {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 /* ───────── Note sheet hero: icon and title, then call and wrap as a numeral pair ───────── */
@@ -1123,11 +1101,11 @@
 }
 /* Labels and muted values use on-dark-2: the grain lifts the lightest speck, and on-dark-3 would drop below 4.5:1. */
 .ns-k {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--on-dark-2);
+  color: var(--text-2);
 }
 .ns-big {
   line-height: 1;
@@ -1135,17 +1113,17 @@
 }
 .ns-tbc {
   padding-bottom: 2px;
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 500;
   line-height: 1.2;
-  color: var(--on-dark-2);
+  color: var(--text-2);
 }
 /* "Check-in", "until 22:00": beside the time, on its baseline row. */
 .ns-sub {
   grid-row: 2;
   padding-bottom: 3px;
-  font-size: var(--fs-md);
-  color: var(--on-dark-2);
+  font-size: var(--fs-2);
+  color: var(--text-2);
 }
 /* Production's note, labelled the way crews label gear on set: a short strip of lime camera
    tape over the card's top-left edge, torn ends, matte grain, marker capitals in near-black on lime.
@@ -1153,7 +1131,7 @@
 .ns-note {
   position: relative;
   margin-top: var(--sp-2);
-  padding: 28px var(--sp-5) var(--sp-5);
+  padding: 28px var(--sp-4) var(--sp-4);
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
@@ -1181,7 +1159,7 @@
 }
 .ns-note p {
   margin: 0;
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   line-height: 1.5;
   white-space: pre-line;
   color: var(--text-2);
@@ -1217,7 +1195,7 @@
 .ns-sos-num {
   font-family: var(--font-numeral);
   font-weight: var(--numeral-weight);
-  font-size: calc(var(--fs-3xl) * var(--numeral-scale));
+  font-size: calc(var(--fs-5) * var(--numeral-scale));
   letter-spacing: var(--numeral-track);
   line-height: 1;
   color: var(--danger-text);
@@ -1225,7 +1203,7 @@
 .ns-sos-k {
   max-width: 100%;
   overflow: hidden;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -1240,7 +1218,7 @@
   padding: 0 var(--sp-2);
   border-radius: var(--r-control);
   background: var(--danger-surface);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -1254,7 +1232,7 @@
 .ns-h {
   margin: 0;
   padding: 0 2px;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
   color: var(--text-2);
 }
@@ -1285,26 +1263,26 @@
   gap: 1px;
 }
 .ns-contact-k {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 .ns-contact-name {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .ns-contact-phone {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
 .ns-contact-name + .ns-contact-phone {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 400;
   color: var(--text-2);
 }
 .ns-contact-note {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   line-height: 1.35;
   color: var(--text-3);
 }
@@ -1343,7 +1321,7 @@
   grid-template-columns: 76px minmax(0, 1fr);
   gap: var(--sp-3);
   padding: 10px 0;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
 }
 .ns-hours-row + .ns-hours-row {
   border-top: 1px solid var(--hairline);
@@ -1386,7 +1364,7 @@
   gap: var(--sp-1);
 }
 .fact-v {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .note-text {
@@ -1394,7 +1372,7 @@
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   line-height: 1.6;
   white-space: pre-line;
   color: var(--text-2);
@@ -1404,7 +1382,7 @@
   align-items: center;
   gap: 10px;
   padding: var(--sp-1) 2px 0;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 /* ───────── Top bars (pdf) ───────── */
@@ -1447,7 +1425,7 @@
   pointer-events: none;
 }
 .topbar-dark .topbar-title {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
 }
 /* ───────── PDF viewer ───────── */
 .screen-pdf {
@@ -1461,7 +1439,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: var(--sp-6) var(--sp-5);
+  padding: var(--sp-6) var(--sp-4);
 }
 .pdf-page {
   width: 100%;
@@ -1488,7 +1466,7 @@
   letter-spacing: -0.01em;
 }
 .pdf-line {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: #394c50;
 }
 .pdf-rule {
@@ -1506,9 +1484,9 @@
 }
 .pdf-foot {
   flex: none;
-  padding: 0 var(--sp-5) max(var(--sp-6), calc(var(--sab) + var(--sp-3)));
+  padding: 0 var(--sp-4) max(var(--sp-6), calc(var(--sab) + var(--sp-3)));
   text-align: center;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: #c9d3d4;
 }
 /* ───────── Tab bar ───────── */
@@ -1553,8 +1531,8 @@
   max-height: 88%;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
-  padding: var(--sp-3) var(--sp-5) max(var(--sp-6), calc(var(--sab) + var(--sp-4)));
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4) max(var(--sp-6), calc(var(--sab) + var(--sp-4)));
   border-radius: var(--r-card) var(--r-card) 0 0;
   background: var(--card);
   animation: sheet-up var(--t-nav) var(--ease-ios) both;
@@ -1622,18 +1600,18 @@
   gap: var(--sp-1);
 }
 .log-titles h2 {
-  font-size: 18px;
+  font-size: var(--fs-3);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 .log-titles span {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 .log-times {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: var(--sp-3);
 }
 .time-tile {
   min-height: 104px;
@@ -1642,7 +1620,7 @@
   align-items: flex-start;
   justify-content: center;
   gap: var(--sp-1);
-  padding: 0 18px;
+  padding: 0 var(--sp-4);
   border: 1px solid transparent;
   border-radius: var(--r-card);
   background: var(--sheet);
@@ -1672,7 +1650,7 @@
   flex: none;
   display: flex;
   align-items: center;
-  padding: 0 6px;
+  padding: 0 var(--sp-2);
   border-radius: var(--r-card);
   background: var(--sheet);
 }
@@ -1720,8 +1698,8 @@
   border: 0;
   background: none;
   scroll-snap-align: center;
-  font-size: 20px;
-  font-weight: 500;
+  font-size: var(--fs-4);
+  font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--text-3);
   transition:
@@ -1735,7 +1713,7 @@
 }
 .wheel-colon {
   position: relative;
-  font-size: 20px;
+  font-size: var(--fs-4);
   font-weight: 600;
 }
 .picker-side {
@@ -1751,15 +1729,15 @@
   border: 1px solid transparent;
   border-radius: var(--r-control);
   background: var(--card);
-  font-size: var(--fs-md);
-  font-weight: 500;
+  font-size: var(--fs-2);
+  font-weight: 600;
   color: var(--ink);
   text-align: left;
 }
 .picker-chip[data-on='true'] {
   border-color: var(--teal);
   background: rgba(143, 208, 198, 0.12);
-  color: var(--teal);
+  color: var(--ink);
   font-weight: 600;
 }
 .picker-chip-plain {
@@ -1769,36 +1747,36 @@
 .picker-done {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
   align-self: flex-start;
   min-height: 40px;
-  padding: 0 4px;
+  padding: 0 var(--sp-1);
   border: 0;
   background: none;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
-  color: var(--teal);
+  color: var(--ink);
 }
 .tt-k {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .tt-v {
-  font-size: var(--fs-3xl);
+  font-size: var(--fs-5);
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
 .tt-sub {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 .stepper {
   min-height: 64px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 10px 10px 18px;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
   border-radius: var(--r-card);
   background: var(--sheet);
 }
@@ -1806,14 +1784,14 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
 }
 .stepper-k {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .stepper-sub {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .step-btn {
@@ -1829,28 +1807,28 @@
 .step-val {
   min-width: 64px;
   text-align: center;
-  font-size: 15px;
+  font-size: var(--fs-3);
   font-weight: 600;
 }
 .log-plan {
   margin-top: calc(-1 * var(--sp-1));
-  padding: 0 2px;
-  font-size: var(--fs-sm);
+  padding: 0 var(--sp-1);
+  font-size: var(--fs-1);
   line-height: 1.55;
   color: var(--text-2);
 }
 .log-send {
   margin-bottom: calc(-1 * var(--sp-3));
   text-align: center;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .log-confirm {
-  padding: 10px var(--sp-3);
+  padding: var(--sp-3) var(--sp-3);
   border-radius: var(--r-control);
   background: var(--amber-surface);
   color: var(--amber-text);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   line-height: 1.4;
 }
 .btn-lime[aria-disabled='true'] {
@@ -1865,7 +1843,7 @@
 .log-dialog .btn-lime {
   flex: none;
   min-height: 52px;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
 }
 .log-dialog .text-btn {
   margin-top: calc(-1 * var(--sp-3));
@@ -1901,7 +1879,7 @@
   border-radius: var(--r-control);
   background: var(--brand-surface);
   color: #ffffff;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
   text-align: center;
   opacity: 0;
@@ -1975,16 +1953,16 @@
     var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
 }
 .app .ccard-head .stub-time {
-  color: #ffffff;
+  color: var(--ink);
 }
 /* On the cards the time is the hero. */
 .app .ccard-head .stub-time {
-  font-size: var(--fs-xl);
-  font-weight: 700;
+  font-size: var(--fs-4);
+  font-weight: 600;
 }
 .app .ccard-head .stub-sub {
   color: var(--text-2);
-  font-weight: 500;
+  font-weight: 400;
 }
 /* Room between the tile and the type chip */
 .app .ccard-head {
@@ -2063,7 +2041,7 @@
   display: none;
 }
 .splash-sub {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -2097,9 +2075,9 @@
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
-  margin: 0 calc(-1 * var(--sp-5));
-  padding: 0 var(--sp-5) 2px;
+  gap: var(--sp-4);
+  margin: 0 calc(-1 * var(--sp-4));
+  padding: 0 var(--sp-4) var(--sp-1);
   scrollbar-width: none;
 }
 .sheet-scroll::-webkit-scrollbar {
@@ -2110,16 +2088,16 @@
   flex-shrink: 0;
 }
 .sheet-note {
-  padding: 14px var(--sp-4);
+  padding: var(--sp-4) var(--sp-4);
   border-radius: var(--r-control);
   background: var(--sheet);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   line-height: 1.55;
   color: var(--text-2);
 }
 .sheet-empty {
   padding: var(--sp-4) 0;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 /* ───────── Glass buttons ───────── */
@@ -2180,7 +2158,7 @@
 .crew-label {
   flex: 1;
   min-width: 0;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
 }
 .crew-action {
@@ -2188,7 +2166,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 500;
   color: var(--teal);
 }
@@ -2206,7 +2184,7 @@
 .crew-dept {
   display: block;
   padding-bottom: 4px;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -2230,11 +2208,11 @@
   gap: 2px;
 }
 .crew-person-text strong {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .crew-person-text span {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .you-chip {
@@ -2242,14 +2220,14 @@
   padding: 3px 8px;
   border-radius: var(--r-control);
   background: var(--chip);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   color: var(--teal);
 }
 .ccard-body .crew {
   margin: -4px 0;
   border-top: 1px solid var(--hairline);
-  padding-top: 4px;
+  padding-top: var(--sp-1);
 }
 .crew-card {
   display: flex;
@@ -2261,7 +2239,7 @@
   background: var(--card);
 }
 .crew-card-k {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 /* ───────── Font themes ─────────
@@ -2317,13 +2295,13 @@
   letter-spacing: var(--numeral-track);
 }
 .route-code {
-  font-size: calc(var(--fs-5xl) * var(--numeral-scale));
+  font-size: calc(var(--fs-6) * var(--numeral-scale));
 }
 .ns-big {
-  font-size: calc(var(--fs-4xl) * var(--numeral-scale));
+  font-size: calc(var(--fs-6) * var(--numeral-scale));
 }
 .tt-v {
-  font-size: calc(var(--fs-3xl) * var(--numeral-scale));
+  font-size: calc(var(--fs-5) * var(--numeral-scale));
 }
 /* Headlines other than .display. Use .head on anything new. */
 .head,
@@ -2335,7 +2313,7 @@
   letter-spacing: var(--display-track);
 }
 .ns-title {
-  font-size: calc(var(--fs-xl) * var(--display-scale));
+  font-size: calc(var(--fs-4) * var(--display-scale));
 }
 /* The signature from the production app, the same in every font theme: bold capitals in the
    UI face, then a bar filling the row, lime fading into forest green. */
@@ -2344,8 +2322,8 @@
   align-items: center;
   gap: var(--sp-3);
   font-family: var(--font);
-  font-weight: 700;
-  font-size: var(--fs-base);
+  font-weight: 600;
+  font-size: var(--fs-2);
   line-height: 1.2;
   letter-spacing: 0.06em;
   text-transform: uppercase;

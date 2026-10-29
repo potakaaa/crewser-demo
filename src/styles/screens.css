@@ -30,8 +30,8 @@
 .fchips {
   display: flex;
   gap: var(--sp-2);
-  margin: -3px calc(-1 * var(--sp-5));
-  padding: 3px var(--sp-5);
+  margin: -3px calc(-1 * var(--sp-4));
+  padding: 3px var(--sp-4);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -46,7 +46,7 @@
   border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
   transition: background var(--t-fast) ease;
 }
@@ -106,9 +106,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 500;
-  color: var(--on-dark-2);
+  color: var(--text-2);
 }
 .dpin-title {
   margin-top: 2px;
@@ -130,7 +130,7 @@
   border-radius: var(--r-control);
   background: var(--lime);
   color: var(--on-lime);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 
@@ -157,13 +157,13 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .drow-meta {
   min-width: 0;
   overflow: hidden;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -172,7 +172,7 @@
   padding: 2px 7px;
   border-radius: var(--r-control);
   background: var(--chip);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   color: var(--text-2);
 }
@@ -192,7 +192,7 @@
   justify-content: center;
   gap: var(--sp-1);
   background: none;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
   color: var(--teal);
 }
@@ -223,7 +223,7 @@
   color: #ffffff;
 }
 .searchbox input::placeholder {
-  color: var(--on-dark-3);
+  color: var(--text-3);
 }
 .searchbox input::-webkit-search-cancel-button {
   display: none;
@@ -269,7 +269,7 @@
   color: inherit;
 }
 .coffice-kicker {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -277,12 +277,12 @@
 }
 .coffice-name {
   font-family: var(--font-display);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
 }
 .coffice-sub {
-  font-size: var(--fs-sm);
-  color: var(--on-dark-2);
+  font-size: var(--fs-1);
+  color: var(--text-2);
 }
 .coffice-row {
   display: flex;
@@ -312,12 +312,12 @@
   display: flex;
   align-items: baseline;
   gap: var(--sp-2);
-  margin: 0 calc(-1 * var(--sp-5));
-  padding: var(--sp-2) var(--sp-5);
+  margin: 0 calc(-1 * var(--sp-4));
+  padding: var(--sp-2) var(--sp-4);
   background: rgba(30, 40, 42, 0.92);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -358,13 +358,13 @@
   flex-wrap: wrap;
   align-items: center;
   column-gap: var(--sp-2);
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   line-height: 1.25;
   overflow-wrap: break-word;
 }
 .crow-pos {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
@@ -375,7 +375,7 @@
   padding: 2px 7px;
   border-radius: var(--r-control);
   background: var(--chip);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   color: var(--text-2);
 }
@@ -407,7 +407,7 @@
 .csheet {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
 }
 .csheet-who {
   display: flex;
@@ -418,11 +418,11 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .csheet-proj {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .cacts {
@@ -439,7 +439,7 @@
   gap: 6px;
   border-radius: var(--r-control);
   background: var(--soft);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
   color: var(--ink);
   transition: transform 180ms var(--ease-out);
@@ -470,12 +470,12 @@
   border-top: 1px solid var(--hairline);
 }
 .cdetail-k {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 .cdetail-v {
   min-width: 0;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 500;
   overflow-wrap: anywhere;
 }
@@ -512,12 +512,12 @@
 }
 .setprofile-name {
   font-family: var(--font-display);
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 .setprofile-sub {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .setstatus {
@@ -528,7 +528,7 @@
   padding: 0 var(--sp-3);
   border-radius: var(--r-control);
   background: var(--soft);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 500;
 }
 .setprofile .setstatus-todo {
@@ -554,18 +554,18 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .setrow-hint {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 400;
   color: var(--text-2);
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 .setrow-value {
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 .switch {
@@ -657,12 +657,12 @@
   gap: 2px;
 }
 .fontopt-label {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   overflow-wrap: anywhere;
   font-weight: 600;
 }
 .fontopt-hint {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
@@ -695,7 +695,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   line-height: 1.5;
   color: var(--text-2);
 }
@@ -721,7 +721,7 @@
   padding: 0 var(--sp-1);
 }
 .lgroup-h strong {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -749,7 +749,7 @@
   justify-content: center;
   border-radius: 50%;
   background: var(--chip);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .lrow.is-active .lrow-av {
@@ -763,11 +763,11 @@
   gap: 2px;
 }
 .lrow-name {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .lrow-sub {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -785,7 +785,7 @@
   gap: 4px;
   padding: 5px 9px;
   border-radius: var(--r-control);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   font-weight: 600;
   line-height: 1.2;
 }
@@ -820,11 +820,11 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: var(--fs-sm);
-  color: var(--on-dark-2);
+  font-size: var(--fs-1);
+  color: var(--text-2);
 }
 .setbanner-text strong {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   color: #ffffff;
 }
@@ -835,7 +835,7 @@
 
 /* Compact rhythm: sections sit closer than on the dashboard. */
 .sheet.sheet-compact {
-  gap: var(--sp-5);
+  gap: var(--sp-4);
 }
 
 .btn-sm {
@@ -854,7 +854,7 @@
   height: 22px;
   padding: 0 9px 0 8px;
   border-radius: var(--r-control);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;

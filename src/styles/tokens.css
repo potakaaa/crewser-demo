@@ -50,27 +50,36 @@
   --grain-card-size: 160px;
   --grain-card-blend: overlay;
 
-  /* Type: small, calm, medium-weight. Big numbers get tight tracking. */
-  --fs-xs: 11px; /* labels, chips, chart ticks */
-  --fs-sm: 12px; /* secondary lines */
-  --fs-md: 13px; /* body, buttons */
-  --fs-base: 14px; /* titles in cards, values */
-  --fs-lg: 16px; /* section titles */
-  --fs-xl: 20px;
-  --fs-2xl: 24px; /* screen titles */
-  --fs-3xl: 28px; /* tile numbers */
-  --fs-4xl: 34px; /* hero numbers */
-  --fs-5xl: 40px;
+  /* Type: six sizes, weights 400 and 600 only (plus the display face's own weight).
+     1 caption: labels, meta, chips, ticks · 2 body: rows, values, buttons · 3 title: card titles, names
+     4 heading: day and section heads · 5 display title: screen and sheet titles · 6 display number. */
+  --fs-1: 12px;
+  --fs-2: 14px;
+  --fs-3: 16px;
+  --fs-4: 20px;
+  --fs-5: 28px;
+  --fs-6: 40px;
+  /* Legacy names folded onto the six; removed once every file uses --fs-1..6. */
+  --fs-xs: var(--fs-1);
+  --fs-sm: var(--fs-1);
+  --fs-md: var(--fs-2);
+  --fs-base: var(--fs-2);
+  --fs-lg: var(--fs-3);
+  --fs-xl: var(--fs-4);
+  --fs-2xl: var(--fs-5);
+  --fs-3xl: var(--fs-5);
+  --fs-4xl: var(--fs-6);
+  --fs-5xl: var(--fs-6);
   --track-tight: -0.02em;
 
-  /* Spacing steps */
+  /* Spacing: 4 / 8 / 12 / 16 / 24 / 32, nothing in between. 16 is the page gutter and card padding. */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
   --sp-4: 16px;
-  --sp-5: 20px;
   --sp-6: 24px;
   --sp-8: 32px;
+  --sp-5: var(--sp-4); /* legacy 20 px step, folded into 16 */
   /* Between sibling cards, and the extra air above a section head (more above a head than below it). */
   --card-gap: var(--sp-4);
   --section-gap: var(--sp-4);
@@ -108,6 +117,7 @@
   --lime: #d7e336;
   --on-lime: #172022;
 
+  /* Text uses six colours only: ink, text-2, text-3, lime, on-lime, danger-text. Teal is never text. */
   --teal: #8fd0c6;
   --danger-text: #ff9a8f;
   --danger-surface: rgba(255, 120, 105, 0.12);
@@ -116,8 +126,9 @@
   --amber-text: #f4c35a;
   --amber-dark: #f4c35a;
 
-  --on-dark-2: #c4cfd0;
-  --on-dark-3: #a9b7b9;
+  /* Legacy text names, same values as text-2 / text-3 now. */
+  --on-dark-2: var(--text-2);
+  --on-dark-3: var(--text-3);
 
   --dashed: 1.5px dashed rgba(255, 255, 255, 0.24);
   --focus: var(--lime);
