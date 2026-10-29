@@ -2465,7 +2465,7 @@
    Base, card, raised control: one look per level so nested things never melt together.
    Cards with a hairline border already have their rim; the rest get it as an inset ring. */
 :is(.hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
-  .duo-card, .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile, .fontopt) {
+  .duo-card, .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile) {
 }
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
   background: var(--card);

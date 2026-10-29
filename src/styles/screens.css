@@ -615,31 +615,52 @@
   transform: translateX(20px);
 }
 
-.fontlist {
+.fontsel {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.fontopt {
+.fontsel-btn,
+.fontsel-opt {
   min-height: 56px;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-3);
-  border: 1.5px solid transparent;
   border-radius: var(--r-card);
   background: var(--card);
   text-align: left;
   color: var(--ink);
-  transition:
-    border-color var(--t-fast) ease,
-    transform 180ms var(--ease-out);
 }
-.fontopt:active {
-  transform: scale(0.985);
+.fontsel-btn {
+  width: 100%;
+  border: 1.5px solid transparent;
 }
-.fontopt[aria-pressed='true'] {
+.fontsel-btn[aria-expanded='true'] {
   border-color: var(--lime);
+}
+.fontsel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: var(--r-card);
+  background: var(--card-2);
+}
+.fontsel-opt {
+  min-height: 48px;
+  border-radius: var(--r-control);
+  background: transparent;
+  cursor: pointer;
+}
+.fontsel-opt[aria-selected='true'] {
+  background: var(--card);
+}
+.fontsel-opt:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: -2px;
 }
 .fontopt-sample {
   flex: none;
@@ -666,20 +687,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.fontopt-check {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.32);
-}
-.fontopt[aria-pressed='true'] .fontopt-check {
-  border-color: var(--lime);
-  background: var(--lime);
 }
 /* Each option shows its own typeface, whichever font theme is active. */
 :is(.fontopt-sample, .fontopt-label)[data-font='inter'] {

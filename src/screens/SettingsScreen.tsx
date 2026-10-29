@@ -1,5 +1,5 @@
-import { useId, type ReactNode } from 'react';
-import { FONT_THEMES, useActiveLink, useDemo, useUnreadCount } from '../store';
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { FONT_THEMES, type FontTheme, useActiveLink, useDemo, useUnreadCount } from '../store';
 import { Icon, type IconName } from '../components/Icon';
 import { GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
@@ -48,6 +48,97 @@ function Group({ title, sub, children }: { title: string; sub?: string; children
       <SectionHead title={title} sub={sub} />
       {children}
     </section>
+  );
+}
+
+/** Listbox rather than <select>: each option is drawn in its own typeface. */
+function FontSelect({ value, onChange }: { value: FontTheme; onChange: (v: FontTheme) => void }) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const btn = useRef<HTMLButtonElement>(null);
+  const id = useId();
+  const current = FONT_THEMES.find((f) => f.value === value) ?? FONT_THEMES[0];
+
+  useEffect(() => {
+    if (!open) return;
+    root.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus();
+    const away = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', away);
+    return () => document.removeEventListener('pointerdown', away);
+  }, [open]);
+
+  const close = () => {
+    setOpen(false);
+    btn.current?.focus();
+  };
+  const pick = (v: FontTheme) => {
+    onChange(v);
+    close();
+  };
+  const onListKey = (e: KeyboardEvent<HTMLUListElement>) => {
+    const items = [...e.currentTarget.querySelectorAll<HTMLElement>('[role="option"]')];
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    const go = (n: number) => items[(n + items.length) % items.length]?.focus();
+    if (e.key === 'ArrowDown') go(i + 1);
+    else if (e.key === 'ArrowUp') go(i - 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(items.length - 1);
+    else if (e.key === 'Escape') close();
+    else if (e.key === 'Enter' || e.key === ' ') pick(FONT_THEMES[i].value);
+    else if (e.key === 'Tab') setOpen(false);
+    else return;
+    if (e.key !== 'Tab') e.preventDefault();
+  };
+
+  return (
+    <div className="fontsel" ref={root}>
+      <button
+        ref={btn}
+        type="button"
+        className="fontsel-btn"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={`${id}-list`}
+        onClick={() => setOpen(!open)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+      >
+        <FontOption f={current} />
+        <Icon name="down" size={18} color="currentColor" />
+      </button>
+      {open && (
+        <ul className="fontsel-list" id={`${id}-list`} role="listbox" aria-label="Font" onKeyDown={onListKey}>
+          {FONT_THEMES.map((f) => (
+            <li key={f.value} role="option" tabIndex={-1} aria-selected={f.value === value} className="fontsel-opt" onClick={() => pick(f.value)}>
+              <FontOption f={f} />
+              {f.value === value && <Icon name="check" size={16} color="currentColor" strokeWidth={2.4} />}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function FontOption({ f }: { f: (typeof FONT_THEMES)[number] }) {
+  return (
+    <>
+      <span className="fontopt-sample" data-font={f.value}>
+        {f.sample}
+      </span>
+      <span className="fontopt-text">
+        <span className="fontopt-label" data-font={f.value}>
+          {f.label}
+        </span>
+        <span className="fontopt-hint">{f.hint}</span>
+      </span>
+    </>
   );
 }
 
@@ -148,27 +239,7 @@ export function SettingsScreen() {
         </Group>
 
         <Group title="Font" sub="Headlines and numbers">
-          <div className="fontlist" role="group" aria-label="Font">
-            {FONT_THEMES.map((f) => {
-              const on = f.value === fontTheme;
-              return (
-                <button type="button" key={f.value} className="fontopt" aria-pressed={on} onClick={() => setFontTheme(f.value)}>
-                  <span className="fontopt-sample" data-font={f.value}>
-                    {f.sample}
-                  </span>
-                  <span className="fontopt-text">
-                    <span className="fontopt-label" data-font={f.value}>
-                      {f.label}
-                    </span>
-                    <span className="fontopt-hint">{f.hint}</span>
-                  </span>
-                  <span className="fontopt-check" aria-hidden="true">
-                    {on && <Icon name="check" size={14} color="#172022" strokeWidth={2.4} />}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <FontSelect value={fontTheme} onChange={setFontTheme} />
         </Group>
 
         <Group title="Notifications">
