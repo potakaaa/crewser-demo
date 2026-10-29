@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import { isTab, useActiveLink, useDemo, useRoute, type TabName } from '../store';
 import { Icon, type IconName } from './Icon';
-import { guideEmit } from '../lib/guide';
 
 const TABS: { name: TabName; label: string; icon: IconName }[] = [
   { name: 'dashboard', label: 'Home', icon: 'dashboard' },
@@ -33,6 +32,7 @@ export function TabBar({ hidden }: { hidden: boolean }) {
             data-on={t.name === active || undefined}
             aria-current={t.name === active && onTab ? 'page' : undefined}
             aria-label={t.label}
+            data-guide={t.name === 'documents' ? 'documents' : undefined}
             onClick={() => navigate({ name: t.name })}
           >
             <Icon name={t.icon} size={22} color="currentColor" strokeWidth={t.name === active ? 1.9 : 1.6} />
@@ -41,14 +41,10 @@ export function TabBar({ hidden }: { hidden: boolean }) {
         <button
           type="button"
           className="dock-btn"
-          data-guide="profile"
           data-on={active === 'settings' || undefined}
           aria-current={active === 'settings' && onTab ? 'page' : undefined}
           aria-label="Profile and settings"
-          onClick={() => {
-            navigate({ name: 'settings' });
-            guideEmit('profile:opened');
-          }}
+          onClick={() => navigate({ name: 'settings' })}
         >
           <span className="dock-avatar">{link.initials}</span>
         </button>

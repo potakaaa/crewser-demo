@@ -5,8 +5,7 @@ export type GuideEvent =
   | 'deck:swiped'
   | 'ruler:scrubbed'
   | 'switch:opened'
-  | 'timer:started'
-  | 'profile:opened';
+  | 'timer:started';
 
 export interface GuideStep {
   id: string;
@@ -27,7 +26,7 @@ export const GUIDE_STEPS: GuideStep[] = [
   { id: 'ruler', route: 'dashboard', target: 'ruler', title: 'Look ahead', body: 'Drag the strip to scrub through the coming days.', waitFor: ['ruler:scrubbed'], placement: 'below' },
   { id: 'switch', route: 'dashboard', target: 'switch', title: 'Switch', body: 'Tap the arrow to switch project or person.', waitFor: ['switch:opened'], placement: 'below' },
   { id: 'timer', route: 'dashboard', target: 'track-time', title: 'Your hours', body: 'Tap Track time to log hours, or hold it to start the timer.', waitFor: null, placement: 'above' },
-  { id: 'profile', route: 'dashboard', target: 'profile', title: 'Your profile', body: 'Tap your initials for settings, or to replay this tour.', waitFor: ['profile:opened'], placement: 'above' },
+  { id: 'documents', route: 'dashboard', target: 'documents', title: 'Your documents', body: 'Call sheets, invoices and scans live here. Tap to open.', waitFor: null, placement: 'above' },
 ];
 
 const listeners = new Set<(e: GuideEvent) => void>();
