@@ -312,6 +312,17 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
           );
         })}
       </div>
+      <div className="deck-nav">
+        <button type="button" className="deck-arrow" aria-label="Previous note" disabled={i === 0} onClick={() => go(i - 1)}>
+          <Icon name="left" size={20} color="currentColor" strokeWidth={2} />
+        </button>
+        <span className="deck-pos num" aria-hidden="true">
+          {i + 1} / {count}
+        </span>
+        <button type="button" className="deck-arrow" aria-label="Next note" disabled={i === count - 1} onClick={() => go(i + 1)}>
+          <Icon name="right" size={20} color="currentColor" strokeWidth={2} />
+        </button>
+      </div>
       <p className="sr-only" aria-live="polite">
         {i > 0 ? `Card ${i + 1} of ${count}: ${label(i)}` : ''}
       </p>

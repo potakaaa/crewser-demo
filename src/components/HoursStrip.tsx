@@ -5,6 +5,7 @@ import { useActiveLink, useDemo } from '../store';
 import { useSubmitted } from '../lib/useSubmitted';
 import { fmtH, hoursOverview, type HoursOverview } from '../lib/stats';
 import { firstNameOf } from '../lib/greeting';
+import { TimerChip } from './TimerChip';
 
 export type HoursMetric = 'week' | 'overtime' | 'days';
 
@@ -116,6 +117,7 @@ export function HoursStrip() {
           {tile('overtime')}
           {tile('days')}
         </div>
+        <TimerChip />
         <UnsentNudge o={o} />
       </div>
     </section>

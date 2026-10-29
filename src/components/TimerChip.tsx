@@ -1,10 +1,7 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { timerElapsed, useDemo, type WorkTimer } from '../store';
 import { Icon } from './Icon';
 import { guideEmit } from '../lib/guide';
-
-/** Hold this long to start the timer, like the Crewser app's "hold to start timer". */
-const HOLD_MS = 500;
 
 /** "14:05" under an hour (minutes:seconds), "2:14" (hours:minutes) after. */
 export function fmtElapsed(ms: number) {
@@ -32,101 +29,41 @@ export function useTimerNow(timer: WorkTimer | null) {
   return now;
 }
 
-/**
- * The work timer in every header, where the bell was. Idle: tap for manual entry (Log sheet), hold to start.
- * Running or paused: shows the time and opens the timer sheet.
- */
-/** `compact`: the idle chip shows only its icon, for headers that are already full (Calendar's arrows). */
-export function TimerChip({ compact = false }: { compact?: boolean }) {
+/** The work timer on Home's hours card. Idle: tap to start. Running or paused: the time opens the timer sheet, Stop logs it. */
+export function TimerChip() {
   const timer = useDemo((s) => s.timer);
   const startTimer = useDemo((s) => s.startTimer);
-  const setLogOpen = useDemo((s) => s.setLogOpen);
+  const stopTimer = useDemo((s) => s.stopTimer);
   const openSheet = useDemo((s) => s.openSheet);
   const now = useTimerNow(timer);
-  const [holding, setHolding] = useState(false);
-  const hold = useRef(0);
-  /** When a hold last started the timer: the click that ends that same press is not a tap. */
-  const firedAt = useRef(0);
 
-  const beginHold = () => {
-    if (timer) return;
-    setHolding(true);
-    hold.current = window.setTimeout(() => {
-      firedAt.current = Date.now();
-      setHolding(false);
-      startTimer();
-      guideEmit('timer:started');
-      try {
-        navigator.vibrate?.(15);
-      } catch {
-        /* optional */
-      }
-    }, HOLD_MS);
-  };
-  const endHold = () => {
-    window.clearTimeout(hold.current);
-    setHolding(false);
-  };
-  useEffect(() => () => window.clearTimeout(hold.current), []);
-
-  const tap = () => {
-    if (Date.now() - firedAt.current < 800) return;
-    if (timer) openSheet('timer');
-    else {
-      setLogOpen(true);
-      guideEmit('log:opened');
-    }
-  };
-  // Keyboard on the idle chip: holding Enter or Space starts the timer too; a short press is a tap.
-  const isKey = (e: KeyboardEvent) => e.key === 'Enter' || e.key === ' ';
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (!isKey(e)) return;
-    e.preventDefault();
-    if (!e.repeat) beginHold();
-  };
-  const onKeyUp = (e: KeyboardEvent) => {
-    if (!isKey(e)) return;
-    e.preventDefault();
-    endHold();
-    tap();
-  };
-
-  if (timer) {
-    const ms = timerElapsed(timer, now);
-    const running = !!timer.runningSince;
+  if (!timer) {
     return (
       <button
         type="button"
-        className="timer-chip is-on"
+        className="hs-timer"
         data-guide="timer"
-        data-paused={!running || undefined}
-        aria-label={`Timer ${running ? 'running' : 'paused'} ${spokenElapsed(ms)}, open`}
-        onClick={tap}
+        onClick={() => {
+          startTimer();
+          guideEmit('timer:started');
+        }}
       >
-        <span className="timer-dot" aria-hidden="true" />
-        <span className="timer-time num">{fmtElapsed(ms)}</span>
+        <Icon name="logTime" size={18} color="currentColor" strokeWidth={1.8} />
+        Start timer
       </button>
     );
   }
+  const ms = timerElapsed(timer, now);
+  const running = !!timer.runningSince;
   return (
-    <button
-      type="button"
-      className="timer-chip glass-btn"
-      data-guide="timer"
-      data-holding={holding || undefined}
-      aria-label="Start timer, hold. Tap for manual entry"
-      onPointerDown={(e) => e.button === 0 && beginHold()}
-      onPointerUp={endHold}
-      onPointerLeave={endHold}
-      onPointerCancel={endHold}
-      onContextMenu={(e) => e.preventDefault()}
-      onKeyDown={onKeyDown}
-      onKeyUp={onKeyUp}
-      onClick={(e) => e.detail > 0 && tap()}
-    >
-      <span className="timer-ring" aria-hidden="true" />
-      <Icon name="logTime" size={18} color="currentColor" strokeWidth={1.8} />
-      {!compact && <span>Start</span>}
-    </button>
+    <div className="hs-timer hs-timer-on" data-guide="timer" data-paused={!running || undefined}>
+      <button type="button" className="hs-timer-main" aria-label={`Timer ${running ? 'running' : 'paused'} ${spokenElapsed(ms)}, open`} onClick={() => openSheet('timer')}>
+        <span className="timer-dot" aria-hidden="true" />
+        <span className="timer-time num">{fmtElapsed(ms)}</span>
+      </button>
+      <button type="button" className="hs-timer-stop" onClick={stopTimer}>
+        Stop
+      </button>
+    </div>
   );
 }
