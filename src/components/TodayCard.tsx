@@ -4,7 +4,7 @@ import { useDemo } from '../store';
 import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
-import { quickAction, TYPE_LABEL } from '../lib/notes';
+import { primaryIcon, quickAction, TYPE_LABEL } from '../lib/notes';
 import { callSheetFor, callSheetNear, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { dayWord } from './docs/docs';
@@ -113,10 +113,9 @@ function DeckCard({ card }: { card: CardModel }) {
       </button>
     );
   } else if (n.primaryAction) {
-    const boarding = n.primaryAction.kind === 'boardingPass';
     primary = (
       <button type="button" className="btn btn-primary deck-cta" onClick={() => a.primary(n)}>
-        <Icon name={boarding ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
+        <Icon name={primaryIcon(n.primaryAction.kind)} size={16} color="currentColor" strokeWidth={1.8} />
         {n.primaryAction.short}
       </button>
     );

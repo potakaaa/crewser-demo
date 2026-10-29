@@ -84,11 +84,6 @@ button.day-action:active {
 }
 
 
-/* "October 2026 · CW 43" stays on one line, whatever the font. */
-.month-toggle > span:first-child {
-  white-space: nowrap;
-}
-
 /* The day's cards keep Home's rhythm. */
 .sheet.sheet-cal {
   gap: var(--sp-3);
@@ -101,15 +96,55 @@ button.day-action:active {
   padding: var(--sp-4);
 }
 
-/* Week arrows ride level with the bell in the top-right corner, as on every other screen. */
-.gh-titlebar:has(.month-toggle) > .icon-btn {
-  align-self: flex-start;
+/* Top bar as in the live app: arrows around the ISO week, the week's name, then a jump back to today. */
+.cal-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin: 0 calc(-1 * var(--sp-2)) var(--sp-2);
+  color: #ffffff;
+  font-size: var(--fs-md);
 }
-
-/* On a colleague's link the chip sits in the month label ("Oct 2026 · ● Bianca"): plain text, no pill. */
-.month-toggle .for-chip[data-tone] {
+.cal-arrow,
+.cal-label,
+.cal-today {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+.cal-arrow {
+  justify-content: center;
+  min-width: 44px;
+}
+.cal-arrow:active,
+.cal-label:active,
+.cal-today:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+.cal-cw {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cal-label {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  padding: 0 var(--sp-2);
+  color: var(--on-dark-2);
+  white-space: nowrap;
+}
+.cal-today {
+  padding: 0 var(--sp-3);
+  font-weight: 600;
+}
+.cal-label .for-chip[data-tone] {
   height: auto;
-  gap: 5px;
   padding: 0;
   border: 0;
   border-radius: 0;

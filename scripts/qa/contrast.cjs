@@ -5,11 +5,10 @@ const base = process.env.BASE || 'http://127.0.0.1:5173/';
 const w = +(process.argv[2] || 375);
 const views = [
   ['dashboard', '#/dashboard'], ['calendar', '#/calendar'], ['documents', '#/documents'],
-  ['contacts', '#/contacts'], ['settings', '#/settings'], ['ticket', '#/ticket'],
+  ['contacts', '#/contacts'], ['settings', '#/settings'],
   ['note-sheet', '#/note/fl'], ['pdf', '#/pdf/Ticket_OS487.pdf'],
   ['log-sheet', '#/dashboard', '.quick-tile'], ['invoice', '#/dashboard', '.quick-tile:last-child'],
-  ['pass', '#/dashboard', '.dock-btn[aria-controls]'], ['add-menu', '#/calendar', '.dock-add'], ['notifications', '#/calendar', ['.dock-btn[aria-controls]', '.tb-pass-row']], ['timer', '#/dashboard', '.timer-chip'],
-  ['month', '#/calendar', '.gh-titlebar button, .cal-month, [aria-label*="month" i]'],
+  ['month', '#/calendar', '.cal-label'],
 ];
 const audit = () => {
   const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };

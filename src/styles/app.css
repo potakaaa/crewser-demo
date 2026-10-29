@@ -933,37 +933,6 @@
   }
 }
 /* ───────── Calendar ───────── */
-.month-toggle {
-  position: relative;
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  margin: -10px 0 -2px -10px;
-  padding: 0 10px;
-  border: 0;
-  background: none;
-  color: var(--on-dark-2);
-  font-size: var(--fs-sm);
-  font-weight: 500;
-}
-.month-toggle::before {
-  content: '';
-  position: absolute;
-  inset: 7px 0;
-  border: 0;
-  border-radius: var(--r-control);
-  background: rgba(255, 255, 255, 0.08);
-  transition: background var(--t-fast) ease;
-}
-.month-toggle:hover::before,
-.month-toggle[aria-expanded='true']::before {
-  background: rgba(255, 255, 255, 0.14);
-}
-.month-toggle > * {
-  position: relative;
-}
 .cal-panel {
   display: flex;
   flex-direction: column;
@@ -2513,7 +2482,7 @@
 /* ───────── Elevation (dark) ─────────
    Base, card, raised control: one look per level so nested things never melt together.
    Cards with a hairline border already have their rim; the rest get it as an inset ring. */
-:is(.master, .hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
+:is(.hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
   .duo-card, .facts-card, .note-text, .crew-card, .notif-item, .dlist, .setprofile, .fontopt) {
 }
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
@@ -2523,7 +2492,7 @@
   background: var(--card-2);
 }
 /* Icon tiles are not buttons: lighter than the card, no bezel. */
-:is(.chip-icon, .master-icon, .pocket-icon, .notif-icon, .todo-icon-neutral) {
+:is(.chip-icon, .pocket-icon, .notif-icon, .todo-icon-neutral) {
   background: var(--chip);
   color: var(--chip-icon);
 }

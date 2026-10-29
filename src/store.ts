@@ -168,7 +168,6 @@ function loadFontTheme(): FontTheme {
   return DEFAULT_FONT;
 }
 
-export type ExpandList = 'dashboard' | 'calendar';
 
 interface Toast {
   id: number;
@@ -196,7 +195,6 @@ interface DemoState {
   logStart: string;
   logEnd: string | null;
   homeAllOpen: boolean;
-  expanded: Record<ExpandList, string | null>;
   /** Selected day in the calendar (ISO). The week strip shows its week. */
   calDate: string;
   /** First day of the month shown when the month view is open (ISO). */
@@ -251,7 +249,6 @@ interface Actions {
   setBreak: (min: number) => void;
   setLogTime: (k: 'logStart' | 'logEnd', v: string | null) => void;
   toggleHomeAll: () => void;
-  toggleExpanded: (list: ExpandList, id: string) => void;
   /** Prev/next: a week in the week strip, a month in the month view. */
   shiftCal: (delta: number) => void;
   setCalDate: (iso: string) => void;
@@ -306,7 +303,6 @@ const initialState = (): DemoState => ({
   fontTheme: loadFontTheme(),
   ...logDefaults(),
   homeAllOpen: false,
-  expanded: { dashboard: null, calendar: null },
   calDate: today.date,
   calMonth: firstOfMonth(today.date),
   calMonthOpen: false,
@@ -540,14 +536,13 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     if (unsent) get().showToast(UNSENT_TOAST);
   },
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
-  toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
   shiftCal: (delta) =>
     set((s) =>
       s.calMonthOpen
         ? { calMonth: addMonths(s.calMonth, delta) }
-        : { calDate: addDays(s.calDate, delta * 7), expanded: { ...s.expanded, calendar: null } },
+        : { calDate: addDays(s.calDate, delta * 7) },
     ),
-  setCalDate: (iso) => set((s) => ({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false, expanded: { ...s.expanded, calendar: null } })),
+  setCalDate: (iso) => set({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false }),
   toggleCalMonth: () => set((s) => ({ calMonthOpen: !s.calMonthOpen, calMonth: firstOfMonth(s.calDate) })),
   hideSplash: () => set({ splash: false }),
   submitDay: (iso) =>

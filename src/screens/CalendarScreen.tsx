@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import '../styles/calendar.css';
 import { useActiveLink, useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type WorkDay } from '../mock';
@@ -7,8 +7,8 @@ import { UnsentMark } from '../components/UnsentMark';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
 import { ContentCard } from '../components/NoteCards';
-import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, monthShort, mondayOf, relativeDay, weekday } from '../lib/dates';
-import { sortNotes } from '../lib/notes';
+import { addDays, dayOfMonth, diffDays, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, monthShort, mondayOf, relativeDay, weekday } from '../lib/dates';
+import { sortNotes, visibleNotes } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
 
@@ -86,7 +86,8 @@ export function CalendarScreen() {
   // The logged days belong to the crew link in use, so a colleague's link shows their hours, not yours.
   const workdays = workdaysFor(useDemo((s) => s.activeLinkId));
 
-  const notes = empty ? [] : allNotes;
+  const masterDataDone = useDemo((s) => s.masterDataDone);
+  const notes = useMemo(() => visibleNotes(empty ? [] : allNotes, { masterDataDone, isMe: link.isMe }), [empty, masterDataDone, link.isMe]);
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
   const monday = mondayOf(calDate);
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
@@ -112,33 +113,32 @@ export function CalendarScreen() {
   const isToday = calDate === today.date;
   // The Hours sheet only offers Send for logged drafts; a past shoot day nobody logged has nothing to send.
   const loggedDraft = workdays.some((w) => w.date === calDate && w.status === 'draft');
-  const label = monthOpen ? fmtMonthYear(calMonth) : monthLabel(days[0], days[6]);
+  const weekGap = Math.round(diffDays(monday, mondayOf(today.date)) / 7);
+  const label = monthOpen ? fmtMonthYear(calMonth) : weekGap === 0 ? 'This Week' : weekGap === 1 ? 'Next Week' : weekGap === -1 ? 'Last Week' : monthLabel(days[0], days[6]);
 
   return (
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <div className="gh-titlebar">
-          <div className="gh-titles">
-            <button type="button" className="month-toggle" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
-              {/* On a colleague's link the chip takes the place of the week number, and the month is short ("Oct 2026"), so the label fits beside the arrows. */}
-              <span>
-                {link.isMe ? label : label.replace(/^([A-Z][a-z]{2})[a-z]+(?= \d)/, '$1')}
-                {link.isMe ? !monthOpen && ` · CW ${isoWeek(monday)}` : ' · '}
-              </span>
-              <ForChip compact bare />
-              <span className="chev" data-open={monthOpen}>
-                <Icon name="down" size={16} color="#C4CFD0" strokeWidth={1.8} />
-              </span>
-              <span className="sr-only">{monthOpen ? 'Show week' : 'Show whole month'}</span>
-            </button>
-            <h1 className="display">Calendar</h1>
-          </div>
-          <button type="button" className="icon-btn glass-btn" aria-label={`Previous ${unit}`} onClick={() => shiftCal(-1)}>
-            <Icon name="left" size={18} color="#FFFFFF" />
+        <div className="cal-bar">
+          <h1 className="sr-only">Calendar</h1>
+          <button type="button" className="cal-arrow" aria-label={`Previous ${unit}`} onClick={() => shiftCal(-1)}>
+            <Icon name="left" size={16} color="currentColor" strokeWidth={1.8} />
           </button>
-          <button type="button" className="icon-btn glass-btn" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
-            <Icon name="right" size={18} color="#FFFFFF" />
+          <span className="cal-cw">{monthOpen ? monthShort(calMonth) : `CW${isoWeek(monday)}`}</span>
+          <button type="button" className="cal-arrow" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
+            <Icon name="right" size={16} color="currentColor" strokeWidth={1.8} />
+          </button>
+          <button type="button" className="cal-label" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
+            {label}
+            <ForChip compact bare />
+            <span className="chev" data-open={monthOpen}>
+              <Icon name="down" size={14} color="currentColor" strokeWidth={1.8} />
+            </span>
+            <span className="sr-only">{monthOpen ? 'Show week' : 'Show whole month'}</span>
+          </button>
+          <button type="button" className="cal-today" onClick={() => setCalDate(today.date)}>
+            Today
           </button>
         </div>
 
