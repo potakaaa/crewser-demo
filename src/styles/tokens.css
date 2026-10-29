@@ -90,7 +90,7 @@
 
 /*
  * Inside the phone the app is dark only, close to the production Crewser app: slate-teal sheet,
- * flat cards one step lighter, lime used sparingly. The page around the phone keeps the :root values.
+ * flat cards one step lighter, lime used sparingly. Base, card, raised and lime are the live app's own values (crewser.app/demo). The page around the phone keeps the :root values.
  * Flat: three tone levels, no shadows or rims. Base (--sheet), card (--card), raised control (--card-2).
  * Hairlines only divide rows in a list or mark an input's edge.
  * Contrast on --card: ink 10.8:1, text-2 7.9:1, text-3 5.9:1, lime 8.2:1. On --card-2: text-3 4.6:1.
@@ -100,18 +100,18 @@
   --ink: #eef3f2;
   --text-2: #c9d3d4;
   --text-3: #aab8ba;
-  --sheet: #192124;
-  --card: #2d383b;
-  --card-2: #3b484b;
+  --sheet: #1e282a;
+  --card: #293639;
+  --card-2: #394c50;
   --hairline: rgba(255, 255, 255, 0.09);
   --line: rgba(255, 255, 255, 0.16);
   --chip: #3e4b4e;
   --chip-icon: #eef3f2;
-  --soft: #3b484b;
-  --soft-hover: #435053;
+  --soft: #394c50;
+  --soft-hover: #41565a;
   --dark-tile: #151c1e;
-  --lime: #c8e03c;
-  --lime-hover: #d4ec3a;
+  --lime: #d7e336;
+  --lime-hover: #e0ea52;
   --on-lime: #172022;
   --forest: #4a6b55;
 
@@ -137,13 +137,13 @@
   /* The one grainy focal point per screen: a dark green orb, like the original's working-time circle. */
   --header-gradient:
     radial-gradient(85% 70% at 50% 12%, #3d6650 0%, rgba(46, 74, 64, 0.85) 38%, rgba(34, 48, 47, 0) 78%),
-    linear-gradient(180deg, #263033 0%, #192124 100%);
+    linear-gradient(180deg, #263033 0%, #1e282a 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(200, 224, 60, 0.14), rgba(200, 224, 60, 0) 45%);
   /* Note-card time stub: a frosted white wash, brightest behind the time, fading into the card
      so the tile has no right edge. Mocks of other stubs live in screenshots/v4-dark/options/. */
   --stub-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.09) 55%, rgba(255, 255, 255, 0) 100%);
   /* Signature bar beside condensed section headings. */
-  --signature-bar: linear-gradient(90deg, #c8e03c 0%, #8fb046 38%, #4a6b55 100%);
+  --signature-bar: linear-gradient(90deg, #d7e336 0%, #8fb046 38%, #4a6b55 100%);
   /* Ordinary cards are flat: grain only where a component opts back in (see screens.css). */
   --grain-card-opacity: 0;
 }

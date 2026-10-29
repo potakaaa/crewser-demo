@@ -185,7 +185,7 @@
   top: 0;
   height: var(--sat);
   margin-bottom: calc(-1 * var(--sat));
-  background: rgba(25, 33, 36, 0.86);
+  background: rgba(30, 40, 42, 0.86);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   backdrop-filter: blur(18px) saturate(160%);
   opacity: 0;
