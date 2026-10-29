@@ -50,9 +50,6 @@
   font-weight: 500;
   transition: background var(--t-fast) ease;
 }
-.fchip:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
 .fchip[aria-pressed='true'] {
   border-color: #ffffff;
   background: #ffffff;
@@ -148,9 +145,6 @@
   text-align: left;
   color: var(--ink);
   transition: background var(--t-fast) ease;
-}
-.drow:hover {
-  background: var(--sheet);
 }
 .drow-main {
   flex: 1;
@@ -305,9 +299,6 @@
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
-.btn-glass:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
 
 .cdept {
   display: flex;
@@ -405,17 +396,11 @@
     background var(--t-fast) ease,
     transform 180ms var(--ease-out);
 }
-.cquick:hover {
-  background: var(--soft-hover);
-}
 .cquick:active {
   transform: scale(0.94);
 }
 .cquick-dark {
   background: rgba(255, 255, 255, 0.14);
-}
-.cquick-dark:hover {
-  background: rgba(255, 255, 255, 0.22);
 }
 
 /* Contact sheet */
@@ -506,9 +491,6 @@
   border-radius: var(--r-control);
   background: none;
 }
-.cdetail-copy:hover {
-  background: var(--soft);
-}
 .cdetail:not(:has(.cdetail-copy)) {
   padding-right: var(--sp-4);
 }
@@ -565,9 +547,6 @@
   text-align: left;
   color: var(--ink);
   transition: background var(--t-fast) ease;
-}
-.setrow:hover {
-  background: var(--sheet);
 }
 .setrow-main {
   flex: 1;
@@ -757,9 +736,6 @@
   text-align: left;
   color: var(--ink);
   transition: background var(--t-fast) ease;
-}
-.lrow:hover {
-  background: var(--sheet);
 }
 .lrow.is-active {
   background: rgba(200, 224, 60, 0.08);

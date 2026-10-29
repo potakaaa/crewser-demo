@@ -30,12 +30,6 @@
   text-align: left;
   transition: background var(--t-fast) ease;
 }
-/* Hover only where there is a pointer that hovers: on touch the highlight would stick after the swipe. */
-@media (hover: hover) {
-  .dash-who:hover {
-    background: rgba(255, 255, 255, 0.07);
-  }
-}
 /* On a colleague's link the chip takes the greeting's line: only as wide as its words. */
 .dash-who .for-chip {
   align-self: flex-start;
@@ -286,9 +280,6 @@
   transition:
     transform 180ms var(--ease-out),
     background var(--t-fast) ease;
-}
-.btn.btn-primary:hover {
-  background: var(--soft-hover);
 }
 .btn.btn-primary:active {
   transform: scale(0.98);

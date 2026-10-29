@@ -341,16 +341,10 @@
   background: var(--soft);
   color: var(--ink);
 }
-.btn-soft:hover {
-  background: var(--soft-hover);
-}
 .btn-ink {
   background: var(--brand-surface);
   color: #ffffff;
   font-weight: 600;
-}
-.btn-ink:hover {
-  background: var(--brand-surface-hover);
 }
 .btn-ink {
   position: relative;
@@ -372,16 +366,10 @@
   color: var(--on-lime);
   font-weight: 600;
 }
-.btn-lime:hover {
-  background: var(--lime-hover);
-}
 .btn-outline {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink);
-}
-.btn-outline:hover {
-  background: rgba(255, 255, 255, 0.04);
 }
 .btn-md {
   min-height: 48px;
@@ -429,11 +417,6 @@
   font-weight: 500;
   transition: background 150ms ease;
 }
-@media (hover: hover) {
-  .glass-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-}
 .link-btn {
   flex: none;
   min-height: 44px;
@@ -443,10 +426,6 @@
   font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--teal);
-}
-.link-btn:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 .link-btn-plain {
   min-width: 44px;
@@ -820,9 +799,6 @@
     background var(--t-fast) ease,
     transform 180ms var(--ease-out);
 }
-.copy-btn:hover {
-  background: var(--soft-hover);
-}
 .copy-btn:active {
   transform: scale(0.9);
 }
@@ -1007,9 +983,6 @@
   font-variant-numeric: tabular-nums;
   transition: background var(--t-fast) ease;
 }
-.mday:hover .mday-d {
-  background: rgba(255, 255, 255, 0.08);
-}
 .mday:active {
   transform: scale(0.94);
 }
@@ -1070,9 +1043,6 @@
 .wday-disc.has-notes {
   font-weight: 600;
   color: #ffffff;
-}
-.wday:hover .wday-disc {
-  background: rgba(255, 255, 255, 0.12);
 }
 /* The weekday carries the markers: a quiet pill for today, a raised one for the selected day. */
 .wday-wd {
@@ -1951,8 +1921,7 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
-/* Fully inert: no hover colour, no pressed shrink. */
-.btn-lime[aria-disabled='true']:hover,
+/* Fully inert: no pressed shrink. */
 .btn-lime[aria-disabled='true']:active {
   background: var(--lime);
   transform: none;

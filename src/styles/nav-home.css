@@ -217,11 +217,6 @@
   background: var(--lime);
   color: var(--on-lime);
 }
-@media (hover: hover) {
-  .btn.btn-primary.deck-cta:hover {
-    background: var(--lime-hover);
-  }
-}
 .btn.btn-primary.deck-cta:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
