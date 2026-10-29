@@ -234,10 +234,15 @@ export function SettingsScreen() {
             <NavRow title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
             <NavRow title="Show the guide again" onClick={startGuide} />
             <NavRow title="Language" value="English" onClick={() => toast('More languages are not part of this demo')} />
+          </div>
+          <FontSelect value={fontTheme} onChange={setFontTheme} />
+        </Group>
+
+        <Group title="Legal">
+          <div className="dlist">
             <NavRow title="Privacy" onClick={() => toast('The privacy policy is not part of this demo')} />
             <NavRow title="Imprint" onClick={() => toast('The imprint is not part of this demo')} />
           </div>
-          <FontSelect value={fontTheme} onChange={setFontTheme} />
           <p className="setfoot">
             <Icon name="shield" size={16} color="#9AAAAC" />
             <span>Data hosted in Germany</span>
