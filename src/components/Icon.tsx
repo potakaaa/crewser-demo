@@ -62,6 +62,7 @@ export const icons = {
   rental: Key01Icon,
   appointment: Appointment01Icon,
   plain: StickyNote01Icon,
+  task: UserAccountIcon,
   ticket: Ticket01Icon,
   clip: Attachment01Icon,
   pin: Location01Icon,

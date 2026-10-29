@@ -13,7 +13,7 @@ import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { QuickActions } from '../components/QuickActions';
 import { Wordmark } from '../components/Brand';
-import { smartNotes } from '../lib/notes';
+import { smartNotes, visibleNotes } from '../lib/notes';
 import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
 
@@ -24,12 +24,12 @@ export function DashboardScreen() {
   const allOpen = useDemo((s) => s.homeAllOpen);
   const toggleAll = useDemo((s) => s.toggleHomeAll);
   const masterDataDone = useDemo((s) => s.masterDataDone);
-  const openSheet = useDemo((s) => s.openSheet);
   const toast = useDemo((s) => s.showToast);
   const link = useActiveLink();
-  const sn = smartNotes(empty ? [] : notes);
+  const shown = useMemo(() => visibleNotes(empty ? [] : notes, { masterDataDone, isMe: link.isMe }), [empty, masterDataDone, link.isMe]);
+  const sn = smartNotes(shown);
   const hasNotes = sn.top.length + sn.restCount > 0;
-  const scrub = useMemo(() => buildScrub(empty ? [] : notes), [empty]);
+  const scrub = useMemo(() => buildScrub(shown), [shown]);
   // The note under the ruler's playhead; it only changes when the note does, never per pixel.
   const [preview, setPreview] = useState<Preview | null>(null);
   const ruler = useRef<TimelineHandle>(null);
@@ -70,19 +70,6 @@ export function DashboardScreen() {
 
       <Sheet className={`sheet-dash${turnClass}`} key={turn?.n ?? 0}>
         <QuickActions />
-        {link.isMe && !masterDataDone && (
-          <button type="button" className="master" onClick={() => openSheet('info', 'master')}>
-            <span className="master-icon">
-              <Icon name="idCard" size={18} color="currentColor" />
-            </span>
-            <span className="master-text">
-              <span className="master-t1">Submit your master data</span>
-              <span className="master-t2">Needed once, before your first payout.</span>
-            </span>
-            <Icon name="right" size={18} color="currentColor" />
-          </button>
-        )}
-
         <HoursStrip />
 
         <InfoPocket notes={sn.undated} />

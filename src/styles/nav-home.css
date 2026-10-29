@@ -1332,11 +1332,6 @@
   right: -10px;
   clip-path: inset(0 50% 0 0);
 }
-.nticket-stub .qr-preview {
-  border: 0;
-  padding: 0;
-  background: none;
-}
 
 /* ───────── First-visit guide: dim everything but the spotlit target ───────── */
 .guide {

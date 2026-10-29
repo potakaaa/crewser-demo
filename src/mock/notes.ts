@@ -1,5 +1,6 @@
 import type { Note } from './types';
 import { madeiraTeam } from './crew';
+import { person } from './data';
 
 const directionsToSet = { kind: 'directions', label: 'Directions to set', short: 'Directions' } as const;
 
@@ -116,6 +117,28 @@ export const notes: Note[] = [
     attachments: [{ file: 'Reservation_FNC-4471.pdf', kind: 'PDF · reservation' }],
     crew: madeiraTeam,
     primaryAction: { kind: 'directions', label: 'Directions to desk', short: 'Directions' },
+  },
+  {
+    id: 'md',
+    type: 'task',
+    kind: 'time',
+    time: '18:00',
+    timeNote: 'Tonight',
+    day: '2026-10-21',
+    title: 'Master data',
+    subtitle: 'Needed before your first payout',
+    facts: [
+      { label: 'Needed for', value: 'Your first payout' },
+      { label: 'Takes', value: 'About 2 minutes' },
+      { label: 'Personal details', value: 'Name, address, date of birth' },
+      { label: 'Tax and social security', value: 'Tax ID and social security number' },
+      { label: 'Bank account', value: 'IBAN and account holder' },
+    ],
+    text: 'Production needs these once. You can do it on set, and it is saved as you go.',
+    attachments: [],
+    crew: [person.id],
+    source: 'Production office',
+    primaryAction: { kind: 'masterData', label: 'Submit master data', short: 'Submit data' },
   },
   {
     id: 'd9',

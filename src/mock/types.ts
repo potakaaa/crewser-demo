@@ -1,6 +1,6 @@
 // Shared types for the mock data and the components that render it.
 
-export type NoteType = 'flight' | 'hotel' | 'rental' | 'appointment' | 'plain';
+export type NoteType = 'flight' | 'hotel' | 'rental' | 'appointment' | 'plain' | 'task';
 
 /** time = has a clock time, allday = dated without a time, undated = no date at all */
 export type NoteKind = 'time' | 'allday' | 'undated';
@@ -22,7 +22,8 @@ export interface Attachment {
   kind: string;
 }
 
-export type PrimaryActionKind = 'directions' | 'boardingPass';
+/** boardingPass: the note itself shows the code, so the kind only names the card button that opens the note. masterData opens the master data form. */
+export type PrimaryActionKind = 'directions' | 'boardingPass' | 'masterData';
 
 export interface PrimaryAction {
   kind: PrimaryActionKind;

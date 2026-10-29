@@ -10,7 +10,7 @@ import { addDays, addMonths, firstOfMonth, toMinutes } from './lib/dates';
 
 export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'settings';
 
-export type Route = { name: TabName } | { name: 'ticket' } | { name: 'pdf'; file: string };
+export type Route = { name: TabName } | { name: 'pdf'; file: string };
 
 /** Things that open in a bottom sheet over the current tab. `id` picks the note, contact, project... */
 export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice' | 'timer';
@@ -58,18 +58,17 @@ const parseHash = (hash: string) => {
   return { head: m?.[1].toLowerCase(), arg: m?.[2]?.replace(/\/$/, '') || undefined };
 };
 
-/** Rewrite an old or loose hash (#home, #stats, #ticket...) to its canonical form, so the address bar matches the screen. */
+/** Rewrite an old or loose hash (#home, #stats...) to its canonical form, so the address bar matches the screen. */
 export function normalizeLocation() {
   if (typeof location === 'undefined' || hashToSheet(location.hash)) return;
   const canon = routeToHash(hashToRoute(location.hash));
   if (location.hash !== canon) history.replaceState(history.state, '', canon);
 }
 
-/** Accepts "#/pdf/x.pdf" and the bare-token form "#ticket" (for hosts that only pass plain anchors). Old #home and #stats land on the dashboard. */
+/** Accepts "#/pdf/x.pdf" and the bare-token form "#calendar" (for hosts that only pass plain anchors). Old #home and #stats land on the dashboard. */
 export function hashToRoute(hash: string): Route {
   const { head, arg } = parseHash(hash);
   if (head === 'calendar' || head === 'documents' || head === 'contacts' || head === 'settings') return { name: head };
-  if (head === 'ticket') return { name: 'ticket' };
   if (head === 'pdf' && arg) {
     const file = safeDecode(arg);
     if (file !== null && Object.hasOwn(pdfs, file)) return { name: 'pdf', file };
@@ -77,9 +76,10 @@ export function hashToRoute(hash: string): Route {
   return { name: 'dashboard' };
 }
 
-/** "#/note/fl" (or "#note-fl") is a deep link to a note: the dashboard with that note's sheet open. */
+/** "#/note/fl" (or "#note-fl") is a deep link to a note: the dashboard with that note's sheet open. "#ticket" opens the flight note, where the boarding pass is. */
 export function hashToSheet(hash: string): SheetState | null {
   const { head, arg } = parseHash(hash);
+  if (head === 'ticket') return { kind: 'note', id: 'fl' };
   return head === 'note' && arg && noteById(arg) ? { kind: 'note', id: arg } : null;
 }
 
@@ -87,7 +87,6 @@ const sameRoute = (a: Route | undefined, b: Route | undefined) => !!a && !!b && 
 
 /** The screen and sheet a deep link should go back to when the app was opened on it. */
 function fallbackFor(r: Route): { route: Route; reopen?: SheetState } {
-  if (r.name === 'ticket') return { route: { name: 'dashboard' }, reopen: { kind: 'note', id: 'fl' } };
   if (r.name === 'pdf') return { route: { name: 'dashboard' }, reopen: { kind: 'note', id: r.file === 'Ticket_OS487.pdf' ? 'fl' : 're' } };
   return { route: { name: 'dashboard' } };
 }
