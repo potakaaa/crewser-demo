@@ -8,7 +8,6 @@
   /* Dark mode: "brand" tiles sit flat, one step above the card, like the production app.
      The grain + gradient look lives only on --brand-focal (the header orb, one hero per screen). */
   --brand-surface: var(--card-2);
-  --brand-surface-hover: var(--soft-hover);
   --brand-focal:
     radial-gradient(160px 70px at 100% 0%, rgba(200, 224, 60, 0.18), rgba(200, 224, 60, 0)),
     radial-gradient(140% 120% at 20% 0%, #3d6650 0%, #2c4a3e 48%, #22302f 100%);
