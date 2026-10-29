@@ -616,6 +616,35 @@
   -webkit-user-select: none;
   user-select: none;
 }
+/* Hold to start: a lime fill sweeps across the tile over HOLD_MS (500 ms) and drains back on an early release. */
+.quick-tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.quick-fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--lime);
+  opacity: 0.35;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms var(--ease-out);
+}
+.quick-tile[data-holding] .quick-fill {
+  transform: scaleX(1);
+  transition: transform 500ms linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-fill,
+  .quick-tile[data-holding] .quick-fill {
+    transition: none;
+  }
+  .quick-tile[data-holding] .quick-fill {
+    opacity: 0.6;
+  }
+}
 .quick-tile[data-paused] .timer-dot {
   animation: none;
   opacity: 0.5;

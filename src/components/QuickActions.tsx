@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Icon } from './Icon';
 import { useAddActions, type AddAction } from '../lib/addActions';
 import { fmtElapsed, spokenElapsed, useTimerNow } from '../lib/timer';
@@ -44,10 +44,12 @@ function TimeTile({ action }: { action: AddAction }) {
   const now = useTimerNow(timer);
   const hold = useRef<{ id: number; x: number; y: number } | null>(null);
   const fired = useRef(false);
+  const [holding, setHolding] = useState(false);
 
   const cancel = () => {
     if (hold.current) window.clearTimeout(hold.current.id);
     hold.current = null;
+    setHolding(false);
   };
 
   const ms = timer ? timerElapsed(timer, now) : 0;
@@ -59,15 +61,18 @@ function TimeTile({ action }: { action: AddAction }) {
       className="quick-tile"
       data-guide="track-time"
       data-paused={(timer && !running) || undefined}
+      data-holding={holding || undefined}
       aria-label={timer ? `Timer ${running ? 'running' : 'paused'} ${spokenElapsed(ms)}, open` : 'Track time. Hold to start the timer'}
       onPointerDown={(e) => {
         fired.current = false;
         if (timer) return;
+        setHolding(true);
         hold.current = {
           x: e.clientX,
           y: e.clientY,
           id: window.setTimeout(() => {
             hold.current = null;
+            setHolding(false);
             fired.current = true;
             startTimer();
             navigator.vibrate?.(10);
@@ -92,6 +97,7 @@ function TimeTile({ action }: { action: AddAction }) {
         else action.run();
       }}
     >
+      {!timer && <span className="quick-fill" aria-hidden="true" />}
       <TileIcon action={action} />
       {timer ? (
         <span className="quick-t quick-t-timer">
