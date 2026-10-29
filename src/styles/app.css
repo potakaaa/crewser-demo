@@ -1023,13 +1023,6 @@
   background: rgba(255, 255, 255, 0.3);
   font-weight: 700;
 }
-.mday .wday-dots {
-  height: 4px;
-}
-.mday .wday-dots i {
-  width: 4px;
-  height: 4px;
-}
 .day-list {
   display: flex;
   flex-direction: column;
@@ -1104,18 +1097,6 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
   color: var(--on-dark-3);
-}
-.wday-dots {
-  height: 6px;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.wday-dots i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--lime);
 }
 .sheet-cal {
   gap: var(--sp-4);
