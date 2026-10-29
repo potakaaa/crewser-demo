@@ -32,9 +32,9 @@ function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): bo
   return !submitted.includes(iso);
 }
 
-/** One dot when the day has any note: it only says there is something inside. */
-function Dots({ notes }: { notes: Note[] }) {
-  return <span className="wday-dots">{notes.length > 0 && <i />}</span>;
+/** One badge on the day's disc when it has any note: it only says there is something inside. */
+function Badge({ notes }: { notes: Note[] }) {
+  return notes.length > 0 ? <i className="day-badge" /> : null;
 }
 
 /** The week strip's disc, as in the live app: how many notes the day holds, or a dash for none. */
@@ -42,6 +42,7 @@ function Disc({ notes }: { notes: Note[] }) {
   return (
     <span className={`wday-disc${notes.length ? ' has-notes' : ''}`}>
       {notes.length || '–'}
+      <Badge notes={notes} />
     </span>
   );
 }
@@ -150,7 +151,6 @@ export function CalendarScreen() {
                       <Disc notes={dn} />
                       <span className="wday-wd">{weekday(iso)}</span>
                       <span className="wday-d">{dayDotMonth(iso)}</span>
-                      <Dots notes={dn} />
                     </button>
                   );
                 })}
@@ -178,8 +178,10 @@ export function CalendarScreen() {
                       aria-label={dayAria(iso, dn.length)}
                       onClick={() => setCalDate(iso)}
                     >
-                      <span className="mday-d">{dayOfMonth(iso)}</span>
-                      <Dots notes={dn} />
+                      <span className="mday-d">
+                        {dayOfMonth(iso)}
+                        <Badge notes={dn} />
+                      </span>
                     </button>
                   );
                 })}

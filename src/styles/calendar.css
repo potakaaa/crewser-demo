@@ -3,6 +3,23 @@
 .cal-panel .mday {
   position: relative;
 }
+.mday-d {
+  position: relative;
+}
+/* Notification badge on the disc's top-right edge, ringed in the page colour so it reads as cut out. */
+.day-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 2px solid var(--sheet);
+  border-radius: 50%;
+  background: var(--lime);
+  transform: translate(25%, -25%);
+  pointer-events: none;
+}
 
 /* Under the day heading: open the call sheet, or finish the hours. */
 .day-actions {
