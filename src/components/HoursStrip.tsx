@@ -111,7 +111,7 @@ export function HoursStrip() {
 
   return (
     <section className="stack stats" aria-label="Statistics">
-      <SectionHead title="Statistics" />
+      <SectionHead title="Statistics" bar />
       <div className="hs-card">
         {logged ? (
           <button type="button" className="st-hero" onClick={() => openSheet('hours', 'week')} aria-label={`Daily average: ${fmtH(o.dailyAvg)} hours, target ${target} h. Open details`}>
