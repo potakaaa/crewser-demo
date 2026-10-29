@@ -1,4 +1,4 @@
-/* Crewser crew app v4 design tokens. Radii: 10 px controls, 18 px cards/bars/sheets. Nothing else. */
+/* Crewser crew app v4 design tokens. Flat: no shadows. Radii: 4 px controls, 8 px cards/bars/sheets (sheets top corners only; 8 px matches the live app), 50% true circles. Nothing else. */
 :root {
   --ink: #111a1b;
   --text-2: #3f5155;
@@ -7,28 +7,13 @@
   --card: #ffffff;
   --hairline: rgba(17, 26, 27, 0.08);
   --chip: #e6edec;
-  --chip-icon: #2a3b3f;
   --soft: #edf2f1;
   --dark-tile: #1e282a;
   --lime: #dbf227;
 
-  --data-regular: #7fa1a8;
-  --data-night-dark: #8a93e8;
-  --teal: #2c6b72;
-  --night: #5a63d6;
-  --night-text: #4a53c0;
-
-  --amber-surface: #fbefd0;
-  --amber-border: #e3c36a;
-  --amber-text: #6b4a00;
-  --amber-dark: #f4c35a;
-
-  --on-dark-2: #c4cfd0;
-  --on-dark-3: #a9b7b9;
-
   --dashed: 1.5px dashed rgba(17, 26, 27, 0.28);
-  --r-control: 10px;
-  --r-card: 18px;
+  --r-control: 4px;
+  --r-card: 8px;
 
   --header-gradient: linear-gradient(180deg, #141d1e 0%, #1f3a3d 55%, #2d5559 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(219, 242, 39, 0.16), rgba(219, 242, 39, 0) 45%);
@@ -55,25 +40,22 @@
   --grain-card-size: 160px;
   --grain-card-blend: overlay;
 
-  /* Type: small, calm, medium-weight. Big numbers get tight tracking. */
-  --fs-xs: 11px; /* labels, chips, chart ticks */
-  --fs-sm: 12px; /* secondary lines */
-  --fs-md: 13px; /* body, buttons */
-  --fs-base: 14px; /* titles in cards, values */
-  --fs-lg: 16px; /* section titles */
-  --fs-xl: 20px;
-  --fs-2xl: 24px; /* screen titles */
-  --fs-3xl: 28px; /* tile numbers */
-  --fs-4xl: 34px; /* hero numbers */
-  --fs-5xl: 40px;
+  /* Type: six sizes, weights 400 and 600 only (plus the display face's own weight).
+     1 caption: labels, meta, chips, ticks · 2 body: rows, values, buttons · 3 title: card titles, names
+     4 heading: day and section heads · 5 display title: screen and sheet titles · 6 display number. */
+  --fs-1: 12px;
+  --fs-2: 14px;
+  --fs-3: 16px;
+  --fs-4: 20px;
+  --fs-5: 28px;
+  --fs-6: 40px;
   --track-tight: -0.02em;
 
-  /* Spacing steps */
+  /* Spacing: 4 / 8 / 12 / 16 / 24 / 32, nothing in between. 16 is the page gutter and card padding. */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
   --sp-4: 16px;
-  --sp-5: 20px;
   --sp-6: 24px;
   --sp-8: 32px;
   /* Between sibling cards, and the extra air above a section head (more above a head than below it). */
@@ -90,63 +72,45 @@
 
 /*
  * Inside the phone the app is dark only, close to the production Crewser app: slate-teal sheet,
- * flat cards one step lighter, lime used sparingly. The page around the phone keeps the :root values.
- * Three elevation levels, each a visible step: base (--sheet), card (--card + --elev-1), raised control
- * (--card-2 + --elev-2). Each level carries a light rim and a top highlight, flat-ish like the original.
- * Contrast on --card: ink 10.8:1, text-2 7.9:1, text-3 5.9:1, lime 8.2:1. On --card-2: text-3 4.6:1.
+ * flat cards one step lighter, lime used sparingly. Base, card, raised and lime are the live app's own values (crewser.app/demo). The page around the phone keeps the :root values.
+ * Flat: three tone levels, no shadows or rims. Base (--sheet), card (--card), raised control (--card-2).
+ * Hairlines only divide rows in a list or mark an input's edge.
+ * Contrast on --card: ink 11.15:1, text-2 8.18:1, text-3 6.11:1, lime 8.88:1. On --card-2: text-3 4.42:1.
+ * text-3 on --card-2 or --soft is below AA (4.5:1) for small text, so use it there for large text only.
  */
 .app {
   color-scheme: dark;
   --ink: #eef3f2;
   --text-2: #c9d3d4;
   --text-3: #aab8ba;
-  --sheet: #192124;
-  --card: #2d383b;
-  --card-2: #3b484b;
+  --sheet: #1e282a;
+  --card: #293639;
+  --card-2: #394c50;
   --hairline: rgba(255, 255, 255, 0.09);
   --line: rgba(255, 255, 255, 0.16);
   --chip: #3e4b4e;
-  --chip-icon: #eef3f2;
-  --soft: #3b484b;
-  --soft-hover: #435053;
+  --soft: #394c50;
   --dark-tile: #151c1e;
-  --lime: #c8e03c;
-  --lime-hover: #d4ec3a;
+  --lime: #d7e336;
   --on-lime: #172022;
-  --forest: #4a6b55;
 
-  --data-regular: #7fa1a8;
-  --data-night-dark: #a6adff;
-  --teal: #8fd0c6;
-  --night: #8a93e8;
-  --night-text: #a6adff;
+  /* Text uses six colours only: ink, text-2, text-3, lime, on-lime, danger-text. No teal, no amber. */
   --danger-text: #ff9a8f;
   --danger-surface: rgba(255, 120, 105, 0.12);
 
-  --amber-surface: rgba(244, 195, 90, 0.12);
-  --amber-border: rgba(244, 195, 90, 0.42);
-  --amber-text: #f4c35a;
-  --amber-dark: #f4c35a;
-
-  --on-dark-2: #c4cfd0;
-  --on-dark-3: #a9b7b9;
-
   --dashed: 1.5px dashed rgba(255, 255, 255, 0.24);
-  --rim: rgba(255, 255, 255, 0.09);
-  --elev-1: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px -8px rgba(0, 0, 0, 0.45);
-  --elev-2: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.35);
   --focus: var(--lime);
 
   /* The one grainy focal point per screen: a dark green orb, like the original's working-time circle. */
   --header-gradient:
     radial-gradient(85% 70% at 50% 12%, #3d6650 0%, rgba(46, 74, 64, 0.85) 38%, rgba(34, 48, 47, 0) 78%),
-    linear-gradient(180deg, #263033 0%, #192124 100%);
+    linear-gradient(180deg, #263033 0%, #1e282a 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(200, 224, 60, 0.14), rgba(200, 224, 60, 0) 45%);
   /* Note-card time stub: a frosted white wash, brightest behind the time, fading into the card
      so the tile has no right edge. Mocks of other stubs live in screenshots/v4-dark/options/. */
   --stub-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.09) 55%, rgba(255, 255, 255, 0) 100%);
   /* Signature bar beside condensed section headings. */
-  --signature-bar: linear-gradient(90deg, #c8e03c 0%, #8fb046 38%, #4a6b55 100%);
+  --signature-bar: linear-gradient(90deg, #d7e336 0%, #8fb046 38%, #4a6b55 100%);
   /* Ordinary cards are flat: grain only where a component opts back in (see screens.css). */
   --grain-card-opacity: 0;
 }

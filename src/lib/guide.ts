@@ -4,12 +4,8 @@ import type { TabName } from '../store';
 export type GuideEvent =
   | 'deck:swiped'
   | 'ruler:scrubbed'
-  | 'switch:person'
-  | 'switch:project'
-  | 'timer:started'
-  | 'log:opened'
-  | 'add:opened'
-  | 'pass:opened';
+  | 'switch:opened'
+  | 'timer:started';
 
 export interface GuideStep {
   id: string;
@@ -26,11 +22,11 @@ export interface GuideStep {
 
 /** The first-visit tour, in order. */
 export const GUIDE_STEPS: GuideStep[] = [
-  { id: 'deck', route: 'dashboard', target: 'deck', title: "What's next", body: 'Swipe the card left or right to see what comes after.', waitFor: ['deck:swiped'], placement: 'below' },
+  { id: 'deck', route: 'dashboard', target: 'deck', title: "What's next", body: 'Swipe the card or tap the arrows to see what comes after.', waitFor: ['deck:swiped'], placement: 'below' },
   { id: 'ruler', route: 'dashboard', target: 'ruler', title: 'Look ahead', body: 'Drag the strip to scrub through the coming days.', waitFor: ['ruler:scrubbed'], placement: 'below' },
-  { id: 'switch', route: 'dashboard', target: 'who', title: 'Switch', body: 'Swipe up or down to switch person, sideways to switch project.', waitFor: ['switch:person', 'switch:project'], placement: 'below' },
-  { id: 'timer', route: 'dashboard', target: 'timer', title: 'Your hours', body: 'Tap for manual entry. Hold to start the timer.', waitFor: ['timer:started', 'log:opened'], placement: 'below' },
-  { id: 'pass', route: 'dashboard', target: 'pass', title: 'Your pass', body: 'Documents, contacts, settings and notifications live here.', waitFor: ['pass:opened'], placement: 'above' },
+  { id: 'switch', route: 'dashboard', target: 'switch', title: 'Switch', body: 'Tap the arrow to switch project or person.', waitFor: ['switch:opened'], placement: 'below' },
+  { id: 'timer', route: 'dashboard', target: 'track-time', title: 'Your hours', body: 'Tap Track time to log hours, or hold it to start the timer.', waitFor: null, placement: 'above' },
+  { id: 'documents', route: 'dashboard', target: 'documents', title: 'Your documents', body: 'Call sheets, invoices and scans live here. Tap to open.', waitFor: null, placement: 'above' },
 ];
 
 const listeners = new Set<(e: GuideEvent) => void>();

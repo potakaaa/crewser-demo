@@ -3,26 +3,22 @@
 .cal-panel .mday {
   position: relative;
 }
-
-/* Corner mark: hours still open (the shared .unsent-mark in nav-home.css), clear of the note dot under the date. */
-.day-marks {
+.mday-d {
+  position: relative;
+}
+/* Notification badge on the disc's top-right edge, ringed in the page colour so it reads as cut out. */
+.day-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  left: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 2px solid var(--sheet);
+  border-radius: 50%;
+  background: var(--lime);
+  transform: translate(25%, -25%);
   pointer-events: none;
-  color: currentColor;
-}
-.mday .day-marks {
-  top: 2px;
-  right: 2px;
-  left: 2px;
-}
-.mday.is-out .day-marks {
-  opacity: 0.4;
 }
 
 /* Under the day heading: open the call sheet, or finish the hours. */
@@ -38,11 +34,11 @@
   min-height: 32px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 12px 0 10px;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-3) 0 var(--sp-3);
   border: 0;
   border-radius: var(--r-control);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
   line-height: 1;
   transition: transform 180ms var(--ease-out);
@@ -58,10 +54,7 @@ button.day-action:active {
 /* The day's primary: the note primary button (.btn-primary in dashboard.css), scaled down. */
 .day-action-sheet {
   background: var(--brand-surface);
-  color: #ffffff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 3px 8px rgba(0, 0, 0, 0.3);
+  color: var(--ink);
 }
 .day-action-sheet::after {
   content: '';
@@ -79,7 +72,7 @@ button.day-action:active {
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
-  font-weight: 500;
+  font-weight: 600;
 }
 .day-action-unsent::before {
   inset: -7px 0;
@@ -90,64 +83,70 @@ button.day-action:active {
   }
 }
 
-/* Room for the corner marks above the weekday. */
-.cal-panel .wday {
-  height: 72px;
-  padding-top: 14px;
-  gap: 4px;
-}
-.cal-panel .mday {
-  height: 42px;
-}
 
-/* "October 2026 · CW 43" stays on one line, whatever the font. */
-.month-toggle > span:first-child {
-  white-space: nowrap;
-}
-
-/* Narrow phones (360 px): give the note titles the width the ticket stub was taking. */
-@media (max-width: 400px) {
-  .app .sheet-cal .nrow:not(.nrow-dashed) .nrow-toggle {
-    --stub-solid: 80px;
-    grid-template-columns: 74px 36px minmax(0, 1fr) 16px;
-    gap: var(--sp-2);
-    padding-left: var(--sp-3);
-    padding-right: var(--sp-2);
-  }
-  .sheet-cal .nrow-quick {
-    width: 52px;
-  }
-}
-
-/* Compact list: the day's notes sit close together and the page scrolls past quickly. */
+/* The day's cards keep Home's rhythm. */
 .sheet.sheet-cal {
   gap: var(--sp-3);
-  padding-top: var(--sp-5);
+  padding-top: var(--sp-4);
 }
 .sheet-cal .day-list {
-  gap: var(--sp-2);
-}
-.sheet-cal .day-heading {
-  padding-top: 0;
+  gap: var(--sp-3);
 }
 .sheet-cal .empty-day {
   padding: var(--sp-4);
 }
 
-/* Week arrows ride level with the bell in the top-right corner, as on every other screen. */
-.gh-titlebar:has(.month-toggle) > .icon-btn {
-  align-self: flex-start;
+/* Top bar: arrows around the week/month toggle, then a jump back to today. */
+.cal-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin: 0 calc(-1 * var(--sp-2)) var(--sp-2);
+  color: var(--ink);
+  font-size: var(--fs-2);
 }
-
-/* On a colleague's link the chip sits in the month label ("Oct 2026 · ● Bianca"): plain text, no pill. */
-.month-toggle .for-chip[data-tone] {
+.cal-arrow,
+.cal-label,
+.cal-today {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+.cal-arrow {
+  justify-content: center;
+  min-width: 44px;
+}
+.cal-arrow:active,
+.cal-label:active,
+.cal-today:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+.cal-label {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  padding: 0 var(--sp-2);
+  color: var(--ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cal-today {
+  padding: 0 var(--sp-3);
+  font-weight: 600;
+}
+.cal-label .for-chip[data-tone] {
   height: auto;
-  gap: 5px;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: none;
-  color: #ffffff;
+  color: var(--ink);
   font-size: inherit;
   font-weight: 600;
 }

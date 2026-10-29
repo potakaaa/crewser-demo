@@ -44,10 +44,11 @@ export function OfflineBanner({ tone }: { tone: 'dark' | 'light' }) {
   );
 }
 
-export function SectionHead({ title, sub }: { title: string; sub?: string }) {
+/** The signature bar is opt-in: at most one per screen. */
+export function SectionHead({ title, sub, bar }: { title: string; sub?: string; bar?: boolean }) {
   return (
     <div className="section-head">
-      <div className="section-titles">
+      <div className={bar ? 'section-titles section-titles-bar' : 'section-titles'}>
         <h2>{title}</h2>
         {sub && <span>{sub}</span>}
       </div>

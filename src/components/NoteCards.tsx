@@ -1,12 +1,9 @@
 import type { Fact, Note } from '../mock';
 import { Icon } from './Icon';
-import { Collapse } from './Layout';
-import { QrPreview } from './QrPreview';
-import { CrewSection } from './CrewStack';
 import { NotePrimaryAction } from './NotePrimaryAction';
 import { chipStyle } from '../lib/noteStyle';
 import { useNoteActions } from '../lib/actions';
-import { cardSubtitle, cardTiles, dayStub, hasScanCode, quickAction, timeSub, timeText, TYPE_LABEL } from '../lib/notes';
+import { cardSubtitle, cardTiles, dayStub, timeText } from '../lib/notes';
 
 /** Codes and addresses are worth copying; "to be confirmed" is not. */
 export const isCopyable = (f: Pick<Fact, 'action' | 'unconfirmed'>) => !f.unconfirmed && (f.action === 'copy' || f.action === 'map');
@@ -32,8 +29,8 @@ export function FactActions({ fact, size = 'md' }: { fact: Fact; size?: 'sm' | '
 }
 
 /**
- * A top smart note, kept short so a few fit on a screen: the header row, the two facts you
- * most often act on, and one action. The rest (QR code, note text, crew) is one tap away in the sheet.
+ * The one smart note card, on Home and in the Calendar: the header row, the two facts you most
+ * often act on, and one action. The rest (QR code, note text, crew) is one tap away in the sheet.
  */
 export function ContentCard({ note }: { note: Note }) {
   const a = useNoteActions();
@@ -86,77 +83,5 @@ export function ContentCard({ note }: { note: Note }) {
         </div>
       )}
     </article>
-  );
-}
-
-/** Compact, tap-to-expand note row used in the full list and the calendar. */
-export function NoteRow({ note, open, onToggle, withPrimary }: { note: Note; open: boolean; onToggle: () => void; withPrimary?: boolean }) {
-  const a = useNoteActions();
-  const q = quickAction(note);
-  const bodyId = `row-${note.id}-${withPrimary ? 'cal' : 'home'}`;
-  const pa = note.primaryAction;
-  return (
-    <div className={`nrow${note.kind === 'undated' ? ' nrow-dashed' : ''}`}>
-      <div className="nrow-top">
-        <button type="button" className="nrow-toggle" aria-expanded={open} aria-controls={bodyId} onClick={onToggle}>
-          <span className="stub">
-            <span className={`stub-time${note.kind === 'time' ? '' : ' stub-time-sm'}${note.kind === 'undated' ? ' stub-muted' : ''}`}>{timeText(note)}</span>
-            <span className="stub-sub">{timeSub(note)}</span>
-          </span>
-          <span className="chip-icon" style={chipStyle(note.type)}>
-            <Icon name={note.type} size={18} />
-          </span>
-          <span className="row-titles">
-            <span className={`row-t1${note.type === 'flight' ? ' row-t1-route' : ''}`}>{note.title}</span>
-            <span className="row-t2">
-              {/* The coloured chip already says the type; keep it for screen readers. */}
-              <span className="sr-only">{TYPE_LABEL[note.type]} · </span>
-              {note.subtitle}
-            </span>
-          </span>
-          <span className="chev" data-open={open}>
-            <Icon name="down" size={18} color="#9AAAAC" />
-          </span>
-        </button>
-        {q && (
-          <button
-            type="button"
-            className="nrow-quick"
-            aria-label={q === 'ticket' ? 'Show boarding pass' : `Open attachment ${note.attachments[0].file}`}
-            onClick={() => a.quick(note)}
-          >
-            <Icon name={q === 'ticket' ? 'ticket' : 'clip'} size={20} color="currentColor" />
-            <span>{q === 'ticket' ? 'Ticket' : 'PDF'}</span>
-          </button>
-        )}
-      </div>
-      <Collapse open={open} id={bodyId}>
-        <div className="nrow-body">
-          {hasScanCode(note) && <QrPreview note={note} />}
-          {note.facts.map((f) => (
-            <div className="nrow-fact" key={f.label}>
-              <span className="nrow-fact-text">
-                <span className="tile-k">{f.label}</span>
-                <span className={`nrow-fv${f.unconfirmed ? ' muted' : ''}`}>{f.value}</span>
-              </span>
-              <FactActions fact={f} size="sm" />
-            </div>
-          ))}
-          {!note.facts.length && note.text && <p className="nrow-text">{note.text}</p>}
-          <CrewSection note={note} />
-          <div className="btn-row">
-            <button type="button" className="btn btn-soft" onClick={() => a.openNote(note.id)}>
-              {withPrimary ? 'Details' : 'Open details'}
-            </button>
-            {withPrimary && pa && (
-              <button type="button" className="btn btn-primary btn-grow" onClick={() => a.primary(note)}>
-                <Icon name={pa.kind === 'boardingPass' ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
-                {pa.short}
-              </button>
-            )}
-          </div>
-        </div>
-      </Collapse>
-    </div>
   );
 }

@@ -1,0 +1,61 @@
+/* One-page smart note: the boarding pass sits inside the flight note. Flat: tones only, no shadows or rims. */
+.pass {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+/* Plain white around the code so scanners read it in any theme. */
+.pass-code {
+  padding: var(--sp-3);
+  border-radius: var(--r-card);
+  background: #ffffff;
+  line-height: 0;
+}
+.pass-code svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.pass-line {
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-1);
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+.pass-line strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.pass-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+.pass-tool {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-3);
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--card-2);
+  color: var(--ink);
+  font-size: var(--fs-1);
+  font-weight: 400;
+}
+.pass-tool[aria-pressed='true'] {
+  background: var(--lime);
+  color: var(--on-lime);
+}
+.pass-warn {
+  font-size: var(--fs-2);
+  font-weight: 600;
+  color: var(--ink);
+}
+.pass-open {
+  width: 100%;
+}

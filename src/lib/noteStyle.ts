@@ -11,6 +11,7 @@ export const TYPE_COLOR: Record<NoteType, { fg: string; bg: string; dot: string 
   hotel: { fg: '#D4A8F0', bg: 'rgba(212, 168, 240, 0.14)', dot: '#D4A8F0' },
   rental: { fg: '#F5B27A', bg: 'rgba(245, 178, 122, 0.14)', dot: '#F5B27A' },
   plain: { fg: '#F4A3BD', bg: 'rgba(244, 163, 189, 0.14)', dot: '#F4A3BD' },
+  task: { fg: '#D7E336', bg: 'rgba(215, 227, 54, 0.14)', dot: '#D7E336' },
 };
 
 /** Inline style for an icon chip of this type. */

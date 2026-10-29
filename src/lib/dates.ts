@@ -74,6 +74,11 @@ export function relativeDay(iso: string, todayIso: string): string {
   return n > 1 ? `in ${n} days` : `${-n} days ago`;
 }
 
+export const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/** "HH:MM" for minutes since midnight. */
+export const fmtHHMM = (min: number) => `${pad2(Math.floor(min / 60))}:${pad2(min % 60)}`;
+
 export const toMinutes = (hhmm: string) => {
   const [h, m] = hhmm.split(':').map(Number);
   return h * 60 + m;

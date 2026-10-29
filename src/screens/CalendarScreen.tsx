@@ -1,15 +1,14 @@
-import { useRef, type CSSProperties } from 'react';
+import { useMemo, useRef } from 'react';
 import '../styles/calendar.css';
 import { useActiveLink, useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type WorkDay } from '../mock';
 import { ForChip } from '../components/ForChip';
-import { TimerChip } from '../components/TimerChip';
 import { UnsentMark } from '../components/UnsentMark';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
-import { NoteRow } from '../components/NoteCards';
-import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
-import { sortNotes } from '../lib/notes';
+import { ContentCard } from '../components/NoteCards';
+import { addDays, dayOfMonth, diffDays, fmtDayMonth, fmtMonthYear, isSameMonth, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
+import { sortNotes, visibleNotes } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
 
@@ -30,19 +29,19 @@ function hoursNotSent(iso: string, submitted: string[], workdays: WorkDay[]): bo
   return !submitted.includes(iso);
 }
 
-/** The corner mark of a day: hours still open. Call sheets are reached from the day's chip below the grid. */
-function DayMarks({ unsent }: { unsent: boolean }) {
-  if (!unsent) return null;
-  return (
-    <span className="day-marks" aria-hidden="true">
-      <UnsentMark />
-    </span>
-  );
+/** One badge on the day's disc when it has any note: it only says there is something inside. */
+function Badge({ notes }: { notes: Note[] }) {
+  return notes.length > 0 ? <i className="day-badge" /> : null;
 }
 
-/** One dot when the day has any note: it only says there is something inside. */
-function Dots({ notes }: { notes: Note[] }) {
-  return <span className="wday-dots">{notes.length > 0 && <i />}</span>;
+/** The week strip's disc: the date, dimmer when the day holds no notes. */
+function Disc({ iso, notes }: { iso: string; notes: Note[] }) {
+  return (
+    <span className={`wday-disc${notes.length ? ' has-notes' : ''}`}>
+      {dayOfMonth(iso)}
+      <Badge notes={notes} />
+    </span>
+  );
 }
 
 /** Which way the last prev/next went, so the new week or month slides in from that side. */
@@ -67,8 +66,6 @@ export function CalendarScreen() {
   const shiftCal = useDemo((s) => s.shiftCal);
   const setCalDate = useDemo((s) => s.setCalDate);
   const toggleMonth = useDemo((s) => s.toggleCalMonth);
-  const expanded = useDemo((s) => s.expanded.calendar);
-  const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const openSheet = useDemo((s) => s.openSheet);
   const navigate = useDemo((s) => s.navigate);
   const openLog = useDemo((s) => s.setLogOpen);
@@ -76,18 +73,18 @@ export function CalendarScreen() {
   // The logged days belong to the crew link in use, so a colleague's link shows their hours, not yours.
   const workdays = workdaysFor(useDemo((s) => s.activeLinkId));
 
-  const notes = empty ? [] : allNotes;
+  const masterDataDone = useDemo((s) => s.masterDataDone);
+  const notes = useMemo(() => visibleNotes(empty ? [] : allNotes, { masterDataDone, isMe: link.isMe }), [empty, masterDataDone, link.isMe]);
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
   const monday = mondayOf(calDate);
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
-  const selIndex = days.indexOf(calDate);
   const weekDir = useSlideDir(monday);
   const monthDir = useSlideDir(calMonth);
   const grid = monthGrid(calMonth);
 
   const dayNotes = notesOn(calDate);
   const rel = relativeDay(calDate, today.date);
-  const dayLabel = rel === 'today' ? `Today · ${fmtDayMonth(calDate)}` : rel === 'tomorrow' ? `Tomorrow · ${fmtDayMonth(calDate)}` : fmtDayMonth(calDate);
+  const relWord = rel === 'today' || rel === 'tomorrow' || rel === 'yesterday' ? rel[0].toUpperCase() + rel.slice(1) : '';
   const unit = monthOpen ? 'month' : 'week';
   const dayAria = (iso: string, n: number) =>
     [
@@ -103,41 +100,37 @@ export function CalendarScreen() {
   const isToday = calDate === today.date;
   // The Hours sheet only offers Send for logged drafts; a past shoot day nobody logged has nothing to send.
   const loggedDraft = workdays.some((w) => w.date === calDate && w.status === 'draft');
-  const label = monthOpen ? fmtMonthYear(calMonth) : monthLabel(days[0], days[6]);
+  const weekGap = Math.round(diffDays(monday, mondayOf(today.date)) / 7);
+  const label = monthOpen ? fmtMonthYear(calMonth) : weekGap === 0 ? 'This Week' : weekGap === 1 ? 'Next Week' : weekGap === -1 ? 'Last Week' : monthLabel(days[0], days[6]);
 
   return (
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <div className="gh-titlebar">
-          <div className="gh-titles">
-            <button type="button" className="month-toggle" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
-              {/* On a colleague's link the chip takes the place of the week number, and the month is short ("Oct 2026"), so the label fits beside the arrows. */}
-              <span>
-                {link.isMe ? label : label.replace(/^([A-Z][a-z]{2})[a-z]+(?= \d)/, '$1')}
-                {link.isMe ? !monthOpen && ` · CW ${isoWeek(monday)}` : ' · '}
-              </span>
-              <ForChip compact bare />
-              <span className="chev" data-open={monthOpen}>
-                <Icon name="down" size={16} color="#C4CFD0" strokeWidth={1.8} />
-              </span>
-              <span className="sr-only">{monthOpen ? 'Show week' : 'Show whole month'}</span>
-            </button>
-            <h1 className="display">Calendar</h1>
-          </div>
-          <button type="button" className="icon-btn glass-btn" aria-label={`Previous ${unit}`} onClick={() => shiftCal(-1)}>
-            <Icon name="left" size={18} color="#FFFFFF" />
+        <div className="cal-bar">
+          <h1 className="sr-only">Calendar</h1>
+          <button type="button" className="cal-arrow" aria-label={`Previous ${unit}`} onClick={() => shiftCal(-1)}>
+            <Icon name="left" size={16} color="currentColor" strokeWidth={1.8} />
           </button>
-          <button type="button" className="icon-btn glass-btn" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
-            <Icon name="right" size={18} color="#FFFFFF" />
+          <button type="button" className="cal-label" aria-expanded={monthOpen} aria-controls="cal-month" onClick={toggleMonth}>
+            {label}
+            <ForChip compact bare />
+            <span className="chev" data-open={monthOpen}>
+              <Icon name="down" size={14} color="currentColor" strokeWidth={1.8} />
+            </span>
+            <span className="sr-only">{monthOpen ? 'Show week' : 'Show whole month'}</span>
           </button>
-          <TimerChip compact />
+          <button type="button" className="cal-arrow" aria-label={`Next ${unit}`} onClick={() => shiftCal(1)}>
+            <Icon name="right" size={16} color="currentColor" strokeWidth={1.8} />
+          </button>
+          <button type="button" className="cal-today" onClick={() => setCalDate(today.date)}>
+            Today
+          </button>
         </div>
 
         <div className="cal-panel" data-guide="calendar">
           <Collapse open={!monthOpen}>
             <div className="week-strip" role="group" aria-label="Days of the week">
-              <span className="wday-indicator" style={{ '--i': selIndex } as CSSProperties} aria-hidden="true" />
               <div key={monday} className={`week-days slide-${weekDir}`}>
                 {days.map((iso) => {
                   const isSel = iso === calDate;
@@ -151,10 +144,8 @@ export function CalendarScreen() {
                       aria-label={dayAria(iso, dn.length)}
                       onClick={() => setCalDate(iso)}
                     >
+                      <Disc iso={iso} notes={dn} />
                       <span className="wday-wd">{weekday(iso)}</span>
-                      <span className="wday-d">{dayOfMonth(iso)}</span>
-                      <Dots notes={dn} />
-                      <DayMarks unsent={hoursNotSent(iso, submitted, workdays)} />
                     </button>
                   );
                 })}
@@ -182,9 +173,10 @@ export function CalendarScreen() {
                       aria-label={dayAria(iso, dn.length)}
                       onClick={() => setCalDate(iso)}
                     >
-                      <span className="mday-d">{dayOfMonth(iso)}</span>
-                      <Dots notes={dn} />
-                      <DayMarks unsent={hoursNotSent(iso, submitted, workdays)} />
+                      <span className="mday-d">
+                        {dayOfMonth(iso)}
+                        <Badge notes={dn} />
+                      </span>
                     </button>
                   );
                 })}
@@ -197,10 +189,10 @@ export function CalendarScreen() {
       <Sheet className="sheet-cal">
         {offline && <OfflineBanner tone="dark" />}
         <div key={calDate} className="day-list">
-          <div className="day-heading">
-            <h2>{dayLabel}</h2>
-            {dayNotes.length > 0 && <span>{count(dayNotes.length)}</span>}
-          </div>
+          <h2 className="day-heading">
+            {fmtDayMonth(calDate)}
+            {(relWord || dayNotes.length > 0) && <span> · {[relWord, dayNotes.length > 0 && count(dayNotes.length)].filter(Boolean).join(' · ')}</span>}
+          </h2>
           {(callSheet || unsent) && (
             <div className="day-actions">
               {callSheet && (
@@ -231,7 +223,7 @@ export function CalendarScreen() {
           )}
           {dayNotes.length === 0 && <div className="empty-day">Nothing planned for this day</div>}
           {dayNotes.map((n) => (
-            <NoteRow key={n.id} note={n} withPrimary open={expanded === n.id} onToggle={() => toggleExpanded('calendar', n.id)} />
+            <ContentCard key={n.id} note={n} />
           ))}
         </div>
       </Sheet>

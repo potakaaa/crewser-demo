@@ -1,4 +1,4 @@
-/* Home deck, crew-pass tab bar, the + menu and the invoice scanner. Uses the v4 tokens only. */
+/* Home deck, tab bar and the invoice scanner. Uses the v4 tokens only. */
 
 /* ───────── Today deck ───────── */
 .deck {
@@ -13,6 +13,37 @@
   padding-bottom: 26px;
   touch-action: pan-y;
 }
+.deck-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+.deck-arrow {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink);
+}
+.deck-arrow:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+/* Icon button: no box; at either end of the deck the dead arrow disappears but keeps its place. */
+.deck-arrow:disabled {
+  visibility: hidden;
+}
+.deck-pos {
+  min-width: 48px;
+  text-align: center;
+  font-size: var(--fs-1);
+  color: var(--text-2);
+}
 .deck-stack.is-dragging {
   user-select: none;
   -webkit-user-select: none;
@@ -24,10 +55,6 @@
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
-  box-shadow:
-    inset 0 0 0 1px var(--rim),
-    var(--elev-1),
-    0 12px 28px rgba(0, 0, 0, 0.32);
   overflow: clip;
   transform-origin: 50% 100%;
   transition:
@@ -59,7 +86,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 14px 16px 16px;
+  padding: var(--sp-4) var(--sp-4) var(--sp-4);
+  /* Cards behind show only their edge; their content (the lime CTA) must not peek out. */
+  opacity: clamp(0, calc(1 - var(--slot, 0)), 1);
+  transition: opacity 260ms ease;
 }
 .deck-head {
   display: flex;
@@ -69,12 +99,12 @@
 }
 .deck-pill {
   flex: none;
-  padding: 4px 9px;
-  border-radius: 6px;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-control);
   background: var(--chip);
   color: var(--ink);
-  font-size: var(--fs-xs);
-  font-weight: 700;
+  font-size: var(--fs-1);
+  font-weight: 600;
   letter-spacing: 0.06em;
   line-height: 1.2;
 }
@@ -83,60 +113,44 @@
   color: var(--on-lime);
 }
 .deck-pill[data-tone='teal'] {
-  background: var(--teal);
-  color: var(--on-lime);
+  background: var(--chip);
+  color: var(--ink);
 }
 .deck-rel {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
   color: var(--text-3);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* 32 px to look at, 44 px to hit. */
-.deck-open {
-  position: relative;
-  flex: none;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--r-control);
-  background: var(--card-2);
-  color: var(--ink);
-  box-shadow: var(--elev-2);
-}
-.deck-open::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
+.deck-body[role='button']:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+  border-radius: var(--r-card);
 }
 .deck-main {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 10px;
+  gap: var(--sp-4);
+  margin-top: var(--sp-3);
 }
 .deck-time {
   flex: none;
-  font-size: calc(40px * var(--numeral-scale));
+  font-size: calc(var(--fs-6) * var(--numeral-scale));
   line-height: 1;
 }
 .deck-time-sm {
-  font-size: calc(28px * var(--numeral-scale));
+  font-size: calc(var(--fs-5) * var(--numeral-scale));
 }
 .deck-titles {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
 }
 .deck-t1,
 .deck-t2,
@@ -146,21 +160,21 @@
   white-space: nowrap;
 }
 .deck-t1 {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
   line-height: 1.25;
 }
 .deck-t2 {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 .deck-place {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-2);
   min-width: 0;
-  margin: 10px 0 0;
-  font-size: var(--fs-md);
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 .deck-place svg {
@@ -169,7 +183,7 @@
 .deck-empty {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-2);
   margin-top: var(--sp-3);
 }
 .deck-ctas {
@@ -178,7 +192,7 @@
   grid-auto-flow: column;
   gap: var(--sp-2);
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: var(--sp-4);
 }
 .deck-cta {
   min-height: 48px;
@@ -189,31 +203,9 @@
   background: var(--lime);
   color: var(--on-lime);
 }
-@media (hover: hover) {
-  .btn.btn-primary.deck-cta:hover {
-    background: var(--lime-hover);
-  }
-}
 .btn.btn-primary.deck-cta:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
-}
-.deck-sheet {
-  position: relative;
-  background: var(--card-2);
-  color: var(--ink);
-  font-weight: 600;
-  box-shadow: var(--elev-2);
-}
-.deck-new {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
-  border-radius: 4px;
-  background: var(--lime);
-  box-shadow: 0 0 0 2px var(--card-2);
 }
 
 /* Home's one-tap row: quieter than the deck's CTAs, icon tiles on the sheet. */
@@ -225,14 +217,13 @@
 .quick-tile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-3);
   min-height: 56px;
-  padding: 8px 10px;
+  padding: var(--sp-2) var(--sp-3);
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
   text-align: left;
   transition: transform 180ms var(--ease-out);
 }
@@ -251,38 +242,30 @@
   color: var(--lime);
 }
 .quick-t {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 
-/* ───────── The dock: Home, Calendar, the Pass and the + in one capsule ───────── */
+/* ───────── The dock: Home, Calendar, Documents, Contacts, Profile. Full width, flat, docked to the bottom ───────── */
 .dock {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px;
-  border: 1px solid var(--hairline);
-  border-radius: 30px;
-  background: rgba(40, 50, 53, 0.86);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  backdrop-filter: blur(22px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 10px 30px rgba(0, 0, 0, 0.4);
+  align-items: stretch;
+  background: var(--dark-tile);
 }
-/* Inactive icons: on-dark-2 on the dock, 7:1. The active one is lime with a dot under it. */
+/* Inactive icons: text-2 on the dock, 7:1. The active one is lime with a dot under it. */
 .dock-btn {
   position: relative;
-  width: 52px;
-  height: 48px;
+  flex: 1;
+  min-width: 0;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   border: 0;
-  border-radius: 24px;
+  border-radius: 0;
   background: none;
-  color: var(--on-dark-2);
+  color: var(--text-2);
   transition: color var(--t-fast) ease;
 }
 .dock-btn[data-on]:not(:has(.dock-avatar)) {
@@ -291,12 +274,12 @@
 .dock-btn[data-on]::after {
   content: '';
   position: absolute;
-  bottom: 3px;
+  bottom: 4px;
   left: 50%;
   width: 4px;
   height: 4px;
   margin-left: -2px;
-  border-radius: 2px;
+  border-radius: 50%;
   background: var(--lime);
 }
 .dock-btn:active > * {
@@ -306,263 +289,22 @@
   transition: transform 180ms var(--ease-out);
 }
 .dock-avatar {
-  position: relative;
   width: 30px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
+  border-radius: 50%;
   background: var(--chip);
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.28);
   color: var(--ink);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--fs-1);
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 .dock-btn[data-on] .dock-avatar {
-  box-shadow: 0 0 0 2px var(--lime);
-}
-/* Unread notifications: a small lime dot on the avatar; the count is in the Pass. */
-.dock-unread {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--lime);
-  box-shadow: 0 0 0 2px rgba(40, 50, 53, 1);
-}
-.dock-add {
-  width: 48px;
-  height: 48px;
-  margin-left: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: 24px;
-  background: var(--lime);
-  color: var(--on-lime);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transition:
-    transform 200ms var(--ease-spring),
-    background 150ms ease;
-}
-@media (hover: hover) {
-  .dock-add:hover {
-    background: var(--lime-hover);
-  }
-}
-.dock-add:active {
-  transform: scale(0.94);
-}
-.dock-add svg {
-  transition: transform 300ms var(--ease-spring);
-}
-.dock-add[aria-expanded='true'] svg {
-  transform: rotate(45deg);
-}
-.tb-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 11;
-  background: rgba(0, 0, 0, 0.45);
-  animation: fade-in var(--t-fast) ease both;
-}
-.tabbar-wrap.is-open {
-  z-index: 12;
-}
-/* The menus rise from the bar: the pass over the tabs, the + actions over the + button. */
-@keyframes tb-pop {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.96);
-  }
-}
-.tb-pass {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  width: min(320px, calc(100cqw - 32px));
-  translate: -50% 0;
-  padding: 18px 12px 12px;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card);
-  color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1), 0 18px 48px rgba(0, 0, 0, 0.45);
-  transform-origin: 72% 100%;
-  animation: tb-pop 280ms var(--ease-out) both;
-}
-/* The punched slot of a lanyard pass. */
-.tb-pass::before {
-  content: '';
-  position: absolute;
-  top: 7px;
-  left: 50%;
-  width: 34px;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--chip);
-  transform: translateX(-50%);
-}
-.tb-pass-head {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: 0 4px 12px;
-  /* The row takes vertical swipes (person switch); nothing in the Pass scrolls. */
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-/* The Pass's switch confirmation floats just above the card. */
-.fx-flash.tb-pass-pill {
-  top: auto;
-  bottom: calc(100% + 10px);
-}
-.tb-pass-avatar {
-  flex: none;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 22px;
-  background: var(--dark-tile);
-  color: var(--lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
-}
-.tb-pass-who {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.tb-pass-who strong {
-  overflow: hidden;
-  font-size: var(--fs-base);
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tb-pass-who span {
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tb-pass-tiles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-2);
-}
-.tb-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 76px;
-  padding: 10px 4px;
-  border: 1px solid transparent;
-  border-radius: var(--r-control);
-  background: var(--card-2);
-  color: var(--ink);
-  box-shadow: var(--elev-2);
-  transition: transform 180ms var(--ease-out);
-}
-.tb-tile:active {
-  transform: scale(0.97);
-}
-.tb-tile[aria-current='page'] {
-  border-color: var(--lime);
-}
-.tb-tile-t {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tb-pass-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 44px;
-  margin-top: var(--sp-2);
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: var(--ink);
-  font-size: var(--fs-md);
-  font-weight: 600;
-  text-align: left;
-}
-.tb-pass-row > span {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tb-dial {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 12px);
-  display: flex;
-  /* The first action sits nearest the +, and comes first for focus too. */
-  flex-direction: column-reverse;
-  align-items: flex-end;
-  gap: 10px;
-}
-.tb-dial-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 6px 6px 6px 18px;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card-2);
-  color: var(--ink);
-  font-size: var(--fs-base);
-  font-weight: 600;
-  box-shadow: var(--elev-2), 0 12px 32px rgba(0, 0, 0, 0.4);
-  transform-origin: 100% 100%;
-  animation: tb-pop 260ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 50ms);
-  transition: transform 180ms var(--ease-out);
-}
-.tb-dial-item:active {
-  transform: scale(0.97);
-}
-.tb-dial-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--r-control);
-  background: var(--lime);
-  color: var(--on-lime);
+  outline: 2px solid var(--lime);
 }
 @media (prefers-reduced-motion: reduce) {
-  .tb-pass,
-  .tb-dial-item,
-  .tb-scrim {
-    animation: none;
-  }
-  .dock-add svg,
   .dock-btn > * {
     transition: none;
   }
@@ -572,7 +314,7 @@
 .inv {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sp-4);
 }
 .inv-finder {
   position: relative;
@@ -592,15 +334,14 @@
   width: 60%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 14px 12px 18px;
-  border-radius: 2px;
+  gap: var(--sp-1);
+  padding: var(--sp-4) var(--sp-3) var(--sp-4);
+  border-radius: var(--r-control);
   background: #fbfaf6;
   color: #2a2a2a;
   font-family: var(--ff-screenplay);
-  font-size: 9px;
+  font-size: var(--fs-1);
   line-height: 1.2;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
   transform: rotate(-3deg);
   transition: transform var(--t-med) var(--ease-ios);
 }
@@ -608,25 +349,25 @@
   transform: rotate(0) scale(0.62);
 }
 .inv-paper-h {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--fs-1);
+  font-weight: 600;
   text-align: center;
 }
 .inv-paper-s {
-  margin-bottom: 6px;
+  margin-bottom: var(--sp-2);
   text-align: center;
   color: #6b6b6b;
 }
 .inv-paper-row {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sp-2);
 }
 .inv-paper-total {
-  margin-top: 6px;
-  padding-top: 6px;
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-2);
   border-top: 1px dashed #9a9a9a;
-  font-weight: 700;
+  font-weight: 600;
 }
 /* Lime corner brackets: where the receipt should sit. */
 .inv-corners {
@@ -662,9 +403,8 @@
   left: 16%;
   right: 16%;
   height: 2px;
-  border-radius: 1px;
+  border-radius: var(--r-control);
   background: var(--lime);
-  box-shadow: 0 0 14px 2px rgba(200, 224, 60, 0.7);
   animation: inv-scan 1100ms var(--ease-ios) both;
 }
 .inv-found {
@@ -673,12 +413,12 @@
   left: 50%;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 14px;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-card);
   background: var(--lime);
   color: var(--on-lime);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 600;
   white-space: nowrap;
   transform: translateX(-50%);
@@ -697,7 +437,7 @@
 }
 .inv-hint {
   margin: 0;
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
   text-align: center;
 }
@@ -705,9 +445,9 @@
   align-self: center;
   width: 72px;
   height: 72px;
-  padding: 5px;
+  padding: var(--sp-1);
   border: 3px solid var(--ink);
-  border-radius: 36px;
+  border-radius: 50%;
   background: var(--sheet);
   transition: transform 180ms var(--ease-out);
 }
@@ -730,44 +470,43 @@
   min-height: 44px;
 }
 .inv-result {
-  padding: 16px;
+  padding: var(--sp-4);
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
 }
 .inv-total {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  padding-bottom: 12px;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-3);
   border-bottom: 1px solid var(--hairline);
 }
 .inv-total-v {
-  font-size: calc(34px * var(--numeral-scale));
+  font-size: calc(var(--fs-6) * var(--numeral-scale));
   line-height: 1;
 }
 .inv-total-s {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   color: var(--text-2);
 }
 .inv-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 12px 0 0;
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0 0;
 }
 .inv-fields div {
   min-width: 0;
 }
 .inv-fields dt {
-  font-size: var(--fs-xs);
-  font-weight: 500;
+  font-size: var(--fs-1);
+  font-weight: 400;
   color: var(--text-3);
 }
 .inv-fields dd {
-  margin: 2px 0 0;
+  margin: var(--sp-1) 0 0;
   overflow: hidden;
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -784,7 +523,7 @@
   grid-column: 1 / -1;
   margin-bottom: var(--sp-2);
   padding: 0;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 600;
   color: var(--text-2);
 }
@@ -793,14 +532,13 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 var(--sp-4);
   border: 1px solid transparent;
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2);
-  font-size: var(--fs-md);
-  font-weight: 500;
+  font-size: var(--fs-2);
+  font-weight: 400;
 }
 .inv-cat input {
   position: absolute;
@@ -823,120 +561,28 @@
   gap: var(--sp-2);
 }
 
-/* ───────── Home header: swipe the avatar for a person, the project line for a project ───────── */
+/* Toast action button */
 .toast-action {
   flex: none;
   min-height: 32px;
-  margin: -6px -6px -6px 4px;
-  padding: 0 10px;
+  margin: -6px -6px -6px var(--sp-1);
+  padding: 0 var(--sp-3);
   border: 0;
   border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.12);
   color: var(--lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
+  font-size: var(--fs-2);
+  font-weight: 600;
   pointer-events: auto;
 }
-.who-block {
-  touch-action: none;
-}
-.who-avatar {
-  position: relative;
-  overflow: hidden;
-}
-.who-reel {
-  position: absolute;
-  inset: 0;
-  transform: translateY(var(--ay, 0));
-}
-.who-reel[data-glide='true'] {
-  transition: transform 200ms var(--ease-out);
-}
-.who-av {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.who-av-prev {
-  transform: translateY(-100%);
-}
-.who-av-next {
-  transform: translateY(100%);
-}
-.who-line-zone {
-  overflow: hidden;
-}
-.who-line {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  white-space: nowrap;
-  transform: translateX(var(--lx, 0));
-}
-.who-line[data-glide='true'] {
-  transition:
-    transform 200ms var(--ease-out),
-    opacity 200ms ease;
-}
-@keyframes who-in-right {
-  from {
-    transform: translateX(40px);
-    opacity: 0;
-  }
-}
-@keyframes who-in-left {
-  from {
-    transform: translateX(-40px);
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .who-reel[data-glide='true'],
-  .who-line[data-glide='true'] {
-    transition: none;
-  }
-  .who-line[data-enter] {
-    animation: none;
-  }
-}
-
 /* ───────── Switch turn-over: the screen visibly changes hands, even when the notes are the same ───────── */
 .fx-deck {
   position: relative;
-}
-@keyframes fx-x {
-  from {
-    translate: calc(var(--fx-dir, 1) * 56px) 0;
-    scale: 0.97;
-    opacity: 0;
-  }
-}
-@keyframes fx-y {
-  from {
-    translate: 0 calc(var(--fx-dir, 1) * 32px);
-    scale: 0.97;
-    opacity: 0;
-  }
 }
 @keyframes fx-fade {
   from {
     opacity: 0;
   }
-}
-.fx-in {
-  --fx-dir: 1;
-}
-.fx-in.fx-rev {
-  --fx-dir: -1;
-}
-.sheet.fx-project {
-  animation: fx-x 420ms var(--ease-out) both;
-}
-.sheet.fx-person {
-  animation: fx-y 420ms var(--ease-out) both;
 }
 .sheet.fx-fade {
   animation: fx-fade 300ms ease both;
@@ -952,188 +598,32 @@
   animation: fx-deal 380ms var(--ease-out) both;
   animation-delay: calc(var(--slot, 0) * 70ms);
 }
-.fx-deck.fx-project .deck-stack {
-  animation: fx-x 420ms var(--ease-out) both;
-}
-.fx-deck.fx-person .deck-stack {
-  animation: fx-y 420ms var(--ease-out) both;
-}
-/* Who you are now, over the deck, with Undo: lime with ink (12:1), floating on a soft shadow. */
-@keyframes fx-flash {
-  0% {
-    opacity: 0;
-    scale: 0.94;
-  }
-  7%,
-  88% {
-    opacity: 1;
-    scale: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-.fx-flash {
-  position: absolute;
-  z-index: 20;
-  top: 64px;
-  left: 50%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: max-content;
-  max-width: calc(100% - 16px);
-  padding: 10px 10px 10px 10px;
-  border-radius: var(--r-card);
-  background: var(--lime);
-  color: var(--on-lime);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
-  transform: translateX(-50%);
-  animation: fx-flash 3000ms var(--ease-out) both;
-}
-.fx-flash-av {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  background: var(--on-lime);
-  color: var(--lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
-}
-.fx-flash-text {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.fx-flash-text strong {
-  overflow: hidden;
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.fx-flash-text span {
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.fx-flash-undo {
-  flex: none;
-  min-height: 44px;
-  margin-left: 4px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: var(--r-control);
-  background: rgba(23, 32, 34, 0.12);
-  color: var(--on-lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
-}
-.fx-flash-undo:focus-visible {
-  outline: 2px solid var(--on-lime);
-  outline-offset: 2px;
-}
-/* Header: the avatar rolls in with a lime ring, the new project name lights up. */
-@keyframes who-roll {
-  from {
-    transform: rotateX(90deg);
-    opacity: 0;
-  }
-}
-@keyframes who-ring {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-.who-av[data-turn] {
-  animation: who-roll 360ms var(--ease-out) both;
-}
-.who-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 2px var(--lime);
-  pointer-events: none;
-  animation: who-ring 700ms ease-out both;
-}
-@keyframes who-hl {
-  from {
-    color: var(--lime);
-  }
-}
-.who-line[data-enter] {
-  animation:
-    who-in-right 260ms var(--ease-out) both,
-    who-hl 900ms ease-out both;
-}
-.who-line[data-enter='left'] {
-  animation:
-    who-in-left 260ms var(--ease-out) both,
-    who-hl 900ms ease-out both;
-}
 @media (prefers-reduced-motion: reduce) {
   .sheet.fx-in,
-  .fx-deck.fx-in .deck-stack,
   .fx-deck.fx-in .deck-card {
     animation: fx-fade 300ms ease both;
   }
-  .fx-flash {
-    animation-name: fx-fade-out;
-    scale: none;
-  }
-  .who-av[data-turn],
-  .who-line[data-enter] {
-    animation: who-hl 900ms ease-out both;
-  }
-  .who-av[data-turn] {
-    animation: none;
-  }
-}
-@keyframes fx-fade-out {
-  0%,
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
 }
 
-/* ───────── Work timer chip, in every header where the bell was ───────── */
-.timer-chip {
+/* ───────── Home header buttons: the project/person switch ───────── */
+.home-icon-btn {
+  position: relative;
+  flex: none;
+}
+
+/* ───────── Work timer: live time inside the Track time tile ───────── */
+.quick-tile {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Hold to start: a lime fill sweeps across the tile over HOLD_MS (500 ms) and drains back on an early release. */
+.quick-tile {
   position: relative;
   isolation: isolate;
-  flex: none;
-  align-self: flex-start;
-  height: 44px;
-  min-width: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 12px;
-  border-radius: var(--r-control);
   overflow: hidden;
-  font-size: var(--fs-md);
-  font-weight: 600;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  touch-action: manipulation;
 }
-/* Hold to start: a lime fill sweeps across the chip over HOLD_MS (500 ms). */
-.timer-ring {
+.quick-fill {
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -1141,24 +631,36 @@
   opacity: 0.35;
   transform: scaleX(0);
   transform-origin: left;
+  transition: transform 200ms var(--ease-out);
 }
-.timer-chip[data-holding] .timer-ring {
+.quick-tile[data-holding] .quick-fill {
   transform: scaleX(1);
   transition: transform 500ms linear;
 }
-.timer-chip.is-on {
-  border: 0;
-  background: var(--lime);
-  color: var(--on-lime);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+@media (prefers-reduced-motion: reduce) {
+  .quick-fill,
+  .quick-tile[data-holding] .quick-fill {
+    transition: none;
+  }
+  .quick-tile[data-holding] .quick-fill {
+    opacity: 0.6;
+  }
 }
-.timer-chip.is-on[data-paused] {
-  background: var(--card-2);
+.quick-tile[data-paused] .timer-dot {
+  animation: none;
+  opacity: 0.5;
+}
+.quick-t-timer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--lime);
+}
+.quick-tile[data-paused] .quick-t-timer {
   color: var(--ink);
-  box-shadow: var(--elev-2);
 }
 .timer-time {
-  font-size: var(--fs-base);
+  font-size: var(--fs-2);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
@@ -1170,38 +672,20 @@
 .timer-dot {
   width: 7px;
   height: 7px;
-  border-radius: 4px;
+  border-radius: 50%;
   background: currentColor;
   animation: timer-pulse 1.6s ease-in-out infinite;
-}
-.timer-chip[data-paused] .timer-dot {
-  animation: none;
-  opacity: 0.5;
 }
 @media (prefers-reduced-motion: reduce) {
   .timer-dot {
     animation: none;
   }
 }
-.tb-pass-row > .tb-pass-count {
-  flex: none;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: var(--lime);
-  color: var(--on-lime);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-}
 .tsheet {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
   padding: var(--sp-2) 0 var(--sp-1);
 }
 .tsheet-time {
@@ -1211,7 +695,7 @@
 }
 .tsheet-sub {
   margin: 0 0 var(--sp-4);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   color: var(--text-2);
 }
 .tsheet-actions {
@@ -1228,7 +712,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--on-dark-2);
+  color: var(--text-2);
 }
 .is-sel .unsent-mark {
   color: var(--on-lime);
@@ -1241,7 +725,7 @@
 .who-person {
   min-width: 0;
   overflow: hidden;
-  font-size: var(--fs-lg);
+  font-size: var(--fs-3);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.25;
@@ -1252,9 +736,9 @@
   color: var(--lime);
 }
 .home-greet .home-project {
-  font-size: var(--fs-md);
-  font-weight: 500;
-  color: var(--on-dark-2);
+  font-size: var(--fs-2);
+  font-weight: 400;
+  color: var(--text-2);
 }
 .who-name {
   min-width: 0;
@@ -1264,7 +748,7 @@
 .lrow-name {
   display: flex;
   align-items: baseline;
-  gap: 5px;
+  gap: var(--sp-1);
   min-width: 0;
 }
 .lrow-name-t {
@@ -1275,7 +759,7 @@
 }
 .lrow-you {
   flex: none;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-3);
 }
 
@@ -1284,13 +768,12 @@
   /* The sheet the ticket sits on (.log-dialog is --card in both tones), for the notches. */
   --notch-bg: var(--card);
   position: relative;
-  padding: 18px 18px 0;
+  padding: var(--sp-4) var(--sp-4) 0;
   border-radius: var(--r-card);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02) 60%),
     var(--card);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
 }
 .nticket-route {
   display: flex;
@@ -1301,7 +784,7 @@
 .nticket-port {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-1);
   min-width: 0;
 }
 .nticket-port-to {
@@ -1310,30 +793,30 @@
 }
 .nticket-plane {
   flex: none;
-  margin-top: 10px;
+  margin-top: var(--sp-3);
   color: var(--lime);
 }
 .nticket-facts {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
-  margin: 16px 0 0;
-  padding-bottom: 16px;
+  margin: var(--sp-4) 0 0;
+  padding-bottom: var(--sp-4);
 }
 .nticket-facts dt {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-1);
   color: var(--text-3);
 }
 .nticket-facts dd {
-  margin: 2px 0 0;
-  font-size: var(--fs-lg);
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-3);
   font-weight: 600;
 }
 /* The stub: a dashed tear line with a half-circle notch cut into each edge (circles in the sheet's colour). */
 .nticket-stub {
   position: relative;
   margin: 0 -18px;
-  padding: 16px 18px 18px;
+  padding: var(--sp-4) var(--sp-4) var(--sp-4);
   border-top: 1.5px dashed var(--line);
 }
 .nticket-stub::before,
@@ -1345,7 +828,6 @@
   height: 20px;
   border-radius: 50%;
   background: var(--notch-bg);
-  box-shadow: inset 0 0 0 1px var(--rim);
 }
 .nticket-stub::before {
   left: -10px;
@@ -1355,13 +837,14 @@
   right: -10px;
   clip-path: inset(0 50% 0 0);
 }
-.nticket-stub .qr-preview {
-  border: 0;
-  padding: 0;
-  background: none;
-}
 
 /* ───────── First-visit guide: dim everything but the spotlit target ───────── */
+@keyframes guide-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
 .guide {
   position: absolute;
   inset: 0;
@@ -1377,13 +860,12 @@
   pointer-events: auto;
   background: rgba(0, 0, 0, 0.6);
 }
-/* The hole draws the dim for the whole screen with one big shadow, plus the lime outline. */
+/* The hole draws the dim for the whole screen with one huge outline, plus a lime edge. */
 .guide-hole {
   position: absolute;
   border-radius: var(--r-card);
-  box-shadow:
-    0 0 0 2px var(--lime),
-    0 0 0 9999px rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--lime);
+  outline: 9999px solid rgba(0, 0, 0, 0.6);
   transition:
     left 260ms var(--ease-out),
     top 260ms var(--ease-out),
@@ -1391,16 +873,8 @@
     height 260ms var(--ease-out);
 }
 @keyframes guide-pulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 2px var(--lime),
-      0 0 0 9999px rgba(0, 0, 0, 0.6);
-  }
   50% {
-    box-shadow:
-      0 0 0 5px rgba(200, 224, 60, 0.45),
-      0 0 0 9999px rgba(0, 0, 0, 0.6);
+    border-color: rgba(200, 224, 60, 0.45);
   }
 }
 .guide-hole {
@@ -1410,13 +884,12 @@
   position: absolute;
   left: 16px;
   right: 16px;
-  padding: 14px 14px 10px 16px;
+  padding: var(--sp-4) var(--sp-4) var(--sp-3) var(--sp-4);
   border-radius: var(--r-card);
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2), 0 16px 40px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
-  animation: tb-pop 240ms var(--ease-out) both;
+  animation: guide-pop 240ms var(--ease-out) both;
 }
 /* The card takes focus only so its text is read first; it is not a control, so no ring. */
 .guide-card:focus {
@@ -1428,12 +901,12 @@
 }
 .guide-t {
   margin: 0;
-  font-size: var(--fs-lg);
-  font-weight: 700;
+  font-size: var(--fs-3);
+  font-weight: 600;
 }
 .guide-b {
-  margin: 4px 0 0;
-  font-size: var(--fs-md);
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-2);
   line-height: 1.45;
   color: var(--text-2);
 }
@@ -1441,11 +914,11 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  margin-top: 8px;
+  margin-top: var(--sp-2);
 }
 .guide-count {
   margin-right: auto;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-1);
   font-weight: 600;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
@@ -1453,12 +926,12 @@
 .guide-skip,
 .guide-next {
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 var(--sp-4);
   border: 0;
   border-radius: var(--r-control);
   background: none;
   color: var(--text-2);
-  font-size: var(--fs-md);
+  font-size: var(--fs-2);
   font-weight: 600;
 }
 .guide-next {

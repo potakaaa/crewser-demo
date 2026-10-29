@@ -4,8 +4,8 @@ import { useDemo } from '../store';
 import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
-import { quickAction, TYPE_LABEL } from '../lib/notes';
-import { callSheetFor, callSheetNear, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
+import { primaryIcon, quickAction, TYPE_LABEL } from '../lib/notes';
+import { phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { dayWord } from './docs/docs';
 import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
@@ -52,7 +52,6 @@ interface CardModel {
 function DeckCard({ card }: { card: CardModel }) {
   const a = useNoteActions();
   const setLogOpen = useDemo((s) => s.setLogOpen);
-  const showToast = useDemo((s) => s.showToast);
   const offline = useDemo((s) => s.offline);
   const start = useDemo((s) => s.logStart);
   const end = useDemo((s) => s.logEnd);
@@ -77,10 +76,6 @@ function DeckCard({ card }: { card: CardModel }) {
 
   const isHero = !card.stop;
   const phase = phaseOf(n);
-  // Every card offers the call sheet for its day; a day without one gets the next issued (else the latest), so it never dead-ends.
-  const sheet = callSheetNear(n.day ?? today.date);
-  // A shoot day's sheet is its own: until it is issued, say so instead of opening another day's.
-  const notOut = n.type === 'appointment' && !!n.day && !callSheetFor(n.day);
   const attachment = !n.primaryAction && quickAction(n);
   const time = n.kind === 'time' ? n.time : 'All day';
   // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
@@ -113,10 +108,9 @@ function DeckCard({ card }: { card: CardModel }) {
       </button>
     );
   } else if (n.primaryAction) {
-    const boarding = n.primaryAction.kind === 'boardingPass';
     primary = (
       <button type="button" className="btn btn-primary deck-cta" onClick={() => a.primary(n)}>
-        <Icon name={boarding ? 'ticket' : 'nav'} size={16} color="currentColor" strokeWidth={1.8} />
+        <Icon name={primaryIcon(n.primaryAction.kind)} size={16} color="currentColor" strokeWidth={1.8} />
         {n.primaryAction.short}
       </button>
     );
@@ -133,7 +127,20 @@ function DeckCard({ card }: { card: CardModel }) {
   if (import.meta.env.DEV) console.assert(![status.pill, status.rel, sub, where].some((t) => String(t).includes('undefined')), 'deck card text has undefined', n.id);
 
   return (
-    <div className="deck-body">
+    <div
+      className="deck-body"
+      onClick={(e) => !(e.target as Element).closest('button') && a.openNote(n.id)}
+      // Without a CTA the body is the card's only way in, so the keyboard gets it too.
+      {...(!primary && {
+        role: 'button',
+        tabIndex: 0,
+        onKeyDown: (e: KeyboardEvent<HTMLElement>) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          a.openNote(n.id);
+        },
+      })}
+    >
       {/* Always in the hero card, so a screen reader hears the change when hours are sent. */}
       {isHero && (
         <p className="sr-only" role="status">
@@ -145,9 +152,6 @@ function DeckCard({ card }: { card: CardModel }) {
           {status.pill}
         </span>
         <span className="deck-rel">{status.rel}</span>
-        <button type="button" className="deck-open" onClick={() => a.openNote(n.id)} aria-label={`${n.title}. Open details`}>
-          <Icon name="arrowUpRight" size={18} color="currentColor" strokeWidth={1.8} />
-        </button>
       </div>
       <div className="deck-main">
         <span className={`deck-time num${n.kind === 'time' ? '' : ' deck-time-sm'}`}>{time}</span>
@@ -163,21 +167,6 @@ function DeckCard({ card }: { card: CardModel }) {
         </p>
       )}
       <div className="deck-ctas">
-        {sheet && (
-          <button
-            type="button"
-            className="btn deck-cta deck-sheet"
-            aria-label={notOut ? `Call sheet for ${fmtDayShort(n.day!)}, not out yet` : `Open call sheet, ${sheet.title.replace('Call sheet · ', '')}${sheet.isNew ? ', updated' : ''}`}
-            onClick={() =>
-              notOut
-                ? showToast(`${fmtDayShort(n.day!)} call sheet isn't out yet. You'll get a notification when it is`, { label: 'Open latest', run: () => a.openPdf(sheet.file) })
-                : a.openPdf(sheet.file)
-            }
-          >
-            Call sheet
-            {sheet.isNew && !notOut && <span className="deck-new" aria-hidden="true" />}
-          </button>
-        )}
         {primary}
       </div>
     </div>
@@ -248,7 +237,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
   useEffect(() => {
     if (!keyTurn.current) return;
     keyTurn.current = false;
-    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) .deck-open')?.focus({ preventScroll: true });
+    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) :is(.deck-cta, .deck-body[role="button"])')?.focus({ preventScroll: true });
   }, [i]);
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     keyTurn.current = true;
@@ -311,6 +300,17 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
             </article>
           );
         })}
+      </div>
+      <div className="deck-nav">
+        <button type="button" className="deck-arrow" aria-label="Previous note" disabled={i === 0} onClick={() => go(i - 1)}>
+          <Icon name="left" size={20} color="currentColor" strokeWidth={2} />
+        </button>
+        <span className="deck-pos num" aria-hidden="true">
+          {i + 1} / {count}
+        </span>
+        <button type="button" className="deck-arrow" aria-label="Next note" disabled={i === count - 1} onClick={() => go(i + 1)}>
+          <Icon name="right" size={20} color="currentColor" strokeWidth={2} />
+        </button>
       </div>
       <p className="sr-only" aria-live="polite">
         {i > 0 ? `Card ${i + 1} of ${count}: ${label(i)}` : ''}

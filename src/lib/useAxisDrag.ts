@@ -7,19 +7,19 @@ type Axis = 'x' | 'y';
 
 interface Handlers {
   /** Distance along the claimed axis while the drag moves. */
-  onDrag: (d: number, axis: Axis) => void;
-  /** A claimed drag ended: distance, velocity in px/ms, whether the browser cancelled it, and the axis. */
-  onRelease: (d: number, v: number, cancelled: boolean, axis: Axis) => void;
+  onDrag: (d: number) => void;
+  /** A claimed drag ended: distance, velocity in px/ms, and whether the browser cancelled it. */
+  onRelease: (d: number, v: number, cancelled: boolean) => void;
   enabled?: boolean;
 }
 
 /**
- * Direction lock shared by the deck and the header: after LOCK_PX the gesture is judged once, by its dominant
- * direction. If that is an axis we take ('both' takes either), it is claimed (pointer capture, and a non-passive
+ * Direction lock for the deck: after LOCK_PX the gesture is judged once, by its dominant
+ * direction. If that is the axis we take, it is claimed (pointer capture, and a non-passive
  * touchmove preventDefault so iOS Safari stops scrolling); otherwise it is dropped for good and nothing moves.
  * Pair it with the matching touch-action in CSS.
  */
-export function useAxisDrag<T extends HTMLElement>(axes: Axis | 'both', h: Handlers) {
+export function useAxisDrag<T extends HTMLElement>(axis: Axis, h: Handlers) {
   const ref = useRef<T>(null);
   const g = useRef<{ x: number; y: number; axis: Axis | null; last: number; t: number; v: number } | null>(null);
   const swallow = useRef(false);
@@ -32,10 +32,9 @@ export function useAxisDrag<T extends HTMLElement>(axes: Axis | 'both', h: Handl
     const s = g.current;
     if (!s || s.axis) return !!s?.axis;
     if (Math.hypot(dx, dy) < LOCK_PX) return false;
-    const dominant: Axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-    if (axes === 'both' || axes === dominant) {
-      s.axis = dominant;
-      s.last = along({ clientX: s.x + dx, clientY: s.y + dy }, dominant);
+    if (axis === (Math.abs(dx) > Math.abs(dy) ? 'x' : 'y')) {
+      s.axis = axis;
+      s.last = along({ clientX: s.x + dx, clientY: s.y + dy }, axis);
       return true;
     }
     g.current = null;
@@ -61,7 +60,7 @@ export function useAxisDrag<T extends HTMLElement>(axes: Axis | 'both', h: Handl
     // The click that ends a drag must not also tap what is under the finger.
     swallow.current = true;
     window.setTimeout(() => (swallow.current = false), 0);
-    hr.current.onRelease(along(e, s.axis) - (s.axis === 'x' ? s.x : s.y), s.v, e.type === 'pointercancel', s.axis);
+    hr.current.onRelease(along(e, s.axis) - (s.axis === 'x' ? s.x : s.y), s.v, e.type === 'pointercancel');
   };
 
   return {
@@ -82,7 +81,7 @@ export function useAxisDrag<T extends HTMLElement>(axes: Axis | 'both', h: Handl
         if (dt > 0) s.v = (pos - s.last) / dt;
         s.last = pos;
         s.t = e.timeStamp;
-        hr.current.onDrag(pos - (s.axis === 'x' ? s.x : s.y), s.axis);
+        hr.current.onDrag(pos - (s.axis === 'x' ? s.x : s.y));
       },
       onPointerUp: end,
       onPointerCancel: end,

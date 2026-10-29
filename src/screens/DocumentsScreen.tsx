@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useActiveLink, useDemo } from '../store';
 import { docs, today, type Doc, type DocKind } from '../mock';
 import { ForChip } from '../components/ForChip';
-import { TimerChip } from '../components/TimerChip';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { callSheets, dayWord, KIND_TITLE, updatedLabel, type CallSheet } from '../components/docs/docs';
@@ -72,7 +71,7 @@ function CallSheetSection({ filtered }: { filtered: CallSheet[] }) {
   const rest = filtered.slice(RECENT);
   return (
     <section className="stack" aria-label={KIND_TITLE.callsheet}>
-      <SectionHead title={KIND_TITLE.callsheet} />
+      <SectionHead title={KIND_TITLE.callsheet} bar />
       <div className="dlist">
         {recent.map((d) => (
           <DocRow key={d.id} doc={d} />
@@ -116,7 +115,6 @@ export function DocumentsScreen() {
       <GradientHeader className="gh-compact">
         <ScreenTitle eyebrow={projectName} title="Documents">
           <ForChip compact />
-          <TimerChip />
         </ScreenTitle>
         <div className="fchips" role="group" aria-label="Filter documents">
           {FILTERS.map((f) => (

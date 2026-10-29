@@ -15,7 +15,6 @@ const JUMPS: { label: string; route?: Route; note?: string; log?: boolean; sheet
   { label: 'Contacts', route: { name: 'contacts' } },
   { label: 'Settings', route: { name: 'settings' } },
   { label: 'Flight note', note: 'fl' },
-  { label: 'Boarding pass', route: { name: 'ticket' } },
   { label: 'Ticket PDF', route: { name: 'pdf', file: 'Ticket_OS487.pdf' } },
   { label: 'Track time', log: true },
   { label: 'Scan invoice', sheet: 'invoice' },

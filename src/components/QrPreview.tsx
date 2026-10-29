@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import type { Note } from '../mock';
+import { useMemo, useState } from 'react';
+import { person, type Note } from '../mock';
 import { useDemo } from '../store';
 import { Icon } from './Icon';
 import { useNoteActions } from '../lib/actions';
@@ -17,8 +17,8 @@ export function QrCode({ size, label }: { size: number; label: string }) {
 }
 
 /**
- * Inline preview of a note's boarding-pass code, so it is visible without opening anything.
- * Tapping it opens the full-screen boarding pass. Without a readable code it says so.
+ * Small preview of a note's boarding-pass code in lists (an expanded row). Tapping it opens the note,
+ * where the code is shown large. Without a readable code it says so and opens the PDF.
  */
 export function QrPreview({ note }: { note: Note }) {
   const codeFound = useDemo((s) => s.codeFound);
@@ -26,7 +26,6 @@ export function QrPreview({ note }: { note: Note }) {
   const file = note.attachments[0]?.file ?? '';
 
   if (!codeFound) {
-    // Same tile as a found code, with an empty dashed slot where the code would be.
     return (
       <button type="button" className="qr-preview" onClick={() => a.openPdf(file)} aria-label={`No scannable code in ${file}. Open the PDF`}>
         <span className="qr-thumb qr-thumb-empty" aria-hidden="true">
@@ -46,7 +45,7 @@ export function QrPreview({ note }: { note: Note }) {
   }
 
   return (
-    <button type="button" className="qr-preview" onClick={a.openTicket} aria-label={`Boarding pass code from ${file}. Show full screen`}>
+    <button type="button" className="qr-preview" onClick={() => a.openNote(note.id)} aria-label={`Boarding pass code from ${file}. Open the note`}>
       <span className="qr-thumb">
         <QrCode size={76} label="" />
       </span>
@@ -54,10 +53,59 @@ export function QrPreview({ note }: { note: Note }) {
         <strong>Boarding pass</strong>
         <span>Code from {file}</span>
         <span className="qr-cta">
-          Show full screen
+          Open boarding pass
           <Icon name="arrowUpRight" size={14} strokeWidth={1.8} />
         </span>
       </span>
     </button>
+  );
+}
+
+function PassTool({ label, on, onChange, icon }: { label: string; on: boolean; onChange: (v: boolean) => void; icon: 'sun' }) {
+  return (
+    <button type="button" className="pass-tool" aria-pressed={on} onClick={() => onChange(!on)}>
+      <Icon name={icon} size={15} color="currentColor" strokeWidth={1.8} />
+      {label}
+    </button>
+  );
+}
+
+/** The boarding pass inside the flight note: the code at scanning size, the passenger, and the brightness switch. Without a readable code, the PDF is the pass. */
+export function BoardingPassCode({ note }: { note: Note }) {
+  const codeFound = useDemo((s) => s.codeFound);
+  const a = useNoteActions();
+  const [bright, setBright] = useState(true);
+  const file = note.attachments[0]?.file ?? '';
+
+  if (!codeFound) {
+    return (
+      <div className="pass" role="status">
+        <strong className="pass-warn">No scannable code in this PDF</strong>
+        <span className="pass-line">We could not read a QR, Aztec or PDF417 code in {file}. Show the original PDF at check-in and the gate.</span>
+        <button type="button" className="btn btn-primary btn-lg pass-open" onClick={() => a.openPdf(file)}>
+          <Icon name="file" size={18} color="currentColor" strokeWidth={1.8} />
+          Open original PDF
+        </button>
+      </div>
+    );
+  }
+
+  // A web page cannot change the phone's brightness, so the demo confirms with a toast.
+  const toggle = (what: string, set: (v: boolean) => void) => (v: boolean) => {
+    set(v);
+    a.toast(`${what} ${v ? 'on' : 'off'} (demo)`);
+  };
+  return (
+    <div className="pass">
+      <div className="pass-code">
+        <QrCode size={232} label={`Scannable boarding pass code from ${file}`} />
+      </div>
+      <p className="pass-line">
+        <strong>{person.displayName}</strong> · Code from {file}
+      </p>
+      <div className="pass-tools">
+        <PassTool icon="sun" label="Turn brightness up" on={bright} onChange={toggle('Full brightness', setBright)} />
+      </div>
+    </div>
   );
 }

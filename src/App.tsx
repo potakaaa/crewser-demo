@@ -14,7 +14,6 @@ import { CalendarScreen } from './screens/CalendarScreen';
 import { DocumentsScreen } from './screens/DocumentsScreen';
 import { ContactsScreen } from './screens/ContactsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
-import { BoardingPassScreen } from './screens/BoardingPassScreen';
 import { PdfViewerScreen } from './screens/PdfViewerScreen';
 
 const PHONE_QUERY = '(max-width: 480px)';
@@ -42,8 +41,6 @@ function Screen({ route }: { route: Route }) {
       return <ContactsScreen />;
     case 'settings':
       return <SettingsScreen />;
-    case 'ticket':
-      return <BoardingPassScreen />;
     case 'pdf':
       return <PdfViewerScreen file={route.file} />;
   }
@@ -98,7 +95,7 @@ export default function App() {
     );
   }
 
-  const statusTone = route.name === 'ticket' || (statusDark && !logOpen && route.name !== 'pdf') ? 'dark' : 'light';
+  const statusTone = statusDark && !logOpen && route.name !== 'pdf' ? 'dark' : 'light';
   const indicatorTone = route.name === 'pdf' ? 'light' : 'dark';
   return (
     <main className="page">

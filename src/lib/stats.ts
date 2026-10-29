@@ -77,6 +77,8 @@ export interface HoursOverview {
   /** Logged days in the last 7 days, today included, oldest first. */
   weekDays: DayStat[];
   weekTotal: number;
+  /** Hours per day worked in the last 7 days (0 with nothing logged). */
+  dailyAvg: number;
   overtime: number;
   /** Days of the last 7 that ran past the daily target. */
   overtimeDays: DayStat[];
@@ -88,7 +90,7 @@ export interface HoursOverview {
 }
 
 /**
- * The three big numbers on the dashboard and everything the hours sheet lists under them.
+ * The big numbers in Home's statistics and everything the hours sheet lists under them.
  * Today's shift counts once it has been sent (it lives in the Log sheet, not in the mock days).
  */
 export function hoursOverview(submitted: string[] = [], shift?: TodayShift | null, logged: WorkDay[] = workdays): HoursOverview {
@@ -104,6 +106,7 @@ export function hoursOverview(submitted: string[] = [], shift?: TodayShift | nul
     rangeLabel: rangeLabel(from, today.date),
     weekDays,
     weekTotal: round2(sum(weekDays.map((d) => d.hours))),
+    dailyAvg: weekDays.length ? round2(sum(weekDays.map((d) => d.hours)) / weekDays.length) : 0,
     overtime: round2(sum(weekDays.map((d) => d.overtime))),
     overtimeDays: weekDays.filter((d) => d.overtime > 0),
     shootDone,

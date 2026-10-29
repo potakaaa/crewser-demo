@@ -1,7 +1,6 @@
-import { useId, type ReactNode } from 'react';
-import { FONT_THEMES, useActiveLink, useDemo } from '../store';
-import { Icon, type IconName } from '../components/Icon';
-import { TimerChip } from '../components/TimerChip';
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { FONT_THEMES, type FontTheme, useActiveLink, useDemo, useUnreadCount } from '../store';
+import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
 import { usePrefs } from '../components/settings/prefs';
@@ -10,12 +9,9 @@ import { useScrollRestore } from '../lib/scroll';
 const VERSION = '3.4.0';
 
 /** Row that opens something (a sheet, a page). */
-function NavRow({ icon, title, value, onClick }: { icon: IconName; title: string; value?: string; onClick: () => void }) {
+function NavRow({ title, value, onClick }: { title: string; value?: string; onClick: () => void }) {
   return (
     <button type="button" className="setrow" onClick={onClick}>
-      <span className="chip-icon">
-        <Icon name={icon} size={20} color="currentColor" />
-      </span>
       <span className="setrow-main">{title}</span>
       {value && <span className="setrow-value">{value}</span>}
       <Icon name="right" size={18} color="#9AAAAC" />
@@ -23,13 +19,10 @@ function NavRow({ icon, title, value, onClick }: { icon: IconName; title: string
   );
 }
 
-function SwitchRow({ icon, title, hint, on, onToggle }: { icon: IconName; title: string; hint: string; on: boolean; onToggle: () => void }) {
+function SwitchRow({ title, hint, on, onToggle }: { title: string; hint: string; on: boolean; onToggle: () => void }) {
   const id = useId();
   return (
     <button type="button" className="setrow" role="switch" aria-checked={on} aria-labelledby={`${id}-t`} aria-describedby={`${id}-h`} onClick={onToggle}>
-      <span className="chip-icon">
-        <Icon name={icon} size={20} color="currentColor" />
-      </span>
       <span className="setrow-main">
         <span id={`${id}-t`}>{title}</span>
         <span className="setrow-hint" id={`${id}-h`}>
@@ -52,6 +45,98 @@ function Group({ title, sub, children }: { title: string; sub?: string; children
   );
 }
 
+/** Listbox rather than <select>: each option is drawn in its own typeface. */
+function FontSelect({ value, onChange }: { value: FontTheme; onChange: (v: FontTheme) => void }) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const btn = useRef<HTMLButtonElement>(null);
+  const id = useId();
+  const current = FONT_THEMES.find((f) => f.value === value) ?? FONT_THEMES[0];
+
+  useEffect(() => {
+    if (!open) return;
+    root.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus();
+    root.current?.querySelector('.fontsel-list')?.scrollIntoView({ block: 'nearest' });
+    const away = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', away);
+    return () => document.removeEventListener('pointerdown', away);
+  }, [open]);
+
+  const close = () => {
+    setOpen(false);
+    btn.current?.focus();
+  };
+  const pick = (v: FontTheme) => {
+    onChange(v);
+    close();
+  };
+  const onListKey = (e: KeyboardEvent<HTMLUListElement>) => {
+    const items = [...e.currentTarget.querySelectorAll<HTMLElement>('[role="option"]')];
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    const go = (n: number) => items[(n + items.length) % items.length]?.focus();
+    if (e.key === 'ArrowDown') go(i + 1);
+    else if (e.key === 'ArrowUp') go(i - 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(items.length - 1);
+    else if (e.key === 'Escape') close();
+    else if (e.key === 'Enter' || e.key === ' ') pick(FONT_THEMES[i].value);
+    else if (e.key === 'Tab') setOpen(false);
+    else return;
+    if (e.key !== 'Tab') e.preventDefault();
+  };
+
+  return (
+    <div className="fontsel" ref={root}>
+      <button
+        ref={btn}
+        type="button"
+        className="fontsel-btn"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={`${id}-list`}
+        onClick={() => setOpen(!open)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+      >
+        <FontOption f={current} />
+        <Icon name="down" size={18} color="currentColor" />
+      </button>
+      {open && (
+        <ul className="fontsel-list" id={`${id}-list`} role="listbox" aria-label="Font" onKeyDown={onListKey}>
+          {FONT_THEMES.map((f) => (
+            <li key={f.value} role="option" tabIndex={-1} aria-selected={f.value === value} className="fontsel-opt" onClick={() => pick(f.value)}>
+              <FontOption f={f} />
+              {f.value === value && <Icon name="check" size={16} color="currentColor" strokeWidth={2.4} />}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function FontOption({ f }: { f: (typeof FONT_THEMES)[number] }) {
+  return (
+    <>
+      <span className="fontopt-sample" data-font={f.value}>
+        {f.sample}
+      </span>
+      <span className="fontopt-text">
+        <span className="fontopt-label" data-font={f.value}>
+          {f.label}
+        </span>
+        <span className="fontopt-hint">{f.hint}</span>
+      </span>
+    </>
+  );
+}
+
 export function SettingsScreen() {
   const ref = useScrollRestore<HTMLDivElement>('settings', useDemo((s) => s.setStatusDark));
   const link = useActiveLink();
@@ -66,15 +151,14 @@ export function SettingsScreen() {
   const openSheet = useDemo((s) => s.openSheet);
   const startGuide = useDemo((s) => s.startGuide);
   const toast = useDemo((s) => s.showToast);
+  const unread = useUnreadCount();
   const { callSheetOut, hoursReminder, toggle } = usePrefs();
 
   return (
     <div className="screen" ref={ref}>
       <div className="sat-band" aria-hidden="true" />
       <GradientHeader className="gh-compact">
-        <ScreenTitle eyebrow={link.projectName} title="Settings">
-          <TimerChip />
-        </ScreenTitle>
+        <ScreenTitle eyebrow={link.projectName} title="Settings" />
       </GradientHeader>
 
       <Sheet className="sheet-compact">
@@ -137,54 +221,27 @@ export function SettingsScreen() {
           )}
         </section>
 
-        <Group title="Projects">
-          <div className="dlist">
-            <NavRow icon="users" title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
-          </div>
-        </Group>
-
-        <Group title="Help">
-          <div className="dlist">
-            <NavRow icon="sun" title="Show the guide again" onClick={startGuide} />
-          </div>
-        </Group>
-
-        <Group title="Font" sub="Headlines and numbers">
-          <div className="fontlist" role="group" aria-label="Font">
-            {FONT_THEMES.map((f) => {
-              const on = f.value === fontTheme;
-              return (
-                <button type="button" key={f.value} className="fontopt" aria-pressed={on} onClick={() => setFontTheme(f.value)}>
-                  <span className="fontopt-sample" data-font={f.value}>
-                    {f.sample}
-                  </span>
-                  <span className="fontopt-text">
-                    <span className="fontopt-label" data-font={f.value}>
-                      {f.label}
-                    </span>
-                    <span className="fontopt-hint">{f.hint}</span>
-                  </span>
-                  <span className="fontopt-check" aria-hidden="true">
-                    {on && <Icon name="check" size={14} color="#172022" strokeWidth={2.4} />}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </Group>
-
         <Group title="Notifications">
           <div className="dlist">
-            <SwitchRow icon="bell" title="Call sheet is out" hint="When tomorrow's call sheet is out" on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
-            <SwitchRow icon="logTime" title="Reminder to submit hours" hint="When days are still open at week's end" on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
+            <NavRow title="Notifications" value={unread ? `${unread} unread` : undefined} onClick={() => openSheet('notifications')} />
+            <SwitchRow title="Call sheet is out" hint="When tomorrow's call sheet is out" on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
+            <SwitchRow title="Reminder to submit hours" hint="When days are still open at week's end" on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
           </div>
         </Group>
 
         <Group title="App">
           <div className="dlist">
-            <NavRow icon="globe" title="Language" value="English" onClick={() => toast('More languages are not part of this demo')} />
-            <NavRow icon="shield" title="Privacy" onClick={() => toast('The privacy policy is not part of this demo')} />
-            <NavRow icon="file" title="Imprint" onClick={() => toast('The imprint is not part of this demo')} />
+            <NavRow title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
+            <NavRow title="Show the guide again" onClick={startGuide} />
+            <NavRow title="Language" value="English" onClick={() => toast('More languages are not part of this demo')} />
+          </div>
+          <FontSelect value={fontTheme} onChange={setFontTheme} />
+        </Group>
+
+        <Group title="Legal">
+          <div className="dlist">
+            <NavRow title="Privacy" onClick={() => toast('The privacy policy is not part of this demo')} />
+            <NavRow title="Imprint" onClick={() => toast('The imprint is not part of this demo')} />
           </div>
           <p className="setfoot">
             <Icon name="shield" size={16} color="#9AAAAC" />

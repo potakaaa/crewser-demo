@@ -27,8 +27,8 @@
   top: 1px;
   width: 10px;
   height: 5px;
-  border-radius: 2px;
-  background: var(--on-dark-2);
+  border-radius: var(--r-control);
+  background: var(--text-2);
   opacity: 0.75;
   transition:
     transform 160ms var(--ease-out),
@@ -45,7 +45,7 @@
 }
 /* Notes from earlier today: the same dot, quieter. */
 .tl .tl-dot {
-  background: var(--on-dark-3);
+  background: var(--text-3);
   opacity: 0.45;
 }
 
@@ -91,11 +91,11 @@
   z-index: 3;
   left: 50%;
   bottom: 3px;
-  padding: 1px 6px;
-  border-radius: 4px;
+  padding: 1px var(--sp-2);
+  border-radius: var(--r-control);
   background: var(--dark-tile);
   color: var(--lime);
-  font-size: 11px;
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 14px;

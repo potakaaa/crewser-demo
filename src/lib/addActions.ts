@@ -1,7 +1,7 @@
 import { useDemo } from '../store';
 import type { IconName } from '../components/Icon';
 
-/** The things crew add from anywhere: the + menu and Home's quick row show this same list. */
+/** The things crew add from anywhere: Home's quick row. */
 export interface AddAction {
   id: 'time' | 'invoice';
   label: string;

@@ -6,11 +6,11 @@ import { hoursOverview, todayPlan } from './lib/stats';
 import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { setGuideDone } from './lib/guide';
-import { addDays, addMonths, firstOfMonth, toMinutes } from './lib/dates';
+import { addDays, addMonths, firstOfMonth, fmtHHMM, toMinutes } from './lib/dates';
 
 export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'settings';
 
-export type Route = { name: TabName } | { name: 'ticket' } | { name: 'pdf'; file: string };
+export type Route = { name: TabName } | { name: 'pdf'; file: string };
 
 /** Things that open in a bottom sheet over the current tab. `id` picks the note, contact, project... */
 export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice' | 'timer';
@@ -58,18 +58,17 @@ const parseHash = (hash: string) => {
   return { head: m?.[1].toLowerCase(), arg: m?.[2]?.replace(/\/$/, '') || undefined };
 };
 
-/** Rewrite an old or loose hash (#home, #stats, #ticket...) to its canonical form, so the address bar matches the screen. */
+/** Rewrite an old or loose hash (#home, #stats...) to its canonical form, so the address bar matches the screen. */
 export function normalizeLocation() {
   if (typeof location === 'undefined' || hashToSheet(location.hash)) return;
   const canon = routeToHash(hashToRoute(location.hash));
   if (location.hash !== canon) history.replaceState(history.state, '', canon);
 }
 
-/** Accepts "#/pdf/x.pdf" and the bare-token form "#ticket" (for hosts that only pass plain anchors). Old #home and #stats land on the dashboard. */
+/** Accepts "#/pdf/x.pdf" and the bare-token form "#calendar" (for hosts that only pass plain anchors). Old #home and #stats land on the dashboard. */
 export function hashToRoute(hash: string): Route {
   const { head, arg } = parseHash(hash);
   if (head === 'calendar' || head === 'documents' || head === 'contacts' || head === 'settings') return { name: head };
-  if (head === 'ticket') return { name: 'ticket' };
   if (head === 'pdf' && arg) {
     const file = safeDecode(arg);
     if (file !== null && Object.hasOwn(pdfs, file)) return { name: 'pdf', file };
@@ -77,9 +76,10 @@ export function hashToRoute(hash: string): Route {
   return { name: 'dashboard' };
 }
 
-/** "#/note/fl" (or "#note-fl") is a deep link to a note: the dashboard with that note's sheet open. */
+/** "#/note/fl" (or "#note-fl") is a deep link to a note: the dashboard with that note's sheet open. "#ticket" opens the flight note, where the boarding pass is. */
 export function hashToSheet(hash: string): SheetState | null {
   const { head, arg } = parseHash(hash);
+  if (head === 'ticket') return { kind: 'note', id: 'fl' };
   return head === 'note' && arg && noteById(arg) ? { kind: 'note', id: arg } : null;
 }
 
@@ -87,7 +87,6 @@ const sameRoute = (a: Route | undefined, b: Route | undefined) => !!a && !!b && 
 
 /** The screen and sheet a deep link should go back to when the app was opened on it. */
 function fallbackFor(r: Route): { route: Route; reopen?: SheetState } {
-  if (r.name === 'ticket') return { route: { name: 'dashboard' }, reopen: { kind: 'note', id: 'fl' } };
   if (r.name === 'pdf') return { route: { name: 'dashboard' }, reopen: { kind: 'note', id: r.file === 'Ticket_OS487.pdf' ? 'fl' : 're' } };
   return { route: { name: 'dashboard' } };
 }
@@ -153,7 +152,7 @@ function saveTimer(t: WorkTimer | null) {
 /** "HH:MM" for minutes since midnight, rounded down to the Log sheet's 5-minute steps (clamped to the day). */
 const hhmm5 = (min: number) => {
   const r = Math.max(0, Math.min(23 * 60 + 55, Math.floor(min / 5) * 5));
-  return `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`;
+  return fmtHHMM(r);
 };
 
 /** When a timer of `elapsedMs` started on the demo clock: the demo's "now" is frozen, the elapsed time is real. */
@@ -169,7 +168,6 @@ function loadFontTheme(): FontTheme {
   return DEFAULT_FONT;
 }
 
-export type ExpandList = 'dashboard' | 'calendar';
 
 interface Toast {
   id: number;
@@ -197,7 +195,6 @@ interface DemoState {
   logStart: string;
   logEnd: string | null;
   homeAllOpen: boolean;
-  expanded: Record<ExpandList, string | null>;
   /** Selected day in the calendar (ISO). The week strip shows its week. */
   calDate: string;
   /** First day of the month shown when the month view is open (ISO). */
@@ -252,7 +249,6 @@ interface Actions {
   setBreak: (min: number) => void;
   setLogTime: (k: 'logStart' | 'logEnd', v: string | null) => void;
   toggleHomeAll: () => void;
-  toggleExpanded: (list: ExpandList, id: string) => void;
   /** Prev/next: a week in the week strip, a month in the month view. */
   shiftCal: (delta: number) => void;
   setCalDate: (iso: string) => void;
@@ -307,7 +303,6 @@ const initialState = (): DemoState => ({
   fontTheme: loadFontTheme(),
   ...logDefaults(),
   homeAllOpen: false,
-  expanded: { dashboard: null, calendar: null },
   calDate: today.date,
   calMonth: firstOfMonth(today.date),
   calMonthOpen: false,
@@ -541,14 +536,13 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     if (unsent) get().showToast(UNSENT_TOAST);
   },
   toggleHomeAll: () => set((s) => ({ homeAllOpen: !s.homeAllOpen })),
-  toggleExpanded: (list, id) => set((s) => ({ expanded: { ...s.expanded, [list]: s.expanded[list] === id ? null : id } })),
   shiftCal: (delta) =>
     set((s) =>
       s.calMonthOpen
         ? { calMonth: addMonths(s.calMonth, delta) }
-        : { calDate: addDays(s.calDate, delta * 7), expanded: { ...s.expanded, calendar: null } },
+        : { calDate: addDays(s.calDate, delta * 7) },
     ),
-  setCalDate: (iso) => set((s) => ({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false, expanded: { ...s.expanded, calendar: null } })),
+  setCalDate: (iso) => set({ calDate: iso, calMonth: firstOfMonth(iso), calMonthOpen: false }),
   toggleCalMonth: () => set((s) => ({ calMonthOpen: !s.calMonthOpen, calMonth: firstOfMonth(s.calDate) })),
   hideSplash: () => set({ splash: false }),
   submitDay: (iso) =>
@@ -631,5 +625,5 @@ export function useNotifications(): NotificationItem[] {
   );
 }
 
-/** Unread notifications of the active link, for the bell's badge. */
+/** Unread notifications of the active link, for the Settings Notifications row. */
 export const useUnreadCount = () => useNotifications().filter((n) => n.unread).length;
