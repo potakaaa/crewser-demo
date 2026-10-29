@@ -8,10 +8,9 @@
 /* ───────── Shared list card: rows separated by hairlines ───────── */
 .dlist {
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .dlist > * + *,
 .dlist-inner > * + * {
@@ -43,7 +42,7 @@
   flex: none;
   min-height: 40px;
   padding: 0 var(--sp-4);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid transparent;
   border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
@@ -76,7 +75,6 @@
   background: var(--brand-focal);
   color: #ffffff;
   text-align: left;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transition: transform 180ms var(--ease-out);
 }
 /*
@@ -178,7 +176,7 @@
 }
 .drow-today {
   padding: 2px 7px;
-  border-radius: 6px;
+  border-radius: var(--r-control);
   background: var(--chip);
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -188,9 +186,9 @@
   flex: none;
   width: 8px;
   height: 8px;
-  border-radius: 4px;
+  border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 0 1.5px #aebf14;
+  outline: 1.5px solid #aebf14;
 }
 .dmore {
   width: 100%;
@@ -243,7 +241,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 18px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.16);
 }
 
@@ -303,7 +301,7 @@
   color: #ffffff;
 }
 .btn-glass {
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 0;
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
@@ -384,7 +382,7 @@
 .crow-you {
   flex: none;
   padding: 2px 7px;
-  border-radius: 6px;
+  border-radius: var(--r-control);
   background: var(--chip);
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -472,7 +470,7 @@
 .cdetails {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
 }
 .cdetail {
@@ -521,10 +519,9 @@
   flex-direction: column;
   gap: var(--sp-3);
   padding: var(--sp-3);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .setprofile-who {
   display: flex;
@@ -555,7 +552,6 @@
 .setprofile .setstatus-todo {
   min-height: 56px;
   padding: var(--sp-2) var(--sp-3);
-  box-shadow: none;
 }
 
 .setrow {
@@ -598,7 +594,7 @@
   position: relative;
   width: 48px;
   height: 28px;
-  border-radius: 14px;
+  border-radius: var(--r-control);
   background: #4a5759;
   transition: background var(--t-fast) ease;
 }
@@ -608,9 +604,8 @@
   left: 3px;
   width: 22px;
   height: 22px;
-  border-radius: 11px;
+  border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   transition: transform var(--t-fast) var(--ease-out);
 }
 .setrow[role='switch'][aria-checked='true'] > .switch {
@@ -631,7 +626,7 @@
   align-items: center;
   gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-3);
-  border: 1.5px solid var(--hairline);
+  border: 1.5px solid transparent;
   border-radius: var(--r-card);
   background: var(--card);
   text-align: left;
@@ -679,7 +674,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, 0.32);
 }
 .fontopt[aria-pressed='true'] .fontopt-check {
@@ -768,7 +763,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 19px;
+  border-radius: 50%;
   background: var(--chip);
   font-size: var(--fs-md);
   font-weight: 600;
@@ -874,7 +869,7 @@
   min-width: 0;
   height: 22px;
   padding: 0 9px 0 8px;
-  border-radius: 11px;
+  border-radius: var(--r-control);
   font-size: var(--fs-sm);
   font-weight: 600;
   line-height: 1;
@@ -882,7 +877,7 @@
 }
 /* On the dark headers: glass, white text (over 9:1). */
 .for-chip[data-tone='dark'] {
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 0;
   background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
 }

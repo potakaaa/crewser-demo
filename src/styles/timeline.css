@@ -27,7 +27,7 @@
   top: 1px;
   width: 10px;
   height: 5px;
-  border-radius: 2px;
+  border-radius: var(--r-control);
   background: var(--on-dark-2);
   opacity: 0.75;
   transition:
@@ -92,7 +92,7 @@
   left: 50%;
   bottom: 3px;
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--r-control);
   background: var(--dark-tile);
   color: var(--lime);
   font-size: 11px;

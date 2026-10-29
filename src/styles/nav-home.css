@@ -24,10 +24,6 @@
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
-  box-shadow:
-    inset 0 0 0 1px var(--rim),
-    var(--elev-1),
-    0 12px 28px rgba(0, 0, 0, 0.32);
   overflow: clip;
   transform-origin: 50% 100%;
   transition:
@@ -70,7 +66,7 @@
 .deck-pill {
   flex: none;
   padding: 4px 9px;
-  border-radius: 6px;
+  border-radius: var(--r-control);
   background: var(--chip);
   color: var(--ink);
   font-size: var(--fs-xs);
@@ -110,7 +106,6 @@
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2);
 }
 .deck-open::before {
   content: '';
@@ -203,7 +198,6 @@
   background: var(--card-2);
   color: var(--ink);
   font-weight: 600;
-  box-shadow: var(--elev-2);
 }
 .deck-new {
   position: absolute;
@@ -211,9 +205,9 @@
   right: 6px;
   width: 8px;
   height: 8px;
-  border-radius: 4px;
+  border-radius: var(--r-control);
   background: var(--lime);
-  box-shadow: 0 0 0 2px var(--card-2);
+  outline: 2px solid var(--card-2);
 }
 
 /* Home's one-tap row: quieter than the deck's CTAs, icon tiles on the sheet. */
@@ -232,7 +226,6 @@
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
   text-align: left;
   transition: transform 180ms var(--ease-out);
 }
@@ -261,14 +254,11 @@
   align-items: center;
   gap: 6px;
   padding: 6px;
-  border: 1px solid var(--hairline);
-  border-radius: 30px;
+  border: 0;
+  border-radius: var(--r-card);
   background: rgba(40, 50, 53, 0.86);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
   backdrop-filter: blur(22px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 10px 30px rgba(0, 0, 0, 0.4);
 }
 /* Inactive icons: on-dark-2 on the dock, 7:1. The active one is lime with a dot under it. */
 .dock-btn {
@@ -280,7 +270,7 @@
   justify-content: center;
   padding: 0;
   border: 0;
-  border-radius: 24px;
+  border-radius: var(--r-control);
   background: none;
   color: var(--on-dark-2);
   transition: color var(--t-fast) ease;
@@ -296,7 +286,7 @@
   width: 4px;
   height: 4px;
   margin-left: -2px;
-  border-radius: 2px;
+  border-radius: var(--r-control);
   background: var(--lime);
 }
 .dock-btn:active > * {
@@ -312,16 +302,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
+  border-radius: 50%;
   background: var(--chip);
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.28);
   color: var(--ink);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 .dock-btn[data-on] .dock-avatar {
-  box-shadow: 0 0 0 2px var(--lime);
+  outline: 2px solid var(--lime);
 }
 /* Unread notifications: a small lime dot on the avatar; the count is in the Pass. */
 .dock-unread {
@@ -332,7 +321,7 @@
   height: 9px;
   border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 0 2px rgba(40, 50, 53, 1);
+  outline: 2px solid #283235;
 }
 .dock-add {
   width: 48px;
@@ -343,10 +332,9 @@
   justify-content: center;
   padding: 0;
   border: 0;
-  border-radius: 24px;
+  border-radius: var(--r-control);
   background: var(--lime);
   color: var(--on-lime);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   transition:
     transform 200ms var(--ease-spring),
     background 150ms ease;
@@ -393,7 +381,6 @@
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1), 0 18px 48px rgba(0, 0, 0, 0.45);
   transform-origin: 72% 100%;
   animation: tb-pop 280ms var(--ease-out) both;
 }
@@ -405,7 +392,7 @@
   left: 50%;
   width: 34px;
   height: 5px;
-  border-radius: 3px;
+  border-radius: var(--r-control);
   background: var(--chip);
   transform: translateX(-50%);
 }
@@ -431,7 +418,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 22px;
+  border-radius: 50%;
   background: var(--dark-tile);
   color: var(--lime);
   font-size: var(--fs-md);
@@ -475,7 +462,6 @@
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2);
   transition: transform 180ms var(--ease-out);
 }
 .tb-tile:active {
@@ -537,7 +523,6 @@
   color: var(--ink);
   font-size: var(--fs-base);
   font-weight: 600;
-  box-shadow: var(--elev-2), 0 12px 32px rgba(0, 0, 0, 0.4);
   transform-origin: 100% 100%;
   animation: tb-pop 260ms var(--ease-out) both;
   animation-delay: calc(var(--i) * 50ms);
@@ -594,13 +579,12 @@
   flex-direction: column;
   gap: 5px;
   padding: 14px 12px 18px;
-  border-radius: 2px;
+  border-radius: var(--r-control);
   background: #fbfaf6;
   color: #2a2a2a;
   font-family: var(--ff-screenplay);
   font-size: 9px;
   line-height: 1.2;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
   transform: rotate(-3deg);
   transition: transform var(--t-med) var(--ease-ios);
 }
@@ -662,9 +646,8 @@
   left: 16%;
   right: 16%;
   height: 2px;
-  border-radius: 1px;
+  border-radius: var(--r-control);
   background: var(--lime);
-  box-shadow: 0 0 14px 2px rgba(200, 224, 60, 0.7);
   animation: inv-scan 1100ms var(--ease-ios) both;
 }
 .inv-found {
@@ -675,7 +658,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   background: var(--lime);
   color: var(--on-lime);
   font-size: var(--fs-sm);
@@ -707,7 +690,7 @@
   height: 72px;
   padding: 5px;
   border: 3px solid var(--ink);
-  border-radius: 36px;
+  border-radius: 50%;
   background: var(--sheet);
   transition: transform 180ms var(--ease-out);
 }
@@ -733,7 +716,6 @@
   padding: 16px;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
 }
 .inv-total {
   display: flex;
@@ -798,7 +780,6 @@
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2);
   font-size: var(--fs-md);
   font-weight: 500;
 }
@@ -987,7 +968,6 @@
   border-radius: var(--r-card);
   background: var(--lime);
   color: var(--on-lime);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
   transform: translateX(-50%);
   animation: fx-flash 3000ms var(--ease-out) both;
 }
@@ -998,7 +978,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20px;
+  border-radius: 50%;
   background: var(--on-lime);
   color: var(--lime);
   font-size: var(--fs-md);
@@ -1063,9 +1043,10 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 2px var(--lime);
   pointer-events: none;
   animation: who-ring 700ms ease-out both;
+  outline: 2px solid var(--lime);
+  outline-offset: -2px;
 }
 @keyframes who-hl {
   from {
@@ -1150,12 +1131,10 @@
   border: 0;
   background: var(--lime);
   color: var(--on-lime);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 .timer-chip.is-on[data-paused] {
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2);
 }
 .timer-time {
   font-size: var(--fs-base);
@@ -1170,7 +1149,7 @@
 .timer-dot {
   width: 7px;
   height: 7px;
-  border-radius: 4px;
+  border-radius: 50%;
   background: currentColor;
   animation: timer-pulse 1.6s ease-in-out infinite;
 }
@@ -1191,7 +1170,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: var(--r-control);
   background: var(--lime);
   color: var(--on-lime);
   font-size: var(--fs-xs);
@@ -1290,7 +1269,6 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02) 60%),
     var(--card);
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
 }
 .nticket-route {
   display: flex;
@@ -1345,7 +1323,6 @@
   height: 20px;
   border-radius: 50%;
   background: var(--notch-bg);
-  box-shadow: inset 0 0 0 1px var(--rim);
 }
 .nticket-stub::before {
   left: -10px;
@@ -1377,13 +1354,12 @@
   pointer-events: auto;
   background: rgba(0, 0, 0, 0.6);
 }
-/* The hole draws the dim for the whole screen with one big shadow, plus the lime outline. */
+/* The hole draws the dim for the whole screen with one huge outline, plus a lime edge. */
 .guide-hole {
   position: absolute;
   border-radius: var(--r-card);
-  box-shadow:
-    0 0 0 2px var(--lime),
-    0 0 0 9999px rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--lime);
+  outline: 9999px solid rgba(0, 0, 0, 0.6);
   transition:
     left 260ms var(--ease-out),
     top 260ms var(--ease-out),
@@ -1391,16 +1367,8 @@
     height 260ms var(--ease-out);
 }
 @keyframes guide-pulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 2px var(--lime),
-      0 0 0 9999px rgba(0, 0, 0, 0.6);
-  }
   50% {
-    box-shadow:
-      0 0 0 5px rgba(200, 224, 60, 0.45),
-      0 0 0 9999px rgba(0, 0, 0, 0.6);
+    border-color: rgba(200, 224, 60, 0.45);
   }
 }
 .guide-hole {
@@ -1414,7 +1382,6 @@
   border-radius: var(--r-card);
   background: var(--card-2);
   color: var(--ink);
-  box-shadow: var(--elev-2), 0 16px 40px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
   animation: tb-pop 240ms var(--ease-out) both;
 }

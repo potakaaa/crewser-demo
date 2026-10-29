@@ -47,7 +47,7 @@
   align-items: flex-start;
   gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
@@ -109,7 +109,7 @@
   margin-top: 6px;
   border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 0 1.5px var(--ink);
+  outline: 1.5px solid var(--ink);
 }
 @media (prefers-reduced-motion: reduce) {
   .notif-item:active {

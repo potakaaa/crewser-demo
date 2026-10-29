@@ -120,7 +120,7 @@
   top: 0;
   width: 2px;
   height: 13px;
-  border-radius: 1px;
+  border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.75);
 }
 .tl-label {
@@ -152,8 +152,7 @@
   opacity: 0.8;
   transition:
     transform 160ms var(--ease-out),
-    opacity 160ms ease,
-    box-shadow 160ms ease;
+    opacity 160ms ease;
 }
 
 /* Earlier today: the room left of Now, dimmed. Ticks and dots only; it scrolls away as you look ahead. */
@@ -188,7 +187,7 @@
   top: -12px;
   width: 2px;
   height: 11px;
-  border-radius: 1px;
+  border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.75);
 }
 .tl-past-label {
@@ -217,9 +216,8 @@
   top: 1px;
   width: 2px;
   height: 28px;
-  border-radius: 1px;
+  border-radius: var(--r-control);
   background: var(--lime);
-  box-shadow: 0 0 8px rgba(219, 242, 39, 0.55);
 }
 .tl-tick {
   position: absolute;
@@ -227,7 +225,7 @@
   top: 0;
   width: 20px;
   height: 32px;
-  border-radius: 10px;
+  border-radius: var(--r-control);
   background: rgba(219, 242, 39, 0.4);
   opacity: 0;
 }
@@ -277,7 +275,7 @@
 }
 
 /* ───────── Primary button for a note's own action (NotePrimaryAction) ─────────
-   A raised slate control (--elev-2), light text 8:1. */
+   A slate control, light text 8:1. */
 .btn.btn-primary {
   position: relative;
   isolation: isolate;
@@ -285,7 +283,6 @@
   background: var(--card-2);
   color: var(--ink);
   font-weight: 600;
-  box-shadow: var(--elev-2);
   transition:
     transform 180ms var(--ease-out),
     background var(--t-fast) ease;
@@ -315,7 +312,7 @@
   gap: var(--sp-3);
   min-height: 54px;
   padding: var(--sp-2) var(--sp-3) var(--sp-2) 14px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
@@ -345,7 +342,7 @@
   height: 9px;
   border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 0 1.5px var(--ink);
+  outline: 1.5px solid var(--ink);
 }
 .master-text {
   flex: 1;
@@ -373,7 +370,6 @@
   isolation: isolate;
   border-radius: var(--r-card);
   background: var(--brand-surface);
-  box-shadow: none;
   color: #ffffff;
   overflow: hidden;
 }
@@ -478,7 +474,7 @@
   flex: none;
   min-height: 32px;
   padding: 0 12px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-control);
   background: none;
   color: var(--teal);
@@ -495,7 +491,7 @@
 }
 /* On its own (the hours sheet), the line gets the same card edge. */
 .hs-nudge-solo {
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
 }
@@ -508,7 +504,7 @@
   gap: var(--sp-3);
   min-height: 54px;
   padding: var(--sp-2) var(--sp-3) var(--sp-2) 14px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
   color: var(--ink);
@@ -549,7 +545,6 @@
 
 /* ───────── Compact smart cards and rows (home) ───────── */
 .sheet-dash :is(.ccard, .nrow) {
-  box-shadow: none;
 }
 /* Home: a slimmer ticket stub, so the title gets the width. */
 .app .sheet-dash .ccard-head {
@@ -605,7 +600,7 @@
   margin: -2px -4px;
   padding: 2px 4px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--r-control);
   background: none;
   color: inherit;
   font: inherit;
@@ -685,10 +680,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .hsheet-row {
   display: grid;
@@ -756,10 +750,9 @@
   align-items: center;
   gap: var(--sp-3);
   padding: var(--sp-3);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
   color: var(--ink);
   text-align: left;
 }
@@ -769,7 +762,7 @@
   gap: var(--sp-3);
   min-height: 52px;
   padding: 0 var(--sp-4);
-  border: 1px solid var(--hairline);
+  border: 1px solid transparent;
   border-radius: var(--r-card);
   background: var(--card);
   font-size: var(--fs-base);
@@ -783,7 +776,7 @@
   align-items: center;
   justify-content: center;
   border: 1.5px solid rgba(255, 255, 255, 0.32);
-  border-radius: 11px;
+  border-radius: var(--r-control);
 }
 .info-check[data-done='true'] {
   border-color: var(--lime);

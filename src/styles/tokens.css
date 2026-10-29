@@ -1,4 +1,4 @@
-/* Crewser crew app v4 design tokens. Radii: 10 px controls, 18 px cards/bars/sheets. Nothing else. */
+/* Crewser crew app v4 design tokens. Flat: no shadows. Radii: 4 px controls, 6 px cards/bars/sheets (sheets top corners only), 50% true circles. Nothing else. */
 :root {
   --ink: #111a1b;
   --text-2: #3f5155;
@@ -27,8 +27,8 @@
   --on-dark-3: #a9b7b9;
 
   --dashed: 1.5px dashed rgba(17, 26, 27, 0.28);
-  --r-control: 10px;
-  --r-card: 18px;
+  --r-control: 4px;
+  --r-card: 6px;
 
   --header-gradient: linear-gradient(180deg, #141d1e 0%, #1f3a3d 55%, #2d5559 100%);
   --header-glow: radial-gradient(circle at 92% 0%, rgba(219, 242, 39, 0.16), rgba(219, 242, 39, 0) 45%);
@@ -91,8 +91,8 @@
 /*
  * Inside the phone the app is dark only, close to the production Crewser app: slate-teal sheet,
  * flat cards one step lighter, lime used sparingly. The page around the phone keeps the :root values.
- * Three elevation levels, each a visible step: base (--sheet), card (--card + --elev-1), raised control
- * (--card-2 + --elev-2). Each level carries a light rim and a top highlight, flat-ish like the original.
+ * Flat: three tone levels, no shadows or rims. Base (--sheet), card (--card), raised control (--card-2).
+ * Hairlines only divide rows in a list or mark an input's edge.
  * Contrast on --card: ink 10.8:1, text-2 7.9:1, text-3 5.9:1, lime 8.2:1. On --card-2: text-3 4.6:1.
  */
 .app {
@@ -132,9 +132,6 @@
   --on-dark-3: #a9b7b9;
 
   --dashed: 1.5px dashed rgba(255, 255, 255, 0.24);
-  --rim: rgba(255, 255, 255, 0.09);
-  --elev-1: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px -8px rgba(0, 0, 0, 0.45);
-  --elev-2: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.35);
   --focus: var(--lime);
 
   /* The one grainy focal point per screen: a dark green orb, like the original's working-time circle. */

@@ -11,7 +11,6 @@
   --brand-focal:
     radial-gradient(160px 70px at 100% 0%, rgba(200, 224, 60, 0.18), rgba(200, 224, 60, 0)),
     radial-gradient(140% 120% at 20% 0%, #3d6650 0%, #2c4a3e 48%, #22302f 100%);
-  --shadow-card: var(--elev-1);
   /* Motion: one iOS-like curve for anything that moves, a softer one for fades. */
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -79,7 +78,6 @@
 .layer-current.nav-push {
   z-index: 2;
   animation: push-in var(--t-nav) var(--ease-ios) both;
-  box-shadow: -10px 0 36px rgba(0, 0, 0, 0.35);
 }
 .layer-leaving.nav-push {
   z-index: 1;
@@ -92,7 +90,6 @@
 .layer-leaving.nav-pop {
   z-index: 2;
   animation: pop-out var(--t-nav) var(--ease-ios) both;
-  box-shadow: -10px 0 36px rgba(0, 0, 0, 0.35);
 }
 .layer-current.nav-tab {
   z-index: 2;
@@ -195,8 +192,7 @@
   pointer-events: none;
   transition:
     opacity 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease;
+    background 160ms ease;
 }
 [data-scrolled='header'] > .sat-band {
   opacity: 1;
@@ -204,7 +200,6 @@
 }
 [data-scrolled='sheet'] > .sat-band {
   opacity: 1;
-  box-shadow: 0 1px 0 var(--hairline);
 }
 /* ───────── Gradient header + sheet ───────── */
 .gh {
@@ -356,7 +351,6 @@
   background: var(--brand-surface);
   color: #ffffff;
   font-weight: 600;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .btn-ink:hover {
   background: var(--brand-surface-hover);
@@ -394,7 +388,7 @@
 }
 .btn-outline-ink {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 0;
   color: var(--ink);
 }
 .btn-md {
@@ -440,7 +434,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 0;
   border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
@@ -547,7 +541,7 @@
   align-items: flex-start;
   padding: var(--sp-4);
   background: rgba(244, 195, 90, 0.14);
-  border: 1px solid rgba(244, 195, 90, 0.5);
+  border: 0;
 }
 .offline-dark > svg {
   flex: none;
@@ -573,7 +567,7 @@
   gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-4);
   background: var(--amber-surface);
-  border: 1px solid var(--amber-border);
+  border: 0;
   font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--amber-text);
@@ -611,8 +605,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border: 0;
   background: rgba(255, 255, 255, 0.12);
   font-size: var(--fs-md);
   font-weight: 600;
@@ -641,10 +635,9 @@
   gap: 14px;
   min-height: 72px;
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
   color: var(--ink);
   text-align: left;
 }
@@ -715,10 +708,9 @@
 /* ───────── Content cards ───────── */
 .ccard {
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .ccard-head {
   width: 100%;
@@ -839,14 +831,12 @@
 }
 .nrow {
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .nrow-dashed {
   border: var(--dashed);
-  box-shadow: none;
 }
 .nrow-top {
   display: grid;
@@ -933,7 +923,7 @@
   align-items: center;
   gap: 14px;
   padding: var(--sp-3) 14px var(--sp-3) var(--sp-3);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-control);
   background: var(--sheet);
   color: var(--ink);
@@ -1062,7 +1052,7 @@
   content: '';
   position: absolute;
   inset: 7px 0;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 0;
   border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.08);
   transition: background var(--t-fast) ease;
@@ -1081,7 +1071,7 @@
 .week-strip {
   position: relative;
   padding: var(--sp-2);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 0;
   border-radius: var(--r-card);
   background: rgba(255, 255, 255, 0.08);
 }
@@ -1099,7 +1089,6 @@
   width: calc((100% - 16px - 24px) / 7);
   border-radius: var(--r-control);
   background: #ffffff;
-  box-shadow: 0 4px 14px rgba(8, 14, 15, 0.22);
   transform: translateX(calc(var(--i, 0) * (100% + 4px)));
   transition: transform var(--t-nav) var(--ease-ios);
 }
@@ -1123,7 +1112,7 @@
 }
 .month {
   padding: var(--sp-2) var(--sp-2) var(--sp-3);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 0;
   border-radius: var(--r-card);
   background: rgba(255, 255, 255, 0.08);
 }
@@ -1250,7 +1239,7 @@
 .wday-dots i {
   width: 5px;
   height: 5px;
-  border-radius: 3px;
+  border-radius: 50%;
   background: var(--lime);
   transition: background var(--t-med) ease;
 }
@@ -1407,10 +1396,9 @@
   position: relative;
   margin-top: var(--sp-2);
   padding: 28px var(--sp-5) var(--sp-5);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .ns-tape {
   position: absolute;
@@ -1458,7 +1446,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-1);
-  border: 1px solid rgba(143, 42, 35, 0.16);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--danger-surface);
   text-decoration: none;
@@ -1492,7 +1480,7 @@
   align-items: center;
   height: 20px;
   padding: 0 var(--sp-2);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   background: var(--danger-surface);
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -1517,10 +1505,9 @@
   padding: 0;
   list-style: none;
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .ns-contact {
   min-height: 64px;
@@ -1574,7 +1561,6 @@
   position: relative;
   isolation: isolate;
   background: var(--brand-surface);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 .ns-call::after {
   content: '';
@@ -1590,10 +1576,9 @@
 .ns-hours {
   margin: 0;
   padding: var(--sp-1) var(--sp-4);
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .ns-hours-row {
   display: grid;
@@ -1628,10 +1613,9 @@
   flex-direction: column;
   gap: 6px;
   padding: var(--sp-4) 18px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .duo-card strong {
   font-size: 22px;
@@ -1641,10 +1625,9 @@
 }
 .facts-card {
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .fact-row {
   min-height: 60px;
@@ -1670,10 +1653,9 @@
 }
 .note-text {
   padding: 18px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
   font-size: var(--fs-md);
   line-height: 1.6;
   white-space: pre-line;
@@ -1794,10 +1776,9 @@
 .bp-ticket {
   flex: none;
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: #ffffff;
-  box-shadow: 0 12px 32px rgba(17, 26, 27, 0.1);
 }
 .bp-ticket-top {
   position: relative;
@@ -1846,7 +1827,7 @@
   top: -12px;
   width: 22px;
   height: 22px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: 50%;
   background: #ffffff;
 }
@@ -1906,7 +1887,7 @@
   flex-direction: column;
   gap: var(--sp-2);
   padding: var(--sp-5);
-  border: 1px solid var(--amber-border);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--amber-surface);
 }
@@ -1921,10 +1902,9 @@
   color: var(--text-2);
 }
 .card {
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .fallback-card {
   display: flex;
@@ -1963,10 +1943,9 @@
   gap: var(--sp-3);
   padding: var(--sp-8) 28px;
   /* A sheet of paper, not a UI surface. */
-  border-radius: 4px;
+  border-radius: var(--r-control);
   background: #ffffff;
   color: #0e1314;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 .pdf-kicker {
   font-size: 10.5px;
@@ -1990,7 +1969,7 @@
 }
 .pdf-skel {
   height: 7px;
-  border-radius: 4px;
+  border-radius: var(--r-control);
   background: #ededeb;
 }
 .pdf-skel-gap {
@@ -2105,7 +2084,7 @@
   width: 36px;
   height: 5px;
   margin-bottom: calc(-1 * var(--sp-1));
-  border-radius: 3px;
+  border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.22);
 }
 /* A taller target than the 5 px bar. */
@@ -2147,7 +2126,7 @@
   justify-content: center;
   gap: var(--sp-1);
   padding: 0 18px;
-  border: 1px solid var(--hairline);
+  border: 1px solid transparent;
   border-radius: var(--r-card);
   background: var(--sheet);
   color: var(--ink);
@@ -2159,12 +2138,10 @@
 }
 .time-tile {
   transition:
-    border-color var(--t-fast) ease,
-    box-shadow var(--t-fast) ease;
+    border-color var(--t-fast) ease;
 }
 .time-tile[data-active='true'] {
   border: 1.5px solid var(--teal);
-  box-shadow: 0 0 0 3px rgba(143, 208, 198, 0.16);
 }
 /* Inline time picker: two snapping wheels plus quick picks */
 .log-picker {
@@ -2191,7 +2168,6 @@
   margin-top: -18px;
   border-radius: var(--r-control);
   background: var(--card-2);
-  box-shadow: 0 0 0 1px var(--hairline);
   pointer-events: none;
 }
 .wheel {
@@ -2252,7 +2228,7 @@
 .picker-chip {
   min-height: 40px;
   padding: 0 var(--sp-3);
-  border: 1px solid var(--hairline);
+  border: 1px solid transparent;
   border-radius: var(--r-control);
   background: var(--card);
   font-size: var(--fs-md);
@@ -2329,7 +2305,6 @@
   border: 0;
   border-radius: var(--r-control);
   background: var(--card-2);
-  box-shadow: 0 0 0 1px var(--hairline);
 }
 .step-val {
   min-width: 64px;
@@ -2410,7 +2385,6 @@
   font-size: var(--fs-md);
   font-weight: 500;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   opacity: 0;
   transform: translateY(12px) scale(0.96);
   transition:
@@ -2587,13 +2561,13 @@
   width: 72px;
   height: 3px;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--r-control);
   background: rgba(255, 255, 255, 0.16);
 }
 .splash-bar span {
   display: block;
   height: 100%;
-  border-radius: 2px;
+  border-radius: var(--r-control);
   background: var(--lime);
   transform-origin: left;
   animation: grow-x 900ms var(--ease-ios) both 100ms;
@@ -2771,10 +2745,9 @@
   flex-direction: column;
   gap: 2px;
   padding: 14px 16px 8px;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-card);
   background: var(--card);
-  box-shadow: var(--shadow-card);
 }
 .crew-card-k {
   font-size: var(--fs-xs);
@@ -2882,7 +2855,7 @@
   flex: 1;
   min-width: var(--sp-6);
   height: 0.85em;
-  border-radius: 2px;
+  border-radius: var(--r-control);
   background: var(--signature-bar);
 }
 .log-titles h2 {
@@ -2894,15 +2867,12 @@
    Cards with a hairline border already have their rim; the rest get it as an inset ring. */
 :is(.master, .hs-nudge-solo, .pocket, .info-item, .att-row, .ns-note, .ns-contacts, .ns-hours,
   .duo-card, .facts-card, .note-text, .card, .crew-card, .notif-item, .dlist, .setprofile, .fontopt) {
-  box-shadow: var(--elev-1);
 }
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
   background: var(--card);
-  box-shadow: inset 0 0 0 1px var(--rim), var(--elev-1);
 }
 :is(.btn-ink, .btn-soft, .icon-btn-soft, .icon-btn-chip, .cquick, .cact, .step-btn, .bp-chip) {
   background: var(--card-2);
-  box-shadow: var(--elev-2);
 }
 /* Icon tiles are not buttons: lighter than the card, no bezel. */
 :is(.chip-icon, .master-icon, .pocket-icon, .notif-icon, .todo-icon-neutral) {
