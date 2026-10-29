@@ -93,7 +93,8 @@
  * flat cards one step lighter, lime used sparingly. Base, card, raised and lime are the live app's own values (crewser.app/demo). The page around the phone keeps the :root values.
  * Flat: three tone levels, no shadows or rims. Base (--sheet), card (--card), raised control (--card-2).
  * Hairlines only divide rows in a list or mark an input's edge.
- * Contrast on --card: ink 10.8:1, text-2 7.9:1, text-3 5.9:1, lime 8.2:1. On --card-2: text-3 4.6:1.
+ * Contrast on --card: ink 11.15:1, text-2 8.18:1, text-3 6.11:1, lime 8.88:1. On --card-2: text-3 4.42:1.
+ * text-3 on --card-2 or --soft is below AA (4.5:1) for small text, so use it there for large text only.
  */
 .app {
   color-scheme: dark;
