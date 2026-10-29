@@ -747,13 +747,6 @@
   line-height: 1.15;
   letter-spacing: -0.01em;
 }
-.nrow .stub-time {
-  font-size: 15px;
-}
-.nrow .stub-time-sm {
-  font-size: var(--fs-sm);
-  font-weight: 500;
-}
 .stub-muted {
   color: var(--text-3);
 }
@@ -814,7 +807,7 @@
 .ccard-body .crew-toggle {
   min-height: 40px;
 }
-/* ───────── Note rows ───────── */
+/* ───────── Day groups (Home's more notes) ───────── */
 .day-group {
   display: flex;
   flex-direction: column;
@@ -828,76 +821,6 @@
 .day-group-h strong {
   font-weight: 600;
   color: var(--ink);
-}
-.nrow {
-  overflow: hidden;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card);
-}
-.nrow-dashed {
-  border: var(--dashed);
-}
-.nrow-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-.nrow-toggle {
-  min-height: 72px;
-  display: grid;
-  grid-template-columns: 60px 40px minmax(0, 1fr) 18px;
-  gap: var(--sp-3);
-  align-items: center;
-  padding: 14px var(--sp-3) 14px var(--sp-4);
-  border: 0;
-  background: none;
-  color: var(--ink);
-  text-align: left;
-}
-.nrow-toggle:focus-visible,
-.nrow-quick:focus-visible {
-  outline-offset: -3px;
-}
-.nrow-quick {
-  width: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-1);
-  border: 0;
-  border-left: 1px solid var(--hairline);
-  background: none;
-  color: var(--ink);
-}
-.nrow-quick span {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-}
-.nrow-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-  padding: 14px var(--sp-4) var(--sp-4);
-  border-top: 1px solid var(--hairline);
-}
-.nrow-fact {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-}
-.nrow-fact-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.nrow-fv {
-  font-size: var(--fs-md);
-  font-weight: 600;
-  overflow-wrap: anywhere;
 }
 /* Copy / maps buttons next to a value */
 .fact-actions {
@@ -985,15 +908,6 @@
 .qr-copy > .qr-cta {
   overflow-wrap: anywhere;
 }
-.nrow-text {
-  font-size: var(--fs-md);
-  line-height: 1.55;
-  white-space: pre-line;
-  color: var(--text-2);
-}
-.nrow-body .btn-row {
-  margin-top: var(--sp-1);
-}
 /* Stacked bars, grown in on mount */
 .brand-footer {
   display: flex;
@@ -1068,29 +982,14 @@
   display: flex;
   flex-direction: column;
 }
+/* Week and month sit straight on the header, as in the live app: no panel behind them. */
 .week-strip {
   position: relative;
-  padding: var(--sp-2);
-  border: 0;
-  border-radius: var(--r-card);
-  background: rgba(255, 255, 255, 0.08);
 }
 .week-days {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--sp-1);
-}
-/* The white "selected day" pill slides between days. */
-.wday-indicator {
-  position: absolute;
-  top: var(--sp-2);
-  bottom: var(--sp-2);
-  left: var(--sp-2);
-  width: calc((100% - 16px - 24px) / 7);
-  border-radius: var(--r-control);
-  background: #ffffff;
-  transform: translateX(calc(var(--i, 0) * (100% + 4px)));
-  transition: transform var(--t-nav) var(--ease-ios);
 }
 .slide-next {
   animation: slide-from-right var(--t-med) var(--ease-ios) both;
@@ -1110,26 +1009,21 @@
     transform: translateX(-28px);
   }
 }
-.month {
-  padding: var(--sp-2) var(--sp-2) var(--sp-3);
-  border: 0;
-  border-radius: var(--r-card);
-  background: rgba(255, 255, 255, 0.08);
-}
 .month-head {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  padding: var(--sp-1) 0 6px;
+  padding: 0 0 var(--sp-2);
   text-align: center;
   font-size: var(--fs-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--on-dark-3);
 }
 .month-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px;
+  gap: 2px 0;
 }
+/* Month day: the date in a circle, the note dot under it. Today a quiet disc, the selected day a raised one. */
 .mday {
   height: 46px;
   min-width: 0;
@@ -1137,41 +1031,47 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: var(--r-control);
+  border: 0;
   background: transparent;
   color: #ffffff;
-  transition:
-    background var(--t-fast) ease,
-    color var(--t-fast) ease,
-    transform 180ms var(--ease-out);
+  transition: transform 180ms var(--ease-out);
 }
-.mday:hover {
+.mday-d {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: var(--fs-base);
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--t-fast) ease;
+}
+.mday:hover .mday-d {
   background: rgba(255, 255, 255, 0.08);
 }
 .mday:active {
   transform: scale(0.94);
 }
-.mday-d {
-  font-size: var(--fs-base);
-  font-weight: 500;
-  line-height: 1;
-}
 .mday.is-out {
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--on-dark-3);
 }
-.mday.is-today {
-  border-color: rgba(255, 255, 255, 0.4);
+.mday.is-today .mday-d {
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 600;
 }
-.mday.is-sel {
-  --focus: #2c6b72;
-  background: #ffffff;
-  color: var(--on-lime);
-  border-color: #ffffff;
+.mday.is-sel .mday-d {
+  background: rgba(255, 255, 255, 0.3);
+  font-weight: 700;
 }
 .mday .wday-dots {
+  height: 4px;
+}
+.mday .wday-dots i {
+  width: 4px;
   height: 4px;
 }
 .day-list {
@@ -1186,49 +1086,68 @@
     transform: translateY(10px);
   }
 }
+/* Week day, top to bottom as in the live app: a status disc, the weekday, the date. */
 .wday {
   position: relative;
-  z-index: 1;
-  height: 70px;
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: var(--r-control);
+  gap: 6px;
+  padding: 0 0 2px;
+  border: 0;
   background: transparent;
   color: #ffffff;
-  transition:
-    background var(--t-fast) ease,
-    color var(--t-med) var(--ease-ios),
-    border-color var(--t-fast) ease,
-    transform 180ms var(--ease-out);
-}
-.wday:hover:not(.is-sel) {
-  background: rgba(255, 255, 255, 0.06);
+  transition: transform 180ms var(--ease-out);
 }
 .wday:active {
   transform: scale(0.94);
 }
-.wday.is-today {
-  border-color: rgba(255, 255, 255, 0.4);
-}
-.wday.is-sel {
-  --focus: #2c6b72;
-  color: var(--on-lime);
-}
-.wday-wd {
-  font-size: var(--fs-xs);
+.wday-disc {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: var(--fs-md);
   font-weight: 500;
-  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-dark-3);
+  transition: background var(--t-fast) ease;
+}
+.wday-disc.has-notes {
+  font-weight: 600;
+  color: #ffffff;
+}
+.wday:hover .wday-disc {
+  background: rgba(255, 255, 255, 0.12);
+}
+/* The weekday carries the markers: a quiet pill for today, a raised one for the selected day. */
+.wday-wd {
+  padding: 2px 6px;
+  border-radius: var(--r-control);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--on-dark-2);
+  transition:
+    background var(--t-fast) ease,
+    color var(--t-fast) ease;
+}
+.wday.is-today .wday-wd {
+  background: rgba(255, 255, 255, 0.1);
+}
+.wday.is-sel .wday-wd {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 .wday-d {
-  font-size: var(--fs-lg);
-  font-weight: 600;
+  font-size: var(--fs-xs);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-dark-3);
 }
 .wday-dots {
   height: 6px;
@@ -1241,34 +1160,38 @@
   height: 5px;
   border-radius: 50%;
   background: var(--lime);
-  transition: background var(--t-med) ease;
-}
-/* The selected day is a light tile: the dot turns dark to stay visible. */
-:is(.wday, .mday).is-sel .wday-dots i {
-  background: var(--on-lime);
 }
 .sheet-cal {
   gap: var(--sp-4);
 }
+/* "Wednesday Today" over a large "21. Oct", as in the live app. */
 .day-heading {
   display: flex;
-  align-items: baseline;
-  gap: var(--sp-2);
-  padding: var(--sp-2) 2px 0;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 2px;
 }
-.day-heading h2 {
+.day-heading-wd {
   font-size: var(--fs-lg);
   font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.day-heading span {
-  font-size: var(--fs-sm);
   color: var(--text-2);
+}
+.day-heading-wd span {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-3);
+}
+.day-heading h2 {
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: var(--track-tight);
+  font-variant-numeric: tabular-nums;
 }
 .empty-day {
   padding: var(--sp-6);
-  border: var(--dashed);
   border-radius: var(--r-card);
+  background: var(--card);
   text-align: center;
   font-size: var(--fs-md);
   color: var(--text-2);
@@ -2424,25 +2347,21 @@
   }
 }
 /* ───────── Smart note time stub ─────────
-   The time column of note cards and rows sits on its own frosted wash (--stub-bg). */
-.ccard,
-.nrow {
+   The time column of note cards sits on its own frosted wash (--stub-bg). */
+.ccard {
   position: relative;
   isolation: isolate;
 }
 /* Ticket stub: the time column sits on its own wash (--stub-bg). A non-zero --stub-edge breaks
    the wash's edge up into film grain instead of a hard line. */
-.app :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle) {
+.app .ccard-head {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   --stub-solid: 88px;
   --stub-edge: 0px;
 }
-.app .nrow:not(.nrow-dashed) .nrow-toggle {
-  --stub-solid: 82px;
-}
-.app :is(.ccard-head, .nrow:not(.nrow-dashed) .nrow-toggle)::before {
+.app .ccard-head::before {
   content: '';
   position: absolute;
   z-index: -1;
@@ -2459,7 +2378,7 @@
     linear-gradient(#000, #000) 0 0 / calc(var(--stub-solid) + 1px) 100% no-repeat,
     var(--dissolve, linear-gradient(90deg, #000, transparent)) var(--stub-solid) 0 / var(--stub-edge) 256px repeat-y;
 }
-.app :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-time {
+.app .ccard-head .stub-time {
   color: #ffffff;
 }
 /* On the cards the time is the hero. */
@@ -2467,16 +2386,13 @@
   font-size: var(--fs-xl);
   font-weight: 700;
 }
-.app :is(.ccard-head, .nrow:not(.nrow-dashed)) .stub-sub {
+.app .ccard-head .stub-sub {
   color: var(--text-2);
   font-weight: 500;
 }
 /* Room between the tile and the type chip */
 .app .ccard-head {
   grid-template-columns: 74px 36px minmax(0, 1fr) 18px;
-}
-.app .nrow:not(.nrow-dashed) .nrow-toggle {
-  grid-template-columns: 86px 40px minmax(0, 1fr) 18px;
 }
 /* ───────── Brand ───────── */
 .wordmark {
@@ -2734,8 +2650,7 @@
   font-weight: 600;
   color: var(--teal);
 }
-.ccard-body .crew,
-.nrow-body .crew {
+.ccard-body .crew {
   margin: -4px 0;
   border-top: 1px solid var(--hairline);
   padding-top: 4px;

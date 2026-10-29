@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties } from 'react';
+import { useRef } from 'react';
 import '../styles/calendar.css';
 import { useActiveLink, useDemo } from '../store';
 import { docs, notes as allNotes, today, workdaysFor, type Doc, type Note, type WorkDay } from '../mock';
@@ -7,13 +7,16 @@ import { TimerChip } from '../components/TimerChip';
 import { UnsentMark } from '../components/UnsentMark';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, Sheet } from '../components/Layout';
-import { NoteRow } from '../components/NoteCards';
-import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, mondayOf, relativeDay, weekday } from '../lib/dates';
+import { ContentCard } from '../components/NoteCards';
+import { addDays, dayOfMonth, fmtDayMonth, fmtMonthYear, isSameMonth, isoWeek, monthGrid, monthLabel, monthShort, mondayOf, relativeDay, weekday } from '../lib/dates';
 import { sortNotes } from '../lib/notes';
 import { useScrollRestore } from '../lib/scroll';
 import { useSubmitted } from '../lib/useSubmitted';
 
 const count = (n: number) => (n === 1 ? '1 note' : `${n} notes`);
+/** "21.10.", as under the live app's week strip. */
+const dayDotMonth = (iso: string) => `${iso.slice(8)}.${iso.slice(5, 7)}.`;
+const longWeekday = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' });
 
 /** The call sheet for each shoot day; a day with one is a shoot day. */
 const callSheetByDay = new Map<string, Doc>(docs.flatMap((d) => (d.kind === 'callsheet' && d.day ? [[d.day, d] as [string, Doc]] : [])));
@@ -45,6 +48,16 @@ function Dots({ notes }: { notes: Note[] }) {
   return <span className="wday-dots">{notes.length > 0 && <i />}</span>;
 }
 
+/** The week strip's disc, as in the live app: how many notes the day holds, or a dash for none. */
+function Disc({ notes, unsent }: { notes: Note[]; unsent: boolean }) {
+  return (
+    <span className={`wday-disc${notes.length ? ' has-notes' : ''}`}>
+      {notes.length || '–'}
+      <DayMarks unsent={unsent} />
+    </span>
+  );
+}
+
 /** Which way the last prev/next went, so the new week or month slides in from that side. */
 function useSlideDir(key: string) {
   const prev = useRef(key);
@@ -67,8 +80,6 @@ export function CalendarScreen() {
   const shiftCal = useDemo((s) => s.shiftCal);
   const setCalDate = useDemo((s) => s.setCalDate);
   const toggleMonth = useDemo((s) => s.toggleCalMonth);
-  const expanded = useDemo((s) => s.expanded.calendar);
-  const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const openSheet = useDemo((s) => s.openSheet);
   const navigate = useDemo((s) => s.navigate);
   const openLog = useDemo((s) => s.setLogOpen);
@@ -80,14 +91,13 @@ export function CalendarScreen() {
   const notesOn = (iso: string) => sortNotes(notes.filter((n) => n.day === iso));
   const monday = mondayOf(calDate);
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
-  const selIndex = days.indexOf(calDate);
   const weekDir = useSlideDir(monday);
   const monthDir = useSlideDir(calMonth);
   const grid = monthGrid(calMonth);
 
   const dayNotes = notesOn(calDate);
   const rel = relativeDay(calDate, today.date);
-  const dayLabel = rel === 'today' ? `Today · ${fmtDayMonth(calDate)}` : rel === 'tomorrow' ? `Tomorrow · ${fmtDayMonth(calDate)}` : fmtDayMonth(calDate);
+  const relWord = rel === 'today' || rel === 'tomorrow' || rel === 'yesterday' ? rel[0].toUpperCase() + rel.slice(1) : '';
   const unit = monthOpen ? 'month' : 'week';
   const dayAria = (iso: string, n: number) =>
     [
@@ -137,7 +147,6 @@ export function CalendarScreen() {
         <div className="cal-panel" data-guide="calendar">
           <Collapse open={!monthOpen}>
             <div className="week-strip" role="group" aria-label="Days of the week">
-              <span className="wday-indicator" style={{ '--i': selIndex } as CSSProperties} aria-hidden="true" />
               <div key={monday} className={`week-days slide-${weekDir}`}>
                 {days.map((iso) => {
                   const isSel = iso === calDate;
@@ -151,10 +160,9 @@ export function CalendarScreen() {
                       aria-label={dayAria(iso, dn.length)}
                       onClick={() => setCalDate(iso)}
                     >
+                      <Disc notes={dn} unsent={hoursNotSent(iso, submitted, workdays)} />
                       <span className="wday-wd">{weekday(iso)}</span>
-                      <span className="wday-d">{dayOfMonth(iso)}</span>
-                      <Dots notes={dn} />
-                      <DayMarks unsent={hoursNotSent(iso, submitted, workdays)} />
+                      <span className="wday-d">{dayDotMonth(iso)}</span>
                     </button>
                   );
                 })}
@@ -198,8 +206,16 @@ export function CalendarScreen() {
         {offline && <OfflineBanner tone="dark" />}
         <div key={calDate} className="day-list">
           <div className="day-heading">
-            <h2>{dayLabel}</h2>
-            {dayNotes.length > 0 && <span>{count(dayNotes.length)}</span>}
+            <span className="day-heading-wd">
+              {longWeekday(calDate)}
+              {(relWord || dayNotes.length > 0) && <span> {[relWord, dayNotes.length > 0 && count(dayNotes.length)].filter(Boolean).join(' · ')}</span>}
+            </span>
+            <h2>
+              <span className="sr-only">{fmtDayMonth(calDate)}</span>
+              <span aria-hidden="true">
+                {dayOfMonth(calDate)}. {monthShort(calDate)}
+              </span>
+            </h2>
           </div>
           {(callSheet || unsent) && (
             <div className="day-actions">
@@ -231,7 +247,7 @@ export function CalendarScreen() {
           )}
           {dayNotes.length === 0 && <div className="empty-day">Nothing planned for this day</div>}
           {dayNotes.map((n) => (
-            <NoteRow key={n.id} note={n} withPrimary open={expanded === n.id} onToggle={() => toggleExpanded('calendar', n.id)} />
+            <ContentCard key={n.id} note={n} />
           ))}
         </div>
       </Sheet>

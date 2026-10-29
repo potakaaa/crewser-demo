@@ -3,7 +3,7 @@ import { notes } from '../mock';
 import { useActiveLink, useDemo } from '../store';
 import { Icon } from '../components/Icon';
 import { Collapse, GradientHeader, OfflineBanner, SectionHead, Sheet } from '../components/Layout';
-import { ContentCard, NoteRow } from '../components/NoteCards';
+import { ContentCard } from '../components/NoteCards';
 import { Timeline, type TimelineHandle } from '../components/Timeline';
 import { TodayCard } from '../components/TodayCard';
 import { TimerChip } from '../components/TimerChip';
@@ -23,8 +23,6 @@ export function DashboardScreen() {
   const empty = useDemo((s) => s.empty);
   const allOpen = useDemo((s) => s.homeAllOpen);
   const toggleAll = useDemo((s) => s.toggleHomeAll);
-  const expanded = useDemo((s) => s.expanded.dashboard);
-  const toggleExpanded = useDemo((s) => s.toggleExpanded);
   const masterDataDone = useDemo((s) => s.masterDataDone);
   const openSheet = useDemo((s) => s.openSheet);
   const toast = useDemo((s) => s.showToast);
@@ -105,7 +103,7 @@ export function DashboardScreen() {
                           <strong>{g.label}</strong> · {g.sub}
                         </span>
                         {g.notes.map((n) => (
-                          <NoteRow key={n.id} note={n} open={expanded === n.id} onToggle={() => toggleExpanded('dashboard', n.id)} />
+                          <ContentCard key={n.id} note={n} />
                         ))}
                       </div>
                     ))}

@@ -4,22 +4,18 @@
   position: relative;
 }
 
-/* Corner mark: hours still open (the shared .unsent-mark in nav-home.css), clear of the note dot under the date. */
+/* Corner mark: hours still open (the shared .unsent-mark in nav-home.css), on the disc's top-right edge. */
 .day-marks {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  left: 4px;
+  top: -3px;
+  right: -5px;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
   pointer-events: none;
-  color: currentColor;
+  color: #ffffff;
 }
 .mday .day-marks {
-  top: 2px;
+  top: 0;
   right: 2px;
-  left: 2px;
 }
 .mday.is-out .day-marks {
   opacity: 0.4;
@@ -87,45 +83,19 @@ button.day-action:active {
   }
 }
 
-/* Room for the corner marks above the weekday. */
-.cal-panel .wday {
-  height: 72px;
-  padding-top: 14px;
-  gap: 4px;
-}
-.cal-panel .mday {
-  height: 42px;
-}
 
 /* "October 2026 · CW 43" stays on one line, whatever the font. */
 .month-toggle > span:first-child {
   white-space: nowrap;
 }
 
-/* Narrow phones (360 px): give the note titles the width the ticket stub was taking. */
-@media (max-width: 400px) {
-  .app .sheet-cal .nrow:not(.nrow-dashed) .nrow-toggle {
-    --stub-solid: 80px;
-    grid-template-columns: 74px 36px minmax(0, 1fr) 16px;
-    gap: var(--sp-2);
-    padding-left: var(--sp-3);
-    padding-right: var(--sp-2);
-  }
-  .sheet-cal .nrow-quick {
-    width: 52px;
-  }
-}
-
-/* Compact list: the day's notes sit close together and the page scrolls past quickly. */
+/* The day's cards keep Home's rhythm. */
 .sheet.sheet-cal {
   gap: var(--sp-3);
   padding-top: var(--sp-5);
 }
 .sheet-cal .day-list {
-  gap: var(--sp-2);
-}
-.sheet-cal .day-heading {
-  padding-top: 0;
+  gap: var(--sp-3);
 }
 .sheet-cal .empty-day {
   padding: var(--sp-4);
@@ -147,4 +117,9 @@ button.day-action:active {
   color: #ffffff;
   font-size: inherit;
   font-weight: 600;
+}
+
+/* Selected days are no longer a light tile, so the hours mark stays light on them. */
+.cal-panel .is-sel .unsent-mark {
+  color: var(--on-dark-2);
 }
