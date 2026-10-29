@@ -1,4 +1,4 @@
-/* Home deck, crew-pass tab bar, the + menu and the invoice scanner. Uses the v4 tokens only. */
+/* Home deck, tab bar and the invoice scanner. Uses the v4 tokens only. */
 
 /* ───────── Today deck ───────── */
 .deck {
@@ -12,6 +12,36 @@
   grid-template-columns: minmax(0, 1fr);
   padding-bottom: 26px;
   touch-action: pan-y;
+}
+.deck-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+.deck-arrow {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+.deck-arrow:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+.deck-arrow:disabled {
+  opacity: 0.35;
+}
+.deck-pos {
+  min-width: 48px;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--on-dark-2);
 }
 .deck-stack.is-dragging {
   user-select: none;
@@ -248,29 +278,24 @@
   font-weight: 600;
 }
 
-/* ───────── The dock: Home, Calendar, the Pass and the + in one capsule ───────── */
+/* ───────── The dock: Home, Calendar, Documents, Contacts, Profile. Full width, flat, docked to the bottom ───────── */
 .dock {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px;
-  border: 0;
-  border-radius: var(--r-card);
-  background: rgba(40, 50, 53, 0.86);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  backdrop-filter: blur(22px) saturate(160%);
+  align-items: stretch;
+  background: var(--dark-tile);
 }
 /* Inactive icons: on-dark-2 on the dock, 7:1. The active one is lime with a dot under it. */
 .dock-btn {
   position: relative;
-  width: 52px;
-  height: 48px;
+  flex: 1;
+  min-width: 0;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: 0;
   background: none;
   color: var(--on-dark-2);
   transition: color var(--t-fast) ease;
@@ -281,12 +306,12 @@
 .dock-btn[data-on]::after {
   content: '';
   position: absolute;
-  bottom: 3px;
+  bottom: 4px;
   left: 50%;
   width: 4px;
   height: 4px;
   margin-left: -2px;
-  border-radius: var(--r-control);
+  border-radius: 50%;
   background: var(--lime);
 }
 .dock-btn:active > * {
@@ -296,7 +321,6 @@
   transition: transform 180ms var(--ease-out);
 }
 .dock-avatar {
-  position: relative;
   width: 30px;
   height: 30px;
   display: flex;
@@ -312,242 +336,7 @@
 .dock-btn[data-on] .dock-avatar {
   outline: 2px solid var(--lime);
 }
-/* Unread notifications: a small lime dot on the avatar; the count is in the Pass. */
-.dock-unread {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--lime);
-  outline: 2px solid #283235;
-}
-.dock-add {
-  width: 48px;
-  height: 48px;
-  margin-left: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--r-control);
-  background: var(--lime);
-  color: var(--on-lime);
-  transition:
-    transform 200ms var(--ease-spring),
-    background 150ms ease;
-}
-@media (hover: hover) {
-  .dock-add:hover {
-    background: var(--lime-hover);
-  }
-}
-.dock-add:active {
-  transform: scale(0.94);
-}
-.dock-add svg {
-  transition: transform 300ms var(--ease-spring);
-}
-.dock-add[aria-expanded='true'] svg {
-  transform: rotate(45deg);
-}
-.tb-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 11;
-  background: rgba(0, 0, 0, 0.45);
-  animation: fade-in var(--t-fast) ease both;
-}
-.tabbar-wrap.is-open {
-  z-index: 12;
-}
-/* The menus rise from the bar: the pass over the tabs, the + actions over the + button. */
-@keyframes tb-pop {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.96);
-  }
-}
-.tb-pass {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  width: min(320px, calc(100cqw - 32px));
-  translate: -50% 0;
-  padding: 18px 12px 12px;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card);
-  color: var(--ink);
-  transform-origin: 72% 100%;
-  animation: tb-pop 280ms var(--ease-out) both;
-}
-/* The punched slot of a lanyard pass. */
-.tb-pass::before {
-  content: '';
-  position: absolute;
-  top: 7px;
-  left: 50%;
-  width: 34px;
-  height: 5px;
-  border-radius: var(--r-control);
-  background: var(--chip);
-  transform: translateX(-50%);
-}
-.tb-pass-head {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: 0 4px 12px;
-  /* The row takes vertical swipes (person switch); nothing in the Pass scrolls. */
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-/* The Pass's switch confirmation floats just above the card. */
-.fx-flash.tb-pass-pill {
-  top: auto;
-  bottom: calc(100% + 10px);
-}
-.tb-pass-avatar {
-  flex: none;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--dark-tile);
-  color: var(--lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
-}
-.tb-pass-who {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.tb-pass-who strong {
-  overflow: hidden;
-  font-size: var(--fs-base);
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tb-pass-who span {
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tb-pass-tiles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-2);
-}
-.tb-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 76px;
-  padding: 10px 4px;
-  border: 1px solid transparent;
-  border-radius: var(--r-control);
-  background: var(--card-2);
-  color: var(--ink);
-  transition: transform 180ms var(--ease-out);
-}
-.tb-tile:active {
-  transform: scale(0.97);
-}
-.tb-tile[aria-current='page'] {
-  border-color: var(--lime);
-}
-.tb-tile-t {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tb-pass-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 44px;
-  margin-top: var(--sp-2);
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: var(--ink);
-  font-size: var(--fs-md);
-  font-weight: 600;
-  text-align: left;
-}
-.tb-pass-row > span {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tb-dial {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 12px);
-  display: flex;
-  /* The first action sits nearest the +, and comes first for focus too. */
-  flex-direction: column-reverse;
-  align-items: flex-end;
-  gap: 10px;
-}
-.tb-dial-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 6px 6px 6px 18px;
-  border: 0;
-  border-radius: var(--r-card);
-  background: var(--card-2);
-  color: var(--ink);
-  font-size: var(--fs-base);
-  font-weight: 600;
-  transform-origin: 100% 100%;
-  animation: tb-pop 260ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 50ms);
-  transition: transform 180ms var(--ease-out);
-}
-.tb-dial-item:active {
-  transform: scale(0.97);
-}
-.tb-dial-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--r-control);
-  background: var(--lime);
-  color: var(--on-lime);
-}
 @media (prefers-reduced-motion: reduce) {
-  .tb-pass,
-  .tb-dial-item,
-  .tb-scrim {
-    animation: none;
-  }
-  .dock-add svg,
   .dock-btn > * {
     transition: none;
   }
@@ -804,7 +593,7 @@
   gap: var(--sp-2);
 }
 
-/* ───────── Home header: swipe the avatar for a person, the project line for a project ───────── */
+/* Toast action button */
 .toast-action {
   flex: none;
   min-height: 32px;
@@ -818,106 +607,14 @@
   font-weight: 700;
   pointer-events: auto;
 }
-.who-block {
-  touch-action: none;
-}
-.who-avatar {
-  position: relative;
-  overflow: hidden;
-}
-.who-reel {
-  position: absolute;
-  inset: 0;
-  transform: translateY(var(--ay, 0));
-}
-.who-reel[data-glide='true'] {
-  transition: transform 200ms var(--ease-out);
-}
-.who-av {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.who-av-prev {
-  transform: translateY(-100%);
-}
-.who-av-next {
-  transform: translateY(100%);
-}
-.who-line-zone {
-  overflow: hidden;
-}
-.who-line {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  white-space: nowrap;
-  transform: translateX(var(--lx, 0));
-}
-.who-line[data-glide='true'] {
-  transition:
-    transform 200ms var(--ease-out),
-    opacity 200ms ease;
-}
-@keyframes who-in-right {
-  from {
-    transform: translateX(40px);
-    opacity: 0;
-  }
-}
-@keyframes who-in-left {
-  from {
-    transform: translateX(-40px);
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .who-reel[data-glide='true'],
-  .who-line[data-glide='true'] {
-    transition: none;
-  }
-  .who-line[data-enter] {
-    animation: none;
-  }
-}
-
 /* ───────── Switch turn-over: the screen visibly changes hands, even when the notes are the same ───────── */
 .fx-deck {
   position: relative;
-}
-@keyframes fx-x {
-  from {
-    translate: calc(var(--fx-dir, 1) * 56px) 0;
-    scale: 0.97;
-    opacity: 0;
-  }
-}
-@keyframes fx-y {
-  from {
-    translate: 0 calc(var(--fx-dir, 1) * 32px);
-    scale: 0.97;
-    opacity: 0;
-  }
 }
 @keyframes fx-fade {
   from {
     opacity: 0;
   }
-}
-.fx-in {
-  --fx-dir: 1;
-}
-.fx-in.fx-rev {
-  --fx-dir: -1;
-}
-.sheet.fx-project {
-  animation: fx-x 420ms var(--ease-out) both;
-}
-.sheet.fx-person {
-  animation: fx-y 420ms var(--ease-out) both;
 }
 .sheet.fx-fade {
   animation: fx-fade 300ms ease both;
@@ -933,208 +630,81 @@
   animation: fx-deal 380ms var(--ease-out) both;
   animation-delay: calc(var(--slot, 0) * 70ms);
 }
-.fx-deck.fx-project .deck-stack {
-  animation: fx-x 420ms var(--ease-out) both;
-}
-.fx-deck.fx-person .deck-stack {
-  animation: fx-y 420ms var(--ease-out) both;
-}
-/* Who you are now, over the deck, with Undo: lime with ink (12:1), floating on a soft shadow. */
-@keyframes fx-flash {
-  0% {
-    opacity: 0;
-    scale: 0.94;
-  }
-  7%,
-  88% {
-    opacity: 1;
-    scale: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-.fx-flash {
-  position: absolute;
-  z-index: 20;
-  top: 64px;
-  left: 50%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: max-content;
-  max-width: calc(100% - 16px);
-  padding: 10px 10px 10px 10px;
-  border-radius: var(--r-card);
-  background: var(--lime);
-  color: var(--on-lime);
-  transform: translateX(-50%);
-  animation: fx-flash 3000ms var(--ease-out) both;
-}
-.fx-flash-av {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--on-lime);
-  color: var(--lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
-}
-.fx-flash-text {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.fx-flash-text strong {
-  overflow: hidden;
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.fx-flash-text span {
-  overflow: hidden;
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.fx-flash-undo {
-  flex: none;
-  min-height: 44px;
-  margin-left: 4px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: var(--r-control);
-  background: rgba(23, 32, 34, 0.12);
-  color: var(--on-lime);
-  font-size: var(--fs-md);
-  font-weight: 700;
-}
-.fx-flash-undo:focus-visible {
-  outline: 2px solid var(--on-lime);
-  outline-offset: 2px;
-}
-/* Header: the avatar rolls in with a lime ring, the new project name lights up. */
-@keyframes who-roll {
-  from {
-    transform: rotateX(90deg);
-    opacity: 0;
-  }
-}
-@keyframes who-ring {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-.who-av[data-turn] {
-  animation: who-roll 360ms var(--ease-out) both;
-}
-.who-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  animation: who-ring 700ms ease-out both;
-  outline: 2px solid var(--lime);
-  outline-offset: -2px;
-}
-@keyframes who-hl {
-  from {
-    color: var(--lime);
-  }
-}
-.who-line[data-enter] {
-  animation:
-    who-in-right 260ms var(--ease-out) both,
-    who-hl 900ms ease-out both;
-}
-.who-line[data-enter='left'] {
-  animation:
-    who-in-left 260ms var(--ease-out) both,
-    who-hl 900ms ease-out both;
-}
 @media (prefers-reduced-motion: reduce) {
   .sheet.fx-in,
-  .fx-deck.fx-in .deck-stack,
   .fx-deck.fx-in .deck-card {
     animation: fx-fade 300ms ease both;
   }
-  .fx-flash {
-    animation-name: fx-fade-out;
-    scale: none;
-  }
-  .who-av[data-turn],
-  .who-line[data-enter] {
-    animation: who-hl 900ms ease-out both;
-  }
-  .who-av[data-turn] {
-    animation: none;
-  }
-}
-@keyframes fx-fade-out {
-  0%,
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
 }
 
-/* ───────── Work timer chip, in every header where the bell was ───────── */
-.timer-chip {
+/* ───────── Home header buttons: notifications and the project/person switch ───────── */
+.home-icon-btn {
   position: relative;
-  isolation: isolate;
   flex: none;
-  align-self: flex-start;
-  height: 44px;
-  min-width: 44px;
+}
+.home-icon-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+
+/* ───────── Work timer, a row at the foot of the hours card ───────── */
+.hs-timer {
+  --focus: #dbf227;
+  width: 100%;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 0 12px;
-  border-radius: var(--r-control);
-  overflow: hidden;
+  gap: 8px;
+  padding: 0 14px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0;
+  background: none;
+  color: var(--lime);
   font-size: var(--fs-md);
   font-weight: 600;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  touch-action: manipulation;
 }
-/* Hold to start: a lime fill sweeps across the chip over HOLD_MS (500 ms). */
-.timer-ring {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--lime);
-  opacity: 0.35;
-  transform: scaleX(0);
-  transform-origin: left;
+.hs-timer:active {
+  background: rgba(255, 255, 255, 0.08);
 }
-.timer-chip[data-holding] .timer-ring {
-  transform: scaleX(1);
-  transition: transform 500ms linear;
+.hs-timer-on {
+  padding: 0;
+  gap: 0;
+  justify-content: stretch;
 }
-.timer-chip.is-on {
+.hs-timer-main,
+.hs-timer-stop {
+  --focus: #dbf227;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
   border: 0;
-  background: var(--lime);
-  color: var(--on-lime);
+  background: none;
+  font-size: var(--fs-md);
+  font-weight: 600;
 }
-.timer-chip.is-on[data-paused] {
-  background: var(--card-2);
-  color: var(--ink);
+.hs-timer-main {
+  flex: 1;
+  gap: 8px;
+  padding: 0 14px;
+  color: var(--lime);
+}
+.hs-timer-on[data-paused] .hs-timer-main {
+  color: #ffffff;
+}
+.hs-timer-stop {
+  padding: 0 18px;
+  color: #ffffff;
+}
+.hs-timer-main:active,
+.hs-timer-stop:active {
+  background: rgba(255, 255, 255, 0.08);
 }
 .timer-time {
   font-size: var(--fs-base);
@@ -1153,7 +723,7 @@
   background: currentColor;
   animation: timer-pulse 1.6s ease-in-out infinite;
 }
-.timer-chip[data-paused] .timer-dot {
+.hs-timer-on[data-paused] .timer-dot {
   animation: none;
   opacity: 0.5;
 }
@@ -1161,20 +731,6 @@
   .timer-dot {
     animation: none;
   }
-}
-.tb-pass-row > .tb-pass-count {
-  flex: none;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--r-control);
-  background: var(--lime);
-  color: var(--on-lime);
-  font-size: var(--fs-xs);
-  font-weight: 700;
 }
 .tsheet {
   display: flex;
@@ -1334,6 +890,12 @@
 }
 
 /* ───────── First-visit guide: dim everything but the spotlit target ───────── */
+@keyframes guide-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
 .guide {
   position: absolute;
   inset: 0;
@@ -1378,7 +940,7 @@
   background: var(--card-2);
   color: var(--ink);
   pointer-events: auto;
-  animation: tb-pop 240ms var(--ease-out) both;
+  animation: guide-pop 240ms var(--ease-out) both;
 }
 /* The card takes focus only so its text is read first; it is not a control, so no ring. */
 .guide-card:focus {

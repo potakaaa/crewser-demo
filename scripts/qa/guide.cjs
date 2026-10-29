@@ -34,15 +34,17 @@ async function waitStep(p, n, label) {
   ok(false, `${label}: expected ${n} / ${N}, got ${await count(p)}`);
 }
 
-const hold = async (p, sel) => { const [x, y] = await center(p, sel); await touch(p, 'touchStart', x, y); await sleep(800); await touch(p, 'touchEnd'); };
+const tapOn = async (p, sel) => { const [x, y] = await center(p, sel); await tap(p, x, y); };
 const STEPS = [
   { name: 'deck swipe', go: async (p) => { const [x, y] = await center(p, '[data-guide="deck"]'); await swipe(p, [x + 100, y], [x - 100, y]); } },
   { name: 'ruler drag', go: async (p) => { const [x, y] = await center(p, '[data-guide="ruler"]'); await swipe(p, [x + 60, y], [x - 80, y], 14); } },
-  { name: 'header switch (vertical)', go: async (p) => { const [x, y] = await center(p, '[data-guide="who"]'); await swipe(p, [x, y + 20], [x, y - 40]); },
-    post: async (p, prev) => { await sleep(500); ok((await link(p)) !== prev, 'person switched'); } },
-  { name: 'timer hold', go: (p) => hold(p, '[data-guide="timer"]'),
-    pre: async (p) => { await sleep(500); const leak = await p.evaluate(() => [...document.querySelectorAll('.toast, [class*="pill"]')].filter((e) => e.offsetWidth && /undo/i.test(e.textContent)).map((e) => e.className)); ok(!leak.length, 'no switch pill/toast leaking into the timer step ' + JSON.stringify(leak)); } },
-  { name: 'tap Pass', go: async (p) => { const [x, y] = await center(p, '[data-guide="pass"]'); await tap(p, x, y); } },
+  { name: 'switch arrow tap', go: (p) => tapOn(p, '[data-guide="switch"]'),
+    post: async (p) => { await sleep(300); ok((await p.locator('.switcher').count()) === 1, 'arrow opened the project switcher'); } },
+  { name: 'timer start tap',
+    pre: async (p) => { await sleep(600); const r = await p.locator('[data-guide="timer"]').boundingBox(); ok(r && r.y > 0 && r.y + r.height < H - 56, `timer scrolled into view above the dock (y ${r && Math.round(r.y)})`); },
+    go: (p) => tapOn(p, '[data-guide="timer"]'),
+    post: async (p) => { await sleep(300); ok((await p.locator('.hs-timer-on').count()) === 1, 'timer is running'); } },
+  { name: 'tap Profile', go: (p) => tapOn(p, '[data-guide="profile"]') },
 ];
 const N = STEPS.length;
 async function guideRun(b) {
@@ -90,34 +92,16 @@ async function guideRun(b) {
   ok(!p.errs.length, 'no console errors ' + JSON.stringify(p.errs.slice(0, 3)));
   await p.context().close();
 
-  // Timer TAP path: opens manual entry and advances the timer step.
-  {
-    const q = await open(b, { done: false });
-    const ti = STEPS.findIndex((x) => x.name.startsWith('timer'));
-    await waitStep(q, 1, 'tap-run start');
-    for (let i = 0; i < ti; i++) { await q.locator('.guide-next').click(); await sleep(400); }
-    await waitStep(q, ti + 1, 'tap-run at timer step');
-    const [x, y] = await center(q, '[data-guide="timer"]'); await tap(q, x, y);
-    await waitStep(q, ti + 2, 'timer tap');
-    ok(await q.locator('.log-sheet, [class*="log-"]').count() > 0 || /Start|End|Break|hours/i.test(await q.evaluate(() => document.body.innerText)), 'timer tap opened manual entry');
-    ok(!q.errs.length, 'no console errors (tap run) ' + JSON.stringify(q.errs.slice(0, 3)));
-    await q.context().close();
-  }
-
-  // Skip and Esc restore the original link
+  // Skip and Esc end the tour and leave the link where it was
   for (const how of ['Skip', 'Esc']) {
     const q = await open(b, { done: false });
-        await waitStep(q, 1, how);
-    // walk to a switched state: step through to 3, swipe person
+    await waitStep(q, 1, how);
+    const before = await link(q);
     await q.locator('.guide-next').click(); await sleep(300); await q.locator('.guide-next').click(); await sleep(400);
-    let [x, y] = await center(q, '[data-guide="who"]');
-    await swipe(q, [x, y + 20], [x, y - 40]); await sleep(1200);
-    const sw = await link(q);
     if (how === 'Skip') await q.locator('.guide-skip').click(); else await q.keyboard.press('Escape');
-    await sleep(1000);
-    const back = await link(q);
+    await sleep(800);
     ok((await q.locator('.guide').count()) === 0, `${how} ends the tour`);
-    ok(/Florentina/.test(back) && /Last Ferry/.test(back), `${how} restores original link (was "${sw}", now "${back}")`);
+    ok((await link(q)) === before, `${how} leaves the link as it was`);
     await q.context().close();
   }
 }
@@ -149,39 +133,62 @@ async function regress(b) {
   }
   console.log('   distinct deck cards seen:', seen.size);
   await p.reload(); await sleep(3000);
-  // header swipes
-  const undoCount = () => p.getByRole('button', { name: /undo/i }).count();
+  // deck arrows: previous disabled at the start, next walks the deck, next disabled at the end
+  const prev = p.getByRole('button', { name: 'Previous note' }), next = p.getByRole('button', { name: 'Next note' });
+  const pos = () => p.locator('.deck-pos').innerText();
+  ok(await prev.isDisabled(), 'previous arrow disabled on the first note');
+  const p0 = await pos();
+  await next.click(); await sleep(500);
+  ok((await pos()) !== p0 && !(await prev.isDisabled()), `next arrow moves the deck (${p0} -> ${await pos()})`);
+  await prev.click(); await sleep(500);
+  ok((await pos()) === p0 && (await prev.isDisabled()), 'previous arrow goes back and disables again');
+  for (let i = 0; i < 30 && !(await next.isDisabled()); i++) { await next.click(); await sleep(150); }
+  ok(await next.isDisabled(), 'next arrow disabled on the last note: ' + (await pos()));
+  await p.reload(); await sleep(3000);
+
+  // the header: no swipe switching, no Start chip, an arrow that opens the switcher
   const l0 = await link(p);
-  let [x, y] = await center(p, '[data-guide="who"]');
-  await swipe(p, [x, y + 20], [x, y - 40]); await sleep(600);
-  const l1 = await link(p);
-  ok(l1 !== l0, `vertical swipe switches person: "${l0}" -> "${l1}"`);
-  ok((await undoCount()) === 1, 'exactly one Undo after person switch');
-  ok((await p.locator('.toast, [class*="pill"]').filter({ hasText: /undo/i }).count()) <= 1, 'single pill');
-  if (shots) await p.screenshot({ path: `${shots}/regress-person-${W}.png` });
-  await p.getByRole('button', { name: /undo/i }).first().click(); await sleep(700);
-  ok((await link(p)) === l0, 'Undo restores previous link');
-  [x, y] = await center(p, '[data-guide="who"]');
-  await swipe(p, [x + 80, y], [x - 80, y]); await sleep(600);
-  const l2 = await link(p); ok(l2 !== l0, `horizontal swipe switches project: "${l0}" -> "${l2}"`);
-  ok((await undoCount()) === 1, 'exactly one Undo after project switch');
-  await p.getByRole('button', { name: /undo/i }).first().click(); await sleep(700);
-  ok((await link(p)) === l0, 'Undo restores project');
-  // ruler resets to Now after a switch
+  let [x, y] = await center(p, '.who-block');
+  await swipe(p, [x, y + 20], [x, y - 40]); await swipe(p, [x + 80, y], [x - 80, y]); await sleep(600);
+  ok((await link(p)) === l0, 'swiping the header does not switch');
+  await p.evaluate(() => document.querySelectorAll('.screen').forEach((e) => (e.scrollTop = 0))); await sleep(300);
+  ok((await p.locator('.timer-chip, .glass-btn:has-text("Start")').count()) === 0, 'no Start chip in the header');
+  // the ruler resets to Now after a switch
   [x, y] = await center(p, '[data-guide="ruler"]');
   await swipe(p, [x + 60, y], [x - 90, y], 14); await sleep(500);
   const rulerState = () => p.locator('[data-guide="ruler"]').evaluate((e) => e.innerText.replace(/\s+/g, ' ') + '|' + e.dataset.preview);
   const r0 = await rulerState(); ok(/true/.test(r0.split('|')[1]), 'ruler is scrubbed (preview) before switch');
-  [x, y] = await center(p, '[data-guide="who"]');
-  await swipe(p, [x, y + 20], [x, y - 40]); await sleep(1000);
+  await tapOn(p, '[data-guide="switch"]'); await sleep(600);
+  ok((await p.locator('.switcher').count()) === 1, 'arrow opens the project switcher');
+  await p.locator('.lrow:not(.is-active):not(.is-blocked)').first().click(); await sleep(900);
+  await p.keyboard.press('Escape'); await sleep(500);
+  const l1 = await link(p);
+  ok(l1 !== l0, `picking a row switches: "${l0}" -> "${l1}"`);
   const r1 = await rulerState(); ok(!/true/.test(r1.split('|')[1]), 'ruler back to Now after switch: ' + r1.slice(0, 80));
-  // dock
-  const dock = await p.evaluate(() => [...document.querySelectorAll('.dock-btn')].map((e) => e.innerText + ' ' + (e.getAttribute('aria-label') || '')).join(' | '));
-  ok(/Home/.test(dock) && /Calendar/.test(dock) && /Your pass/.test(dock), 'dock has Home/Calendar/Pass(avatar) ' + JSON.stringify(dock));
-  ok((await p.locator('.dock-add').count()) === 1, 'dock has +');
-  [x, y] = await center(p, '[data-guide="pass"]'); await tap(p, x, y); await sleep(700);
-  const pass = await txt(); ok(['Documents', 'Contacts', 'Settings', 'Notification'].every((s) => pass.includes(s)), 'Pass opens Documents/Contacts/Settings/Notifications');
-  if (shots) await p.screenshot({ path: `${shots}/regress-pass-${W}.png` });
+  if (shots) await p.screenshot({ path: `${shots}/regress-switched-${W}.png` });
+
+  // timer and the two quick actions stay reachable from Home
+  const quick = await p.locator('.quick').innerText();
+  ok(/Track time/.test(quick) && /Scan invoice/.test(quick), 'Home keeps Track time and Scan invoice');
+  await p.locator('[data-guide="timer"]').scrollIntoViewIfNeeded();
+  await p.locator('[data-guide="timer"]').click(); await sleep(500);
+  ok((await p.locator('.hs-timer-on').count()) === 1, 'Start timer starts the timer');
+  await p.locator('.hs-timer-stop').click(); await sleep(700);
+  ok(/Start|End|Break|hours/i.test(await txt()) && (await p.locator('.hs-timer-on').count()) === 0, 'Stop ends the timer and opens the log');
+  await p.reload(); await sleep(3000);
+
+  // dock: five tabs, full width, docked, no + and no pass menu
+  const labels = await p.evaluate(() => [...document.querySelectorAll('.dock-btn')].map((e) => e.getAttribute('aria-label')));
+  ok(JSON.stringify(labels) === JSON.stringify(['Home', 'Calendar', 'Documents', 'Contacts', 'Profile and settings']), 'dock tabs in order ' + JSON.stringify(labels));
+  ok((await p.locator('.dock-add, .tb-pass, .tb-dial').count()) === 0, 'no + button and no pass menu');
+  const bar = await p.locator('.tabbar-wrap').boundingBox();
+  ok(bar && bar.x === 0 && bar.width >= W - 1 && Math.abs(bar.y + bar.height - H) <= 1, `dock spans the phone and sits at the bottom (${JSON.stringify(bar)})`);
+  if (shots) await p.screenshot({ path: `${shots}/regress-home-${W}.png` });
+  for (const [name, hash] of [['Calendar', 'calendar'], ['Documents', 'documents'], ['Contacts', 'contacts'], ['Profile and settings', 'settings']]) {
+    await p.getByRole('button', { name, exact: true }).click(); await sleep(600);
+    ok(new RegExp(hash).test(p.url()), `${name} opens ${hash}`);
+  }
+  ok((await p.locator('.dock-btn[data-on]').getAttribute('aria-label')) === 'Profile and settings', 'Profile is the active tab on Settings');
   ok(!p.errs.length, 'no console errors ' + JSON.stringify(p.errs.slice(0, 3)));
   await p.context().close();
 }

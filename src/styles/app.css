@@ -281,7 +281,7 @@
 .sheet {
   position: relative;
   margin-top: -20px;
-  padding: var(--sp-6) var(--sp-5) 136px;
+  padding: var(--sp-6) var(--sp-5) calc(var(--sab) + 88px);
   border-radius: var(--r-card) var(--r-card) 0 0;
   background: var(--sheet);
   display: flex;
@@ -1657,32 +1657,20 @@
   color: #c9d3d4;
 }
 /* ───────── Tab bar ───────── */
-.tab-fade {
-  position: absolute;
-  z-index: 10;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120px;
-  background: linear-gradient(180deg, rgba(28, 36, 39, 0) 0%, rgba(28, 36, 39, 0.92) 65%);
-  pointer-events: none;
-  transition: opacity var(--t-med) ease;
-}
-.tab-fade.is-hidden {
-  opacity: 0;
-}
 .tabbar-wrap {
   position: absolute;
   z-index: 11;
-  left: 50%;
-  bottom: max(22px, calc(var(--sab) + 10px));
-  translate: -50% 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-bottom: var(--sab);
+  background: var(--dark-tile);
   transition:
     transform var(--t-nav) var(--ease-ios),
     opacity var(--t-med) ease;
 }
 .tabbar-wrap.is-hidden {
-  transform: translateY(calc(100% + 40px));
+  transform: translateY(100%);
   opacity: 0;
 }
 /* ───────── Log sheet ───────── */
@@ -2031,13 +2019,13 @@
   z-index: 50;
   left: var(--sp-4);
   right: var(--sp-4);
-  bottom: max(96px, calc(var(--sab) + 92px));
+  bottom: calc(var(--sab) + 72px);
   display: flex;
   justify-content: center;
   pointer-events: none;
 }
 .toast-region.raised {
-  bottom: max(100px, calc(var(--sab) + 84px));
+  bottom: calc(var(--sab) + 72px);
 }
 /* While a sheet is open the bottom holds its main button, so toasts drop in from the top. */
 .toast-region.top {

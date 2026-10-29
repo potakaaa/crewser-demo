@@ -42,7 +42,7 @@ export function Guide() {
   const setLogOpen = useDemo((s) => s.setLogOpen);
   const timer = useDemo((s) => s.timer);
   const stopTimer = useDemo((s) => s.stopTimer);
-  // The switch steps leave you on another person or project; finishing puts you back where you started.
+  // If the tour ends on another person or project than it started on, finishing puts you back where you started.
   const movedAway = useDemo((s) => !!s.guideFrom && s.guideFrom !== s.activeLinkId);
   const root = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLDivElement>(null);
@@ -64,6 +64,17 @@ export function Guide() {
     closeSheet();
     setLogOpen(false);
     if (route.name !== s.route) navigate({ name: s.route });
+    // A target further down the page (the timer) is scrolled to the middle of the screen first.
+    const t = window.setTimeout(() => {
+      const el = root.current?.parentElement?.querySelector<HTMLElement>(`[data-guide="${s.target}"]`);
+      const scroller = el?.closest<HTMLElement>('.screen');
+      if (!el || !scroller) return;
+      const e = el.getBoundingClientRect();
+      const r = scroller.getBoundingClientRect();
+      const k = r.height / scroller.offsetHeight || 1;
+      scroller.scrollTop += (e.top + e.height / 2 - (r.top + r.height / 2)) / k;
+    }, 80);
+    return () => window.clearTimeout(t);
     // Route is read, not watched: a step moves you once, then lets you be.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
