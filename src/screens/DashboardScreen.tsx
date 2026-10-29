@@ -69,7 +69,7 @@ export function DashboardScreen() {
 
         {hasNotes ? (
           <section className="stack" aria-label="Smart notes">
-            <SectionHead title="Smart notes" />
+            <SectionHead title="Smart notes" bar />
             {sn.top.map((n) => (
               <ContentCard key={n.id} note={n} />
             ))}

@@ -2449,7 +2449,7 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.app .section-titles h2::after {
+.app .section-titles-bar h2::after {
   content: '';
   flex: 1;
   min-width: var(--sp-6);
