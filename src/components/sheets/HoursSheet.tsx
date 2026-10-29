@@ -9,7 +9,7 @@ const isMetric = (id?: string): id is HoursMetric => METRICS.includes(id as Hour
 export function hoursSheetMeta(id?: string) {
   const metric: HoursMetric = isMetric(id) ? id : 'week';
   const title = { week: 'Last 7 days', overtime: 'Overtime', days: 'Shoot days' }[metric];
-  return { title, subtitle: metric === 'days' ? `${today.shootDay} of ${project.totalShootDays} done` : hoursOverview().rangeLabel };
+  return { title, subtitle: metric === 'days' ? undefined : hoursOverview().rangeLabel };
 }
 
 function Row({ day, hours }: { day: DayStat; hours: string }) {
@@ -29,7 +29,7 @@ export function HoursSheet({ id }: { id?: string }) {
   const hero = {
     week: { label: 'Total hours', value: fmtH(o.weekTotal), unit: 'h' },
     overtime: { label: 'Overtime', value: `+${fmtH(o.overtime)}`, unit: 'h' },
-    days: { label: 'Left after today', value: String(o.shootLeft), unit: '' },
+    days: { label: 'Shoot days', value: String(today.shootDay), unit: `of ${project.totalShootDays}` },
   }[metric];
   const rows =
     metric === 'overtime'
