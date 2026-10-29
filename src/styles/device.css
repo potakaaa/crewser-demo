@@ -264,7 +264,7 @@
 }
 
 .dp-toggle input:checked + .dp-switch {
-  background: var(--teal);
+  background: var(--focus);
 }
 
 .dp-toggle input:checked + .dp-switch::after {

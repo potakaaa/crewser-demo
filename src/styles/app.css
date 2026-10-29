@@ -495,22 +495,22 @@
 .offline-copy strong {
   font-size: var(--fs-2);
   font-weight: 600;
-  color: var(--amber-dark);
+  color: var(--ink);
 }
 .offline-copy span {
   font-size: var(--fs-1);
   line-height: 1.5;
-  color: #e1e8e8;
+  color: var(--text-2);
 }
 .offline-light {
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-4);
-  background: var(--amber-surface);
+  background: var(--chip);
   border: 0;
   font-size: var(--fs-1);
-  font-weight: 500;
-  color: var(--amber-text);
+  font-weight: 400;
+  color: var(--ink);
 }
 .empty-light {
   display: flex;
@@ -523,7 +523,7 @@
   text-align: center;
 }
 .empty-light strong {
-  font-size: 15px;
+  font-size: var(--fs-3);
   font-weight: 600;
 }
 .empty-light span {
@@ -556,11 +556,11 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
 }
 .home-project {
   font-size: var(--fs-2);
-  font-weight: 500;
+  font-weight: 400;
 }
 /* ───────── To-do / attachment rows ───────── */
 .todo-row,
@@ -568,7 +568,7 @@
   transition: transform 180ms var(--ease-out);
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--sp-4);
   min-height: 72px;
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
   border: 0;
@@ -585,7 +585,7 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--r-control);
-  background: var(--amber-surface);
+  background: var(--chip);
 }
 .todo-icon-neutral {
   background: var(--chip);
@@ -595,7 +595,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--sp-1);
 }
 .todo-t1 {
   font-size: var(--fs-2);
@@ -616,8 +616,8 @@
 }
 .att-open {
   font-size: var(--fs-1);
-  font-weight: 500;
-  color: var(--teal);
+  font-weight: 400;
+  color: var(--ink);
 }
 /* ───────── Section heads ───────── */
 .section-head {
@@ -755,7 +755,7 @@
 .fact-actions {
   flex: none;
   display: flex;
-  gap: 6px;
+  gap: var(--sp-2);
 }
 .copy-btn {
   transition:
@@ -770,8 +770,8 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: var(--sp-3) 14px var(--sp-3) var(--sp-3);
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
   border: 0;
   border-radius: var(--r-control);
   background: var(--sheet);
@@ -784,7 +784,7 @@
 }
 .qr-thumb {
   flex: none;
-  padding: 6px;
+  padding: var(--sp-2);
   border: 1px solid #e1e1df;
   border-radius: var(--r-control);
   background: #ffffff;
@@ -795,7 +795,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--sp-1);
 }
 .qr-copy strong {
   font-size: var(--fs-2);
@@ -809,10 +809,10 @@
 .qr-copy > .qr-cta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 4px;
-  font-weight: 500;
-  color: var(--teal);
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
+  font-weight: 400;
+  color: var(--ink);
 }
 .qr-thumb-empty {
   width: 90px;
@@ -821,14 +821,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--sp-2);
   border: var(--dashed);
   background: transparent;
   line-height: 1;
 }
 .qr-thumb-empty span {
   font-size: var(--fs-1);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-3);
 }
 .qr-copy > .qr-cta {
@@ -1038,7 +1038,7 @@
 /* ───────── Note detail ───────── */
 .route-code {
   font-size: var(--fs-6);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -1052,11 +1052,11 @@
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 14px var(--sp-4) var(--sp-4);
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-4) var(--sp-4);
   border-radius: var(--r-card);
   background: var(--brand-surface);
-  color: #ffffff;
+  color: var(--ink);
 }
 /* Static film grain, as on the header and the Documents call sheet card: below the text, never animated. */
 .ns-hero::after {
@@ -1094,12 +1094,12 @@
   justify-content: start;
   align-items: end;
   column-gap: var(--sp-6);
-  row-gap: 3px;
+  row-gap: var(--sp-1);
 }
 .ns-time {
   display: contents;
 }
-/* Labels and muted values use on-dark-2: the grain lifts the lightest speck, and on-dark-3 would drop below 4.5:1. */
+/* Labels and muted values use text-2: the grain lifts the lightest speck, and text-3 would drop below 4.5:1. */
 .ns-k {
   font-size: var(--fs-1);
   font-weight: 600;
@@ -1112,16 +1112,16 @@
   white-space: nowrap;
 }
 .ns-tbc {
-  padding-bottom: 2px;
+  padding-bottom: var(--sp-1);
   font-size: var(--fs-3);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.2;
   color: var(--text-2);
 }
 /* "Check-in", "until 22:00": beside the time, on its baseline row. */
 .ns-sub {
   grid-row: 2;
-  padding-bottom: 3px;
+  padding-bottom: var(--sp-1);
   font-size: var(--fs-2);
   color: var(--text-2);
 }
@@ -1131,7 +1131,7 @@
 .ns-note {
   position: relative;
   margin-top: var(--sp-2);
-  padding: 28px var(--sp-4) var(--sp-4);
+  padding: var(--sp-8) var(--sp-4) var(--sp-4);
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
@@ -1140,7 +1140,7 @@
   position: absolute;
   top: -11px;
   left: 14px;
-  padding: 5px 16px 3px;
+  padding: var(--sp-1) var(--sp-4) var(--sp-1);
   background: var(--grain-soft, none) 0 0 / 160px 160px, var(--lime);
   background-blend-mode: multiply, normal;
   clip-path: polygon(
@@ -1151,7 +1151,7 @@
   transform-origin: left center;
   color: var(--on-lime);
   font-family: var(--ff-poster);
-  font-size: 17px;
+  font-size: var(--fs-3);
   font-weight: 400;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -1231,7 +1231,7 @@
 }
 .ns-h {
   margin: 0;
-  padding: 0 2px;
+  padding: 0 var(--sp-1);
   font-size: var(--fs-2);
   font-weight: 600;
   color: var(--text-2);
@@ -1251,7 +1251,7 @@
   grid-template-columns: minmax(0, 1fr) 44px 44px;
   align-items: center;
   gap: var(--sp-1);
-  padding: 10px var(--sp-3) 10px var(--sp-4);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
 }
 .ns-contact + .ns-contact {
   border-top: 1px solid var(--hairline);
@@ -1272,7 +1272,7 @@
 }
 .ns-contact-phone {
   font-size: var(--fs-2);
-  font-weight: 500;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
@@ -1320,7 +1320,7 @@
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr);
   gap: var(--sp-3);
-  padding: 10px 0;
+  padding: var(--sp-3) 0;
   font-size: var(--fs-2);
 }
 .ns-hours-row + .ns-hours-row {
@@ -1351,7 +1351,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--sp-3);
-  padding: 10px var(--sp-3) 10px 18px;
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
   border-top: 1px solid var(--hairline);
 }
 .fact-row:first-child {
@@ -1368,7 +1368,7 @@
   font-weight: 600;
 }
 .note-text {
-  padding: 18px;
+  padding: var(--sp-4);
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
@@ -1380,8 +1380,8 @@
 .crew-line {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: var(--sp-1) 2px 0;
+  gap: var(--sp-3);
+  padding: var(--sp-1) var(--sp-1) 0;
   font-size: var(--fs-2);
   color: var(--text-2);
 }
@@ -1396,7 +1396,7 @@
 }
 .topbar-title {
   text-align: center;
-  font-size: 15px;
+  font-size: var(--fs-3);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -1410,7 +1410,7 @@
   position: relative;
   isolation: isolate;
   background: #0e1314;
-  color: #f1f4f3;
+  color: var(--ink);
 }
 /* The PDF bar gets the same static grain as the dark cards. */
 .topbar-dark::after {
@@ -1430,7 +1430,7 @@
 /* ───────── PDF viewer ───────── */
 .screen-pdf {
   background: var(--dark-tile);
-  color: #f1f4f3;
+  color: var(--ink);
 }
 .pdf-stage {
   flex: 1;
@@ -1487,7 +1487,7 @@
   padding: 0 var(--sp-4) max(var(--sp-6), calc(var(--sab) + var(--sp-3)));
   text-align: center;
   font-size: var(--fs-1);
-  color: #c9d3d4;
+  color: var(--text-2);
 }
 /* ───────── Tab bar ───────── */
 .tabbar-wrap {
@@ -1636,7 +1636,7 @@
     border-color var(--t-fast) ease;
 }
 .time-tile[data-active='true'] {
-  border: 1.5px solid var(--teal);
+  border: 1.5px solid var(--ink);
 }
 /* Inline time picker: two snapping wheels plus quick picks */
 .log-picker {
@@ -1735,8 +1735,8 @@
   text-align: left;
 }
 .picker-chip[data-on='true'] {
-  border-color: var(--teal);
-  background: rgba(143, 208, 198, 0.12);
+  border-color: var(--ink);
+  background: var(--chip);
   color: var(--ink);
   font-weight: 600;
 }
@@ -1826,8 +1826,8 @@
 .log-confirm {
   padding: var(--sp-3) var(--sp-3);
   border-radius: var(--r-control);
-  background: var(--amber-surface);
-  color: var(--amber-text);
+  background: var(--chip);
+  color: var(--ink);
   font-size: var(--fs-1);
   line-height: 1.4;
 }
@@ -1875,12 +1875,12 @@
   align-items: center;
   gap: var(--sp-2);
   max-width: 100%;
-  padding: 10px var(--sp-4) 10px 12px;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
   border-radius: var(--r-control);
   background: var(--brand-surface);
-  color: #ffffff;
+  color: var(--ink);
   font-size: var(--fs-2);
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
   opacity: 0;
   transform: translateY(12px) scale(0.96);
@@ -2113,8 +2113,8 @@
   min-height: 48px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 2px;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-1);
   border: 0;
   border-radius: var(--r-control);
   background: none;
@@ -2159,22 +2159,22 @@
   flex: 1;
   min-width: 0;
   font-size: var(--fs-2);
-  font-weight: 500;
+  font-weight: 400;
 }
 .crew-action {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
   font-size: var(--fs-1);
-  font-weight: 500;
-  color: var(--teal);
+  font-weight: 600;
+  color: var(--ink);
 }
 .crew-list {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  padding: var(--sp-2) 2px var(--sp-1);
+  padding: var(--sp-2) var(--sp-1) var(--sp-1);
 }
 .crew-group ul {
   margin: 0;
@@ -2183,7 +2183,7 @@
 }
 .crew-dept {
   display: block;
-  padding-bottom: 4px;
+  padding-bottom: var(--sp-1);
   font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -2205,7 +2205,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
 }
 .crew-person-text strong {
   font-size: var(--fs-2);
@@ -2217,12 +2217,12 @@
 }
 .you-chip {
   flex: none;
-  padding: 3px 8px;
+  padding: var(--sp-1) var(--sp-2);
   border-radius: var(--r-control);
   background: var(--chip);
   font-size: var(--fs-1);
   font-weight: 600;
-  color: var(--teal);
+  color: var(--ink);
 }
 .ccard-body .crew {
   margin: -4px 0;
@@ -2232,8 +2232,8 @@
 .crew-card {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 14px 16px 8px;
+  gap: var(--sp-1);
+  padding: var(--sp-4) var(--sp-4) var(--sp-2);
   border: 0;
   border-radius: var(--r-card);
   background: var(--card);
@@ -2338,7 +2338,7 @@
   background: var(--signature-bar);
 }
 .log-titles h2 {
-  font-size: calc(18px * var(--display-scale));
+  font-size: calc(var(--fs-4) * var(--display-scale));
 }
 
 /* ───────── Elevation (dark) ─────────
@@ -2356,5 +2356,5 @@
 /* Icon tiles are not buttons: lighter than the card, no bezel. */
 :is(.chip-icon, .pocket-icon, .notif-icon, .todo-icon-neutral) {
   background: var(--chip);
-  color: var(--chip-icon);
+  color: var(--ink);
 }

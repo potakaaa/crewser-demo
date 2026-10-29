@@ -301,7 +301,7 @@
 }
 
 /* ───────── Statistics: the daily average on the dark brand surface with static grain, then one card per number ─────────
-   Labels in on-dark-2 (4.5:1 or better over the grain), numerals white. */
+   Labels in text-2 (4.5:1 or better over the grain), numerals white. */
 .hs-card {
   position: relative;
   isolation: isolate;

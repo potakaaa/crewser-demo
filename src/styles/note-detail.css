@@ -38,14 +38,14 @@
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-2);
   padding: 0 var(--sp-3);
   border: 0;
   border-radius: var(--r-control);
   background: var(--card-2);
   color: var(--ink);
   font-size: var(--fs-1);
-  font-weight: 500;
+  font-weight: 400;
 }
 .pass-tool[aria-pressed='true'] {
   background: var(--lime);
@@ -54,7 +54,7 @@
 .pass-warn {
   font-size: var(--fs-2);
   font-weight: 600;
-  color: var(--amber-text);
+  color: var(--ink);
 }
 .pass-open {
   width: 100%;

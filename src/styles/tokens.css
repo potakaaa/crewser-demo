@@ -7,19 +7,9 @@
   --card: #ffffff;
   --hairline: rgba(17, 26, 27, 0.08);
   --chip: #e6edec;
-  --chip-icon: #2a3b3f;
   --soft: #edf2f1;
   --dark-tile: #1e282a;
   --lime: #dbf227;
-
-  --teal: #2c6b72;
-
-  --amber-surface: #fbefd0;
-  --amber-text: #6b4a00;
-  --amber-dark: #f4c35a;
-
-  --on-dark-2: #c4cfd0;
-  --on-dark-3: #a9b7b9;
 
   --dashed: 1.5px dashed rgba(17, 26, 27, 0.28);
   --r-control: 4px;
@@ -59,17 +49,6 @@
   --fs-4: 20px;
   --fs-5: 28px;
   --fs-6: 40px;
-  /* Legacy names folded onto the six; removed once every file uses --fs-1..6. */
-  --fs-xs: var(--fs-1);
-  --fs-sm: var(--fs-1);
-  --fs-md: var(--fs-2);
-  --fs-base: var(--fs-2);
-  --fs-lg: var(--fs-3);
-  --fs-xl: var(--fs-4);
-  --fs-2xl: var(--fs-5);
-  --fs-3xl: var(--fs-5);
-  --fs-4xl: var(--fs-6);
-  --fs-5xl: var(--fs-6);
   --track-tight: -0.02em;
 
   /* Spacing: 4 / 8 / 12 / 16 / 24 / 32, nothing in between. 16 is the page gutter and card padding. */
@@ -79,7 +58,6 @@
   --sp-4: 16px;
   --sp-6: 24px;
   --sp-8: 32px;
-  --sp-5: var(--sp-4); /* legacy 20 px step, folded into 16 */
   /* Between sibling cards, and the extra air above a section head (more above a head than below it). */
   --card-gap: var(--sp-4);
   --section-gap: var(--sp-4);
@@ -111,24 +89,14 @@
   --hairline: rgba(255, 255, 255, 0.09);
   --line: rgba(255, 255, 255, 0.16);
   --chip: #3e4b4e;
-  --chip-icon: #eef3f2;
   --soft: #394c50;
   --dark-tile: #151c1e;
   --lime: #d7e336;
   --on-lime: #172022;
 
-  /* Text uses six colours only: ink, text-2, text-3, lime, on-lime, danger-text. Teal is never text. */
-  --teal: #8fd0c6;
+  /* Text uses six colours only: ink, text-2, text-3, lime, on-lime, danger-text. No teal, no amber. */
   --danger-text: #ff9a8f;
   --danger-surface: rgba(255, 120, 105, 0.12);
-
-  --amber-surface: rgba(244, 195, 90, 0.12);
-  --amber-text: #f4c35a;
-  --amber-dark: #f4c35a;
-
-  /* Legacy text names, same values as text-2 / text-3 now. */
-  --on-dark-2: var(--text-2);
-  --on-dark-3: var(--text-3);
 
   --dashed: 1.5px dashed rgba(255, 255, 255, 0.24);
   --focus: var(--lime);

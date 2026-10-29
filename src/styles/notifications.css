@@ -9,7 +9,7 @@
 }
 .notif-count {
   font-size: var(--fs-1);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-3);
 }
 .notif-markall {
@@ -20,13 +20,13 @@
   border: 0;
   border-radius: var(--r-control);
   background: none;
-  color: var(--teal);
+  color: var(--ink);
   font-size: var(--fs-2);
   font-weight: 600;
 }
 .notif-markall[aria-disabled='true'] {
   color: var(--text-3);
-  font-weight: 500;
+  font-weight: 400;
   opacity: 0.7;
 }
 
@@ -69,7 +69,7 @@
   justify-content: center;
   border-radius: var(--r-control);
   background: var(--soft);
-  color: var(--chip-icon);
+  color: var(--ink);
 }
 .notif-item[data-unread='false'] .notif-icon {
   background: var(--chip);
@@ -79,7 +79,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
   padding-top: 1px;
 }
 .notif-title {
@@ -88,7 +88,7 @@
   line-height: 1.3;
 }
 .notif-item[data-unread='false'] .notif-title {
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-2);
 }
 .notif-body {
@@ -97,16 +97,16 @@
   color: var(--text-2);
 }
 .notif-time {
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   font-size: var(--fs-1);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-3);
 }
 .notif-dot {
   flex: none;
   width: 9px;
   height: 9px;
-  margin-top: 6px;
+  margin-top: var(--sp-2);
   border-radius: 50%;
   background: var(--lime);
   outline: 1.5px solid var(--ink);
