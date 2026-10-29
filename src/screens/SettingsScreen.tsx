@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from 'react';
-import { FONT_THEMES, useActiveLink, useDemo } from '../store';
+import { FONT_THEMES, useActiveLink, useDemo, useUnreadCount } from '../store';
 import { Icon, type IconName } from '../components/Icon';
 import { GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
@@ -65,6 +65,7 @@ export function SettingsScreen() {
   const openSheet = useDemo((s) => s.openSheet);
   const startGuide = useDemo((s) => s.startGuide);
   const toast = useDemo((s) => s.showToast);
+  const unread = useUnreadCount();
   const { callSheetOut, hoursReminder, toggle } = usePrefs();
 
   return (
@@ -172,6 +173,7 @@ export function SettingsScreen() {
 
         <Group title="Notifications">
           <div className="dlist">
+            <NavRow icon="bell" title="Notifications" value={unread ? `${unread} unread` : undefined} onClick={() => openSheet('notifications')} />
             <SwitchRow icon="bell" title="Call sheet is out" hint="When tomorrow's call sheet is out" on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
             <SwitchRow icon="logTime" title="Reminder to submit hours" hint="When days are still open at week's end" on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
           </div>

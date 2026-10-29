@@ -1,15 +1,14 @@
-import { useActiveLink, useDemo, useUnreadCount } from '../store';
+import { useActiveLink, useDemo } from '../store';
 import { Icon } from './Icon';
 import { guideEmit } from '../lib/guide';
 
 /**
- * The Home header's who-and-where block, then Notifications and the switch arrow. The arrow opens the projects
+ * The Home header's who-and-where block, then the switch arrow. The arrow opens the projects
  * sheet (ProjectSwitcher), where every crew link on this phone can be picked, yours or a colleague's.
  */
 export function WhoSwitch() {
   const openSheet = useDemo((s) => s.openSheet);
   const link = useActiveLink();
-  const unread = useUnreadCount();
 
   return (
     <>
@@ -32,10 +31,6 @@ export function WhoSwitch() {
           )}
         </span>
       </div>
-      <button type="button" className="glass-btn home-icon-btn" aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} onClick={() => openSheet('notifications')}>
-        <Icon name="bell" size={20} color="currentColor" strokeWidth={1.7} />
-        {unread > 0 && <span className="home-icon-dot" aria-hidden="true" />}
-      </button>
       <button
         type="button"
         className="glass-btn home-icon-btn"

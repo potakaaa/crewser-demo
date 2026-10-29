@@ -3,7 +3,8 @@
   container: app / inline-size;
   /* Safe areas: in the desktop frame the fake status bar is 54 px; on real phones use env(). */
   --sat: 54px;
-  --sab: 0px;
+  /* Clears the home indicator the desktop frame draws (device.css). */
+  --sab: 18px;
   /* Dark mode: "brand" tiles sit flat, one step above the card, like the production app.
      The grain + gradient look lives only on --brand-focal (the header orb, one hero per screen). */
   --brand-surface: var(--card-2);

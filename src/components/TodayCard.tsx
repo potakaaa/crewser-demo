@@ -5,7 +5,7 @@ import { Icon, noteIcon } from './Icon';
 import { useNoteActions } from '../lib/actions';
 import { useSubmitted } from '../lib/useSubmitted';
 import { primaryIcon, quickAction, TYPE_LABEL } from '../lib/notes';
-import { callSheetFor, callSheetNear, phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
+import { phaseOf, wrapMinutes, wrapOf, type Phase } from '../lib/todayPhase';
 import { dayStat, shiftLabel } from '../lib/stats';
 import { dayWord } from './docs/docs';
 import { fmtCountdown, fmtDayShort, toMinutes } from '../lib/dates';
@@ -52,7 +52,6 @@ interface CardModel {
 function DeckCard({ card }: { card: CardModel }) {
   const a = useNoteActions();
   const setLogOpen = useDemo((s) => s.setLogOpen);
-  const showToast = useDemo((s) => s.showToast);
   const offline = useDemo((s) => s.offline);
   const start = useDemo((s) => s.logStart);
   const end = useDemo((s) => s.logEnd);
@@ -77,10 +76,6 @@ function DeckCard({ card }: { card: CardModel }) {
 
   const isHero = !card.stop;
   const phase = phaseOf(n);
-  // Every card offers the call sheet for its day; a day without one gets the next issued (else the latest), so it never dead-ends.
-  const sheet = callSheetNear(n.day ?? today.date);
-  // A shoot day's sheet is its own: until it is issued, say so instead of opening another day's.
-  const notOut = n.type === 'appointment' && !!n.day && !callSheetFor(n.day);
   const attachment = !n.primaryAction && quickAction(n);
   const time = n.kind === 'time' ? n.time : 'All day';
   // What was sent: today's shift as the Log sheet holds it (editing it after sending un-sends the day).
@@ -162,21 +157,6 @@ function DeckCard({ card }: { card: CardModel }) {
         </p>
       )}
       <div className="deck-ctas">
-        {sheet && (
-          <button
-            type="button"
-            className="btn deck-cta deck-sheet"
-            aria-label={notOut ? `Call sheet for ${fmtDayShort(n.day!)}, not out yet` : `Open call sheet, ${sheet.title.replace('Call sheet · ', '')}${sheet.isNew ? ', updated' : ''}`}
-            onClick={() =>
-              notOut
-                ? showToast(`${fmtDayShort(n.day!)} call sheet isn't out yet. You'll get a notification when it is`, { label: 'Open latest', run: () => a.openPdf(sheet.file) })
-                : a.openPdf(sheet.file)
-            }
-          >
-            Call sheet
-            {sheet.isNew && !notOut && <span className="deck-new" aria-hidden="true" />}
-          </button>
-        )}
         {primary}
       </div>
     </div>

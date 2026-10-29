@@ -223,22 +223,6 @@
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
-.deck-sheet {
-  position: relative;
-  background: var(--card-2);
-  color: var(--ink);
-  font-weight: 600;
-}
-.deck-new {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--r-control);
-  background: var(--lime);
-  outline: 2px solid var(--card-2);
-}
 
 /* Home's one-tap row: quieter than the deck's CTAs, icon tiles on the sheet. */
 .quick {
@@ -637,19 +621,10 @@
   }
 }
 
-/* ───────── Home header buttons: notifications and the project/person switch ───────── */
+/* ───────── Home header buttons: the project/person switch ───────── */
 .home-icon-btn {
   position: relative;
   flex: none;
-}
-.home-icon-dot {
-  position: absolute;
-  top: 9px;
-  right: 9px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--lime);
 }
 
 /* ───────── Work timer, a row at the foot of the hours card ───────── */
