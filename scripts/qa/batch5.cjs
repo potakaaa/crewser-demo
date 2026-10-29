@@ -84,6 +84,9 @@ const bodyText = (p) => p.evaluate(() => document.body.innerText);
   const tiles = await p.evaluate(() => { const rows = [...document.querySelectorAll('.dlist button')].filter((r) => /Projects|guide|Language|Privacy|Imprint/.test(r.textContent)); return rows.map((r) => r.querySelectorAll('svg').length - 1 + ':' + r.querySelectorAll('[class*=tile],[class*=ico]').length); });
   console.log('app rows [extra svg : icon-ish els]', tiles.join(' '));
   ok(tiles.every((t) => t.startsWith('0:0') || t.startsWith('-1:0') || t.endsWith(':0')), 'plain nav rows have no icon squares');
+  const sec = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('section[aria-label]')].map((g) => [g.getAttribute('aria-label'), g.innerText])));
+  ok(/Privacy/.test(sec.Legal || '') && /Imprint/.test(sec.Legal || '') && !/Privacy|Imprint/.test(sec.App || '') && /Projects/.test(sec.App || ''), 'Legal is its own group with Privacy+Imprint; App no longer has them');
+  ok(/Data hosted/.test(sec.Legal || ''), 'footer sits under Legal');
   // font picker
   const fontBtn = p.locator('.fontsel button, [aria-haspopup=listbox]').first();
   const before = await p.evaluate(() => getComputedStyle(document.body).fontFamily);
@@ -142,11 +145,19 @@ const bodyText = (p) => p.evaluate(() => document.body.innerText);
 
   console.log('== deck keyboard');
   p = await open(b, 'dashboard');
+  // arrow-key turn lands focus on the new card's CTA
+  await p.locator('.deck-cta').first().focus();
+  for (let i = 0; i < 3; i++) {
+    await p.keyboard.press('ArrowRight'); await sleep(900);
+    const f = await p.evaluate(() => { const a = document.activeElement; const c = a.closest('.deck-card'); return { cta: a.classList.contains('deck-cta'), front: !!c && !c.inert }; });
+    ok(f.cta && f.front, `ArrowRight turn ${i + 1}: focus on front card CTA ${JSON.stringify(f)}`);
+  }
   const n0 = await p.locator('.deck-card').count();
   const strip = async () => { // demo data has no CTA-less note, so strip actions from the live module and re-render by turning a card
     await p.evaluate(async () => { const m = await import('/src/mock/index.ts'); m.notes.forEach((x) => { delete x.primaryAction; x.attachments = []; }); });
     await p.getByLabel('Next note').click(); await sleep(900); await p.getByLabel('Previous note').click(); await sleep(900);
   };
+  await p.reload(); await sleep(2500);
   const rep = [];
   for (let i = 0; i < n0; i++) {
     const info = await p.evaluate(() => { const c = [...document.querySelectorAll('.deck-card')].find((x) => !x.inert); return { cta: !!c.querySelector('.deck-cta'), btn: c.querySelector('.deck-body')?.getAttribute('role') === 'button', ti: c.querySelector('.deck-body')?.tabIndex, tabbable: [...c.querySelectorAll('button,[tabindex="0"],a')].filter((e) => e.tabIndex >= 0).length, lbl: (c.getAttribute('aria-label') || '') }; });
@@ -155,7 +166,7 @@ const bodyText = (p) => p.evaluate(() => document.body.innerText);
   }
   console.log(JSON.stringify(rep));
   ok(rep.every((r) => !(r.cta && r.btn) && r.tabbable === 1), 'cards with a CTA: CTA is the one tab stop, body is not role=button');
-  await p.goto(base + '#/dashboard'); await sleep(2500);
+  await p.reload(); await sleep(2500);
   await strip();
   const noCta = 0;
   const nb = await p.evaluate(() => [...document.querySelectorAll('.deck-card')].filter((c) => !c.inert).map((c) => ({ cta: !!c.querySelector('.deck-cta'), role: c.querySelector('.deck-body').getAttribute('role'), ti: c.querySelector('.deck-body').tabIndex })));
@@ -174,6 +185,12 @@ const bodyText = (p) => p.evaluate(() => document.body.innerText);
       await p.getByLabel('Close').first().click().catch(() => p.keyboard.press('Escape')); await sleep(800);
     }
   }
+  // focus ring on the CTA-less body
+  await p.locator('.deck-card:not([inert]) .deck-body').focus(); await p.keyboard.press('Shift+Tab'); await p.keyboard.press('Tab');
+  const ring = await p.evaluate(() => { const a = document.activeElement, c = getComputedStyle(a); return { vis: a.matches(':focus-visible'), cls: a.className, ow: c.outlineWidth, os: c.outlineStyle, sh: c.boxShadow }; });
+  console.log(JSON.stringify(ring));
+  ok(ring.vis && ((ring.os !== 'none' && parseFloat(ring.ow) > 0) || ring.sh !== 'none'), 'CTA-less body shows a focus ring on keyboard focus');
+  await p.screenshot({ path: `${shots}/kbd-ring.png` });
   // Real keyboard path: Tab from the previous-note arrow into the CTA-less body, no extra stop inside the card
   {
     await p.locator('.deck-arrow:not([disabled])').first().focus();
