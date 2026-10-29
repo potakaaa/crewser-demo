@@ -393,7 +393,7 @@
   background: none;
 }
 .icon-btn-soft {
-  background: var(--soft);
+  background: none;
 }
 .icon-btn-chip {
   background: var(--chip);
@@ -2389,7 +2389,7 @@
 :is(.hs-card, .coffice, .cact-main, .setbanner, .ns-hero, .ns-call, .day-action-sheet) {
   background: var(--card);
 }
-:is(.btn-ink, .btn-soft, .icon-btn-soft, .icon-btn-chip, .cquick, .cact, .step-btn) {
+:is(.btn-ink, .btn-soft, .icon-btn-chip, .cquick, .cact, .step-btn) {
   background: var(--card-2);
 }
 /* Icon tiles are not buttons: lighter than the card, no bezel. */
