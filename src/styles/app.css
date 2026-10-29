@@ -1694,6 +1694,9 @@
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   overscroll-behavior: contain;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
   padding: 72px 0;
   scrollbar-width: none;
   -webkit-mask: linear-gradient(transparent, #000 32%, #000 68%, transparent);
