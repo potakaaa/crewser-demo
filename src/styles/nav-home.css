@@ -125,6 +125,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.deck-body[role='button']:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+  border-radius: var(--r-card);
+}
 .deck-main {
   display: flex;
   align-items: center;

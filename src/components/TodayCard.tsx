@@ -127,7 +127,20 @@ function DeckCard({ card }: { card: CardModel }) {
   if (import.meta.env.DEV) console.assert(![status.pill, status.rel, sub, where].some((t) => String(t).includes('undefined')), 'deck card text has undefined', n.id);
 
   return (
-    <div className="deck-body" onClick={(e) => !(e.target as Element).closest('button') && a.openNote(n.id)}>
+    <div
+      className="deck-body"
+      onClick={(e) => !(e.target as Element).closest('button') && a.openNote(n.id)}
+      // Without a CTA the body is the card's only way in, so the keyboard gets it too.
+      {...(!primary && {
+        role: 'button',
+        tabIndex: 0,
+        onKeyDown: (e: KeyboardEvent<HTMLElement>) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          a.openNote(n.id);
+        },
+      })}
+    >
       {/* Always in the hero card, so a screen reader hears the change when hours are sent. */}
       {isHero && (
         <p className="sr-only" role="status">
@@ -224,7 +237,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
   useEffect(() => {
     if (!keyTurn.current) return;
     keyTurn.current = false;
-    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) .deck-cta')?.focus({ preventScroll: true });
+    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) :is(.deck-cta, .deck-body[role="button"])')?.focus({ preventScroll: true });
   }, [i]);
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     keyTurn.current = true;
