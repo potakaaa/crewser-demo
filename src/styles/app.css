@@ -857,26 +857,6 @@
   overflow-wrap: anywhere;
 }
 /* Stacked bars, grown in on mount */
-.brand-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding-top: var(--sp-2);
-  text-align: center;
-}
-.brand-footer .wordmark {
-  font-size: 17px;
-}
-.brand-footer-line {
-  font-size: var(--fs-xs);
-  color: var(--text-3);
-}
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: var(--sp-5);
-}
 /* ───────── Shared keyframes ───────── */
 @keyframes fade-in {
   from {

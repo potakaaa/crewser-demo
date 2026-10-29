@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { FONT_THEMES, type FontTheme, useActiveLink, useDemo, useUnreadCount } from '../store';
-import { Icon, type IconName } from '../components/Icon';
+import { Icon } from '../components/Icon';
 import { GradientHeader, ScreenTitle, SectionHead, Sheet } from '../components/Layout';
 import { Avatar } from '../components/contacts/Avatar';
 import { usePrefs } from '../components/settings/prefs';
@@ -9,12 +9,9 @@ import { useScrollRestore } from '../lib/scroll';
 const VERSION = '3.4.0';
 
 /** Row that opens something (a sheet, a page). */
-function NavRow({ icon, title, value, onClick }: { icon: IconName; title: string; value?: string; onClick: () => void }) {
+function NavRow({ title, value, onClick }: { title: string; value?: string; onClick: () => void }) {
   return (
     <button type="button" className="setrow" onClick={onClick}>
-      <span className="chip-icon">
-        <Icon name={icon} size={20} color="currentColor" />
-      </span>
       <span className="setrow-main">{title}</span>
       {value && <span className="setrow-value">{value}</span>}
       <Icon name="right" size={18} color="#9AAAAC" />
@@ -22,13 +19,10 @@ function NavRow({ icon, title, value, onClick }: { icon: IconName; title: string
   );
 }
 
-function SwitchRow({ icon, title, hint, on, onToggle }: { icon: IconName; title: string; hint: string; on: boolean; onToggle: () => void }) {
+function SwitchRow({ title, hint, on, onToggle }: { title: string; hint: string; on: boolean; onToggle: () => void }) {
   const id = useId();
   return (
     <button type="button" className="setrow" role="switch" aria-checked={on} aria-labelledby={`${id}-t`} aria-describedby={`${id}-h`} onClick={onToggle}>
-      <span className="chip-icon">
-        <Icon name={icon} size={20} color="currentColor" />
-      </span>
       <span className="setrow-main">
         <span id={`${id}-t`}>{title}</span>
         <span className="setrow-hint" id={`${id}-h`}>
@@ -227,36 +221,23 @@ export function SettingsScreen() {
           )}
         </section>
 
-        <Group title="Projects">
-          <div className="dlist">
-            <NavRow icon="users" title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
-          </div>
-        </Group>
-
-        <Group title="Help">
-          <div className="dlist">
-            <NavRow icon="sun" title="Show the guide again" onClick={startGuide} />
-          </div>
-        </Group>
-
-        <Group title="Font" sub="Headlines and numbers">
-          <FontSelect value={fontTheme} onChange={setFontTheme} />
-        </Group>
-
         <Group title="Notifications">
           <div className="dlist">
-            <NavRow icon="bell" title="Notifications" value={unread ? `${unread} unread` : undefined} onClick={() => openSheet('notifications')} />
-            <SwitchRow icon="bell" title="Call sheet is out" hint="When tomorrow's call sheet is out" on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
-            <SwitchRow icon="logTime" title="Reminder to submit hours" hint="When days are still open at week's end" on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
+            <NavRow title="Notifications" value={unread ? `${unread} unread` : undefined} onClick={() => openSheet('notifications')} />
+            <SwitchRow title="Call sheet is out" hint="When tomorrow's call sheet is out" on={callSheetOut} onToggle={() => toggle('callSheetOut')} />
+            <SwitchRow title="Reminder to submit hours" hint="When days are still open at week's end" on={hoursReminder} onToggle={() => toggle('hoursReminder')} />
           </div>
         </Group>
 
         <Group title="App">
           <div className="dlist">
-            <NavRow icon="globe" title="Language" value="English" onClick={() => toast('More languages are not part of this demo')} />
-            <NavRow icon="shield" title="Privacy" onClick={() => toast('The privacy policy is not part of this demo')} />
-            <NavRow icon="file" title="Imprint" onClick={() => toast('The imprint is not part of this demo')} />
+            <NavRow title="Projects & crew links" value={`${links.length} links`} onClick={() => openSheet('project')} />
+            <NavRow title="Show the guide again" onClick={startGuide} />
+            <NavRow title="Language" value="English" onClick={() => toast('More languages are not part of this demo')} />
+            <NavRow title="Privacy" onClick={() => toast('The privacy policy is not part of this demo')} />
+            <NavRow title="Imprint" onClick={() => toast('The imprint is not part of this demo')} />
           </div>
+          <FontSelect value={fontTheme} onChange={setFontTheme} />
           <p className="setfoot">
             <Icon name="shield" size={16} color="#9AAAAC" />
             <span>Data hosted in Germany</span>

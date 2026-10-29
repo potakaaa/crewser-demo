@@ -127,7 +127,7 @@ function DeckCard({ card }: { card: CardModel }) {
   if (import.meta.env.DEV) console.assert(![status.pill, status.rel, sub, where].some((t) => String(t).includes('undefined')), 'deck card text has undefined', n.id);
 
   return (
-    <div className="deck-body">
+    <div className="deck-body" onClick={(e) => !(e.target as Element).closest('button') && a.openNote(n.id)}>
       {/* Always in the hero card, so a screen reader hears the change when hours are sent. */}
       {isHero && (
         <p className="sr-only" role="status">
@@ -139,9 +139,6 @@ function DeckCard({ card }: { card: CardModel }) {
           {status.pill}
         </span>
         <span className="deck-rel">{status.rel}</span>
-        <button type="button" className="deck-open" onClick={() => a.openNote(n.id)} aria-label={`${n.title}. Open details`}>
-          <Icon name="arrowUpRight" size={18} color="currentColor" strokeWidth={1.8} />
-        </button>
       </div>
       <div className="deck-main">
         <span className={`deck-time num${n.kind === 'time' ? '' : ' deck-time-sm'}`}>{time}</span>
@@ -227,7 +224,7 @@ export function TodayCard({ hero, scrub, preview, onGoTo }: { hero: Note | undef
   useEffect(() => {
     if (!keyTurn.current) return;
     keyTurn.current = false;
-    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) .deck-open')?.focus({ preventScroll: true });
+    deckRef.current?.querySelector<HTMLElement>('.deck-card:not([inert]) .deck-cta')?.focus({ preventScroll: true });
   }, [i]);
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     keyTurn.current = true;

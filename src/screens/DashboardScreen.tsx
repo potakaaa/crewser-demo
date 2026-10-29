@@ -10,7 +10,6 @@ import { WhoSwitch } from '../components/WhoSwitch';
 import { HoursStrip } from '../components/HoursStrip';
 import { InfoPocket } from '../components/InfoPocket';
 import { QuickActions } from '../components/QuickActions';
-import { Wordmark } from '../components/Brand';
 import { smartNotes, visibleNotes } from '../lib/notes';
 import { buildScrub, type Preview } from '../lib/timeline';
 import { useScrollRestore } from '../lib/scroll';
@@ -22,12 +21,16 @@ export function DashboardScreen() {
   const allOpen = useDemo((s) => s.homeAllOpen);
   const toggleAll = useDemo((s) => s.toggleHomeAll);
   const masterDataDone = useDemo((s) => s.masterDataDone);
-  const toast = useDemo((s) => s.showToast);
   const link = useActiveLink();
   const shown = useMemo(() => visibleNotes(empty ? [] : notes, { masterDataDone, isMe: link.isMe }), [empty, masterDataDone, link.isMe]);
   const sn = smartNotes(shown);
   const hasNotes = sn.top.length + sn.restCount > 0;
   const scrub = useMemo(() => buildScrub(shown), [shown]);
+  // The list below the deck only holds what the deck does not already show.
+  const more = useMemo(() => {
+    const inDeck = new Set([sn.hero?.id, ...scrub.stops.map((s) => s.note.id)]);
+    return smartNotes(shown.filter((n) => !inDeck.has(n.id)));
+  }, [shown, scrub, sn.hero?.id]);
   // The note under the ruler's playhead; it only changes when the note does, never per pixel.
   const [preview, setPreview] = useState<Preview | null>(null);
   const ruler = useRef<TimelineHandle>(null);
@@ -67,17 +70,22 @@ export function DashboardScreen() {
 
         <InfoPocket notes={sn.undated} />
 
-        {hasNotes ? (
+        {!hasNotes ? (
+          <div className="empty-light">
+            <strong>No smart notes yet</strong>
+            <span>Flights, hotels and call times from production land here, most important first.</span>
+          </div>
+        ) : more.top.length + more.restCount > 0 && (
           <section className="stack" aria-label="Smart notes">
             <SectionHead title="Smart notes" bar />
-            {sn.top.map((n) => (
+            {more.top.map((n) => (
               <ContentCard key={n.id} note={n} />
             ))}
-            {sn.restCount > 0 && (
+            {more.restCount > 0 && (
               <>
                 <Collapse open={allOpen} id="more-notes">
                   <div className="stack">
-                    {sn.rest.map((g) => (
+                    {more.rest.map((g) => (
                       <div className="day-group" key={g.label}>
                         <span className="day-group-h">
                           <strong>{g.label}</strong> · {g.sub}
@@ -90,7 +98,7 @@ export function DashboardScreen() {
                   </div>
                 </Collapse>
                 <button type="button" className="btn btn-outline btn-md" aria-expanded={allOpen} aria-controls="more-notes" onClick={toggleAll}>
-                  {allOpen ? 'Show fewer notes' : `Show ${sn.restCount} more notes`}
+                  {allOpen ? 'Show fewer notes' : `Show ${more.restCount} more notes`}
                   <span className="chev" data-open={allOpen}>
                     <Icon name="down" size={16} color="currentColor" strokeWidth={1.8} />
                   </span>
@@ -98,25 +106,7 @@ export function DashboardScreen() {
               </>
             )}
           </section>
-        ) : (
-          <div className="empty-light">
-            <strong>No smart notes yet</strong>
-            <span>Flights, hotels and call times from production land here, most important first.</span>
-          </div>
         )}
-
-        <footer className="brand-footer">
-          <Wordmark />
-          <span className="brand-footer-line">Time tracking for film crews · Data hosted in Germany</span>
-          <div className="footer-links">
-            <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Privacy policy is not part of this demo')}>
-              Privacy
-            </button>
-            <button type="button" className="link-btn link-btn-plain" onClick={() => toast('Imprint is not part of this demo')}>
-              Imprint
-            </button>
-          </div>
-        </footer>
       </Sheet>
     </div>
   );
