@@ -40,6 +40,8 @@ export function Guide() {
   const end = useDemo((s) => s.endGuide);
   const closeSheet = useDemo((s) => s.closeSheet);
   const setLogOpen = useDemo((s) => s.setLogOpen);
+  const timer = useDemo((s) => s.timer);
+  const stopTimer = useDemo((s) => s.stopTimer);
   // If the tour ends on another person or project than it started on, finishing puts you back where you started.
   const movedAway = useDemo((s) => !!s.guideFrom && s.guideFrom !== s.activeLinkId);
   const root = useRef<HTMLDivElement>(null);
@@ -62,7 +64,7 @@ export function Guide() {
     closeSheet();
     setLogOpen(false);
     if (route.name !== s.route) navigate({ name: s.route });
-    // A target further down the page is scrolled to the middle of the screen first.
+    // A target further down the page (the timer) is scrolled to the middle of the screen first.
     const t = window.setTimeout(() => {
       const el = root.current?.parentElement?.querySelector<HTMLElement>(`[data-guide="${s.target}"]`);
       const scroller = el?.closest<HTMLElement>('.screen');
@@ -135,6 +137,18 @@ export function Guide() {
             {movedAway ? 'Done takes you back to your own link. ' : ''}Replay this tour any time from Settings.
           </p>
           <div className="guide-actions">
+            {timer && (
+              <button
+                type="button"
+                className="guide-skip"
+                onClick={() => {
+                  end();
+                  stopTimer();
+                }}
+              >
+                Stop the timer
+              </button>
+            )}
             <button type="button" className="guide-next" data-primary onClick={end}>
               Done
             </button>

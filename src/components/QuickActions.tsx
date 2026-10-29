@@ -7,7 +7,7 @@ export function QuickActions() {
   return (
     <div className="quick" role="group" aria-label="Add">
       {actions.map((a) => (
-        <button type="button" key={a.id} className="quick-tile" onClick={a.run}>
+        <button type="button" key={a.id} className="quick-tile" data-guide={a.id === 'time' ? 'track-time' : undefined} onClick={a.run}>
           <span className="quick-icon">
             <Icon name={a.icon} size={20} color="currentColor" strokeWidth={1.8} />
           </span>

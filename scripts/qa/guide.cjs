@@ -40,6 +40,9 @@ const STEPS = [
   { name: 'ruler drag', go: async (p) => { const [x, y] = await center(p, '[data-guide="ruler"]'); await swipe(p, [x + 60, y], [x - 80, y], 14); } },
   { name: 'switch arrow tap', go: (p) => tapOn(p, '[data-guide="switch"]'),
     post: async (p) => { await sleep(300); ok((await p.locator('.switcher').count()) === 1, 'arrow opened the project switcher'); } },
+  { name: 'track time tour step',
+    pre: async (p) => { await sleep(600); const r = await p.locator('[data-guide="track-time"]').boundingBox(); ok(r && r.y > 0 && r.y + r.height < H - 56, `Track time scrolled into view above the dock (y ${r && Math.round(r.y)})`); },
+    go: (p) => p.locator('.guide-next').click() },
   { name: 'tap Profile', go: (p) => tapOn(p, '[data-guide="profile"]') },
 ];
 const N = STEPS.length;
@@ -163,14 +166,12 @@ async function regress(b) {
   const r1 = await rulerState(); ok(!/true/.test(r1.split('|')[1]), 'ruler back to Now after switch: ' + r1.slice(0, 80));
   if (shots) await p.screenshot({ path: `${shots}/regress-switched-${W}.png` });
 
-  // timer and the two quick actions stay reachable from Home
+  // the two quick actions stay reachable from Home
   const quick = await p.locator('.quick').innerText();
   ok(/Track time/.test(quick) && /Scan invoice/.test(quick), 'Home keeps Track time and Scan invoice');
-  await p.locator('[data-guide="timer"]').scrollIntoViewIfNeeded();
-  await p.locator('[data-guide="timer"]').click(); await sleep(500);
-  ok((await p.locator('.hs-timer-on').count()) === 1, 'Start timer starts the timer');
-  await p.locator('.hs-timer-stop').click(); await sleep(700);
-  ok(/Start|End|Break|hours/i.test(await txt()) && (await p.locator('.hs-timer-on').count()) === 0, 'Stop ends the timer and opens the log');
+  ok((await p.locator('.hs-timer').count()) === 0, 'no Start timer button in Statistics');
+  await p.locator('[data-guide="track-time"]').click(); await sleep(700);
+  ok(/Start|End|Break|hours/i.test(await txt()), 'Track time opens the log');
   await p.reload(); await sleep(3000);
 
   // dock: five tabs, full width, docked, no + and no pass menu

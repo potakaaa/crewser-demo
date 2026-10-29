@@ -6,14 +6,14 @@ import { hoursOverview, todayPlan } from './lib/stats';
 import { resetPrefs, usePrefs } from './components/settings/prefs';
 import { clearScrollPositions, scrollAllToTop } from './lib/scroll';
 import { setGuideDone } from './lib/guide';
-import { addDays, addMonths, firstOfMonth } from './lib/dates';
+import { addDays, addMonths, firstOfMonth, toMinutes } from './lib/dates';
 
 export type TabName = 'dashboard' | 'calendar' | 'documents' | 'contacts' | 'settings';
 
 export type Route = { name: TabName } | { name: 'pdf'; file: string };
 
 /** Things that open in a bottom sheet over the current tab. `id` picks the note, contact, project... */
-export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice';
+export type SheetKind = 'note' | 'hours' | 'info' | 'project' | 'contact' | 'notifications' | 'invoice' | 'timer';
 export interface SheetState {
   kind: SheetKind;
   id?: string;
@@ -120,6 +120,43 @@ export const FONT_THEMES = [
 ];
 
 const FONT_KEY = 'crewser-font-theme';
+const TIMER_KEY = 'crewser-work-timer';
+
+/** The work timer: when it first started, when the current run began (null while paused), and time banked before. */
+export interface WorkTimer {
+  startedAt: number;
+  runningSince: number | null;
+  bankedMs: number;
+}
+
+export const timerElapsed = (t: WorkTimer, now = Date.now()) => t.bankedMs + (t.runningSince ? now - t.runningSince : 0);
+
+function loadTimer(): WorkTimer | null {
+  try {
+    const t = JSON.parse(localStorage.getItem(TIMER_KEY) ?? 'null') as WorkTimer | null;
+    return t && typeof t.startedAt === 'number' && typeof t.bankedMs === 'number' ? t : null;
+  } catch {
+    return null; // Blocked or garbled storage: no timer.
+  }
+}
+
+function saveTimer(t: WorkTimer | null) {
+  try {
+    if (t) localStorage.setItem(TIMER_KEY, JSON.stringify(t));
+    else localStorage.removeItem(TIMER_KEY);
+  } catch {
+    // Not persisted; the timer still runs for this visit.
+  }
+}
+
+/** "HH:MM" for minutes since midnight, rounded down to the Log sheet's 5-minute steps (clamped to the day). */
+const hhmm5 = (min: number) => {
+  const r = Math.max(0, Math.min(23 * 60 + 55, Math.floor(min / 5) * 5));
+  return `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`;
+};
+
+/** When a timer of `elapsedMs` started on the demo clock: the demo's "now" is frozen, the elapsed time is real. */
+export const timerStartMin = (elapsedMs: number) => toMinutes(today.time) - Math.round(elapsedMs / 60000);
 
 function loadFontTheme(): FontTheme {
   try {
@@ -177,6 +214,8 @@ interface DemoState {
   toast: Toast | null;
   /** Ids of the notifications already read, per crew link. Read it with useNotifications(). */
   notifRead: Record<string, string[]>;
+  /** The running or paused work timer; persisted, so it survives a reload. */
+  timer: WorkTimer | null;
   /** The first-visit guide: the step shown (an index into GUIDE_STEPS), 'end' for the closing card, or null when idle. */
   guide: number | 'end' | null;
   /** The link the guide started on, so its switch steps can hand you back. */
@@ -196,6 +235,11 @@ interface Actions {
   /** Switch to another crew link. Returns false when refused (unknown, expired or revoked link, with a toast for the last two); true when the link is now active. */
   setActiveLink: (id: string) => boolean;
   completeMasterData: () => void;
+  startTimer: () => void;
+  /** Pauses a running timer, resumes a paused one. */
+  toggleTimerPause: () => void;
+  /** Stops the timer and opens the Log sheet with its start and end filled in. */
+  stopTimer: () => void;
   /** Starts the tour from the first step (also the replay from Settings and Demo controls). */
   startGuide: () => void;
   setGuideStep: (step: number | 'end') => void;
@@ -270,6 +314,7 @@ const initialState = (): DemoState => ({
   statusDark: false,
   toast: null,
   notifRead: initialRead(),
+  timer: loadTimer(),
   guide: null,
   guideFrom: null,
 });
@@ -427,6 +472,20 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     return true;
   },
   completeMasterData: () => set({ masterDataDone: true }),
+  startTimer: () => {
+    const now = Date.now();
+    const timer = { startedAt: now, runningSince: now, bankedMs: 0 };
+    saveTimer(timer);
+    set({ timer });
+  },
+  toggleTimerPause: () => {
+    const t = get().timer;
+    if (!t) return;
+    const now = Date.now();
+    const timer = t.runningSince ? { ...t, runningSince: null, bankedMs: timerElapsed(t, now) } : { ...t, runningSince: now };
+    saveTimer(timer);
+    set({ timer });
+  },
   startGuide: () => {
     setGuideDone(false);
     get().closeSheet();
@@ -438,6 +497,20 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     const from = get().guideFrom;
     set({ guide: null, guideFrom: null });
     if (from && from !== get().activeLinkId) get().setActiveLink(from);
+  },
+  stopTimer: () => {
+    const t = get().timer;
+    if (!t) return;
+    saveTimer(null);
+    set({ timer: null });
+    const s = get();
+    // On the demo clock the timer ends now and started its elapsed time earlier, so the entry never lies in the future.
+    const worked = Math.max(5 * 60000, timerElapsed(t));
+    s.setLogTime('logEnd', hhmm5(toMinutes(today.time)));
+    s.setLogTime('logStart', hhmm5(timerStartMin(worked)));
+    // A timed stretch shorter than the default break was work only: drop the break rather than reject the entry.
+    if (worked <= s.breakMin * 60000) s.setBreak(0);
+    s.setLogOpen(true);
   },
   setFontTheme: (t) => {
     try {
@@ -504,6 +577,7 @@ export const useDemo = create<DemoState & Actions>()((set, get) => ({
     clearScrollPositions();
     history.replaceState(null, '', routeToHash({ name: 'dashboard' }));
     resetPrefs();
+    saveTimer(null);
     try {
       localStorage.removeItem(FONT_KEY);
     } catch {
